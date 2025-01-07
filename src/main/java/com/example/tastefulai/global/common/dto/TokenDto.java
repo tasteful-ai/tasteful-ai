@@ -3,7 +3,6 @@ package com.example.tastefulai.global.common.dto;
 import lombok.Getter;
 
 @Getter
-
 public class TokenDto implements BaseDtoType {
 
     private final String accessToken;

@@ -8,9 +8,13 @@ import com.example.tastefulai.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -31,7 +35,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String nickname;
 
-    @Column
+    @Column(nullable = false)
     private Integer age;
 
     @Enumerated(EnumType.STRING)
@@ -42,6 +46,8 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private MemberRole memberRole;
 
+    private LocalDateTime deletedAt;
+
     // 연관 관계
     @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Image image;
@@ -49,42 +55,22 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Taste> tastes = new ArrayList<>();
 
-    // 사업자 전용 필드
-    @Column(unique = true)
-    private String businessNumber;
-
-    @Column
-    private String storeName;
-
-    @Column
-    private String storeAddress;
+    public List<GrantedAuthority> getAuthorities() {
+        return List.of(memberRole)
+                .stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                .collect(Collectors.toList());
+    }
 
     // 생성자
-    public Member(String email, String password, String nickname,
-                  Integer age, GenderRole genderRole, MemberRole memberRole) {
+    public Member(String email, String password, String nickname, Integer age,
+                  GenderRole genderRole, MemberRole memberRole, LocalDateTime deletedAt) {
             this.email = email;
             this.password = password;
             this.nickname = nickname;
             this.age = age;
             this.genderRole = genderRole;
             this.memberRole = memberRole;
+            this.deletedAt = deletedAt;
     }
-
-    // 사업자 회원 생성자
-    public Member(String email, String password, String nickname,
-                  Integer age, GenderRole genderRole, MemberRole memberRole,
-                  String businessNumber, String storeName, String storeAddress
-                  ) {
-        this.email = email;
-        this.password = password;
-        this.nickname = nickname;
-        this.age = age;
-        this.genderRole = genderRole;
-//        this.memberRole = MemberRole.OWNER;
-        this.businessNumber = businessNumber;
-        this.storeName = storeName;
-        this.storeAddress = storeAddress;
-
-    }
-
 }
