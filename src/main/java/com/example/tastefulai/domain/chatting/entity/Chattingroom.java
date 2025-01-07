@@ -24,4 +24,8 @@ public class Chattingroom {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    public Chattingroom(Long id) {
+        this.id = id;
+    }
+
 }
