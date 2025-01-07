@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,5 +33,15 @@ public class ChattingMessageService {
         ChattingMessage savedMessage = chattingMessageRepository.save(chattingMessage);
 
         return new ChattingMessageResponseDto(savedMessage.getSenderNickname(), savedMessage.getMessage());
+    }
+
+    public List<ChattingMessageResponseDto> getMessages() {
+        Chattingroom chattingroom = chattingroomRepository.getSingleChattingroom();
+
+        List<ChattingMessage> messages = chattingMessageRepository.findTop50ByChattingroomOrderByCreatedAtDesc(chattingroom);
+
+        return messages.stream()
+                .map(message -> new ChattingMessageResponseDto(message.getSenderNickname(), message.getMessage()))
+                .collect(Collectors.toList());
     }
 }
