@@ -1,9 +1,13 @@
 package com.example.tastefulai.domain.chatting.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.example.tastefulai.domain.chatting.dto.ChattingMessageRequestDto;
+import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 
-@Service
-@RequiredArgsConstructor
-public class ChattingMessageService {
+import java.util.List;
+
+public interface ChattingMessageService {
+
+    ChattingMessageResponseDto saveMessage(Long memberId, ChattingMessageRequestDto chattingMessageRequestDto);
+
+    List<ChattingMessageResponseDto> getMessages();
 }
