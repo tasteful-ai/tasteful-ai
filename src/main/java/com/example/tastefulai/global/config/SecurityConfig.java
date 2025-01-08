@@ -1,6 +1,7 @@
 package com.example.tastefulai.global.config;
 
 import com.example.tastefulai.global.config.filter.JwtAuthFilter;
+import com.example.tastefulai.global.constant.EndpointConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +42,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors().and()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll() // 회원가입과 로그인 요청은 인증 없이 접근 허용
+                .requestMatchers(EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청은 인증 없이 접근 허용
                 .anyRequest().authenticated() // 그 외 요청 인증 필요
                 .and()
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

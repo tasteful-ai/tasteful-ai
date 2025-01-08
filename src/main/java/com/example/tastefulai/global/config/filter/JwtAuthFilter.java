@@ -35,17 +35,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = resolveToken(httpServletRequest);
 
         // 토큰 및 유효 여부 확인
-        if (token != null && jwtProvider.validateToken(token)) {
-            String email = jwtProvider.getEmailFromToken(token);
+        if (token != null) {
+            if (jwtProvider.validateToken(token)) {
+                String email = jwtProvider.getEmailFromToken(token);
 
-            Member member = memberRepository.findByEmail(email)
-                    .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+                Member member = memberRepository.findByEmail(email)
+                        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-            // 인증 객체 생성 및 보안 컨텍스트 설정
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                throw new CustomException(ErrorCode.INVALID_TOKEN);
+            }
         }
+
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 
