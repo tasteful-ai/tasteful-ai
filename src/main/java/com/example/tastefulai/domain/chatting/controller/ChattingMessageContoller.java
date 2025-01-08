@@ -3,7 +3,6 @@ package com.example.tastefulai.domain.chatting.controller;
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageRequestDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 import com.example.tastefulai.domain.chatting.service.ChattingMessageService;
-import com.example.tastefulai.global.common.dto.CommonListResponseDto;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,9 +34,9 @@ public class ChattingMessageContoller {
     }
 
     @GetMapping
-    public ResponseEntity<CommonListResponseDto<ChattingMessageResponseDto>> getMessages() {
+    public ResponseEntity<CommonResponseDto<List<ChattingMessageResponseDto>>> getMessages() {
         List<ChattingMessageResponseDto> messages = chattingMessageService.getMessages();
 
-        return new ResponseEntity<>(new CommonListResponseDto<>("메시지 조회 성공", messages), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("메시지 조회 성공", messages), HttpStatus.OK);
     }
 }
