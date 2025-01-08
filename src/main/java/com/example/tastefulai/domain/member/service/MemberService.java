@@ -1,10 +1,8 @@
 package com.example.tastefulai.domain.member.service;
 
-import com.example.tastefulai.domain.member.dto.MemberRequestDto;
-import com.example.tastefulai.domain.member.dto.MemberResponseDto;
+import com.example.tastefulai.domain.member.entity.Member;
 
 public interface MemberService {
 
-    MemberResponseDto signup(MemberRequestDto memberRequestDto);
-
+    Member findById(Long memberId);
 }
