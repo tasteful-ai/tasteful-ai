@@ -17,6 +17,7 @@ public enum ErrorCode {
     INVALID_VALUE(HttpStatus.BAD_REQUEST,"올바르지 않은 형식입니다."),
     NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"이미 사용중인 닉네임 입니다."),
     PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "새 비밀번호는 기존 비밀번호와 다르게 설정해야 합니다."),
+    VERIFY_PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "비밀번호 검증이 필요합니다."),
 
 
     // 401 UNAUTHORIZED
