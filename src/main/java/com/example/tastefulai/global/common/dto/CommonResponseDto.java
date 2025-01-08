@@ -3,7 +3,7 @@ package com.example.tastefulai.global.common.dto;
 import lombok.Getter;
 
 @Getter
-public class CommonResponseDto<T extends BaseDtoType> {
+public class CommonResponseDto<T> {
 
     private final String message;
 

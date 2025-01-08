@@ -1,12 +1,11 @@
 package com.example.tastefulai.domain.chatting.dto;
 
-import com.example.tastefulai.global.common.dto.BaseDtoType;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-public class ChattingroomResponseDto implements BaseDtoType {
+public class ChattingroomResponseDto {
 
     private final Long id;
     private final LocalDateTime createdAt;
