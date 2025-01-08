@@ -73,4 +73,9 @@ public class Member extends BaseEntity {
         this.memberRole = memberRole;
         this.deletedAt = deletedAt;
     }
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
 }
