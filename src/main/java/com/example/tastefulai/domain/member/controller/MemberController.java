@@ -49,4 +49,12 @@ public class MemberController {
         memberService.changePassword(memberId, passwordChangeRequestDto);
         return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 변경 완료",null), HttpStatus.OK);
     }
+
+    // 5. 회원탈퇴
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<CommonResponseDto<Void>> delete(@PathVariable Long memberId,
+                                                          @Valid @RequestBody PasswordVerifyRequestDto passwordVerifyRequestDto) {
+        memberService.deleteMember(memberId, passwordVerifyRequestDto.getPassword());
+        return new ResponseEntity<>(new CommonResponseDto<>("회원 탈퇴 완료",null), HttpStatus.OK);
+    }
 }

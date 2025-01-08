@@ -14,4 +14,5 @@ public interface MemberService {
     JwtAuthResponse login(LoginRequestDto loginRequestDto);
     void logout(String token);
     void changePassword(Long memberId, PasswordChangeRequestDto passwordChangeRequestDto);
+    void deleteMember(Long memberId, String password);
 }

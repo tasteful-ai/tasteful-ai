@@ -97,7 +97,7 @@ public class MemberServiceImpl implements MemberService {
      */
     public JwtAuthResponse login(LoginRequestDto loginRequestDto) {
         // 사용자 확인
-        Member member = this.memberRepository.findByEmail(loginRequestDto.getEmail())
+        Member member = this.memberRepository.findActiveByEmail(loginRequestDto.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 비밀번호 확인
@@ -157,5 +157,23 @@ public class MemberServiceImpl implements MemberService {
 
         member.setPassword(passwordEncoder.encode(passwordChangeRequestDto.getNewPassword()));
         memberRepository.save(member);
+    }
+
+    /**
+     * 5. 회원 탈퇴
+     * - 현재 비밀번호 입력 후 탈퇴 진행
+     */
+    public void deleteMember(Long memberId,String password) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if(!passwordEncoder.matches(password, member.getPassword())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD);
+        }
+
+        member.softDelete();
+        memberRepository.save(member);
+
+        redisTemplate.delete(member.getEmail());
     }
 }
