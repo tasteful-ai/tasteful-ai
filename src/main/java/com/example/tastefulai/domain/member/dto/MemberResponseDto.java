@@ -1,11 +1,10 @@
 package com.example.tastefulai.domain.member.dto;
 
 import com.example.tastefulai.domain.member.enums.MemberRole;
-import com.example.tastefulai.global.common.dto.BaseDtoType;
 import lombok.Getter;
 
 @Getter
-public class MemberResponseDto implements BaseDtoType {
+public class MemberResponseDto{
 
     private final Long id;
     private final MemberRole memberRole;
