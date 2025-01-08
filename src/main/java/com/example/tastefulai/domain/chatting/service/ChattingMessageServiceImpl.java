@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ChattingMessageImpl implements ChattingMessageService {
+public class ChattingMessageServiceImpl implements ChattingMessageService {
 
     private final ChattingMessageRepository chattingMessageRepository;
     private final ChattingroomRepository chattingroomRepository;
