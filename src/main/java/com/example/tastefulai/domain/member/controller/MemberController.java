@@ -31,4 +31,12 @@ public class MemberController {
         JwtAuthResponse jwtAuthResponse = memberService.login(loginRequestDto);
         return new ResponseEntity<>(new CommonResponseDto<>("로그인 성공",jwtAuthResponse), HttpStatus.OK);
     }
+
+    // 3. 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<CommonResponseDto<String>> logout(@RequestHeader("Authorization") String token) {
+        String jwtToken = token.replace("Bearer ", "");
+        memberService.logout(jwtToken);
+        return new ResponseEntity<>(new CommonResponseDto<>("로그아웃 완료", null), HttpStatus.OK);
+    }
 }

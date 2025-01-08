@@ -6,19 +6,23 @@ import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
 import com.example.tastefulai.global.common.dto.JwtAuthResponse;
-//import com.example.tastefulai.global.common.dto.TokenService;
-//import com.example.tastefulai.global.config.RedisConfig;
+import com.example.tastefulai.global.common.dto.TokenService;
+import com.example.tastefulai.global.config.RedisConfig;
 import com.example.tastefulai.global.config.auth.SignUpValidation;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
 import com.example.tastefulai.global.error.exception.NotFoundException;
 import com.example.tastefulai.global.util.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +32,12 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder;
     private final SignUpValidation signUpValidation;
     private final JwtProvider jwtProvider;
-//    private final RedisConfig redisConfig;
+    private final RedisConfig redisConfig;
     private final AuthenticationManager authenticationManager;
-//    private final TokenService tokenService;
+    private final TokenService tokenService;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+
 
     @Override
     public Member findById(Long memberId) {
@@ -111,5 +118,23 @@ public class MemberServiceImpl implements MemberService {
 //        tokenService.storeRefreshToken(loginRequestDto.getEmail(), refreshToken);
 
         return new JwtAuthResponse("Bearer", accessToken, refreshToken);
+    }
+
+    /**
+     * 3. 로그아웃
+     * - Redis에 토큰을 블랙리스트로 등록
+     */
+    @Value("${jwt.access-token-expiration}")
+    private long accessTokenExpiryMillis;
+
+    @Override
+    public void logout(String token) {
+        // Redis에 토큰 블랙리스트 등록
+        redisTemplate.opsForValue().set(
+                token,                     // Key: 토큰
+                "logout",                  // Value: 상태값
+                accessTokenExpiryMillis,   // TTL: 설정된 만료 시간
+                TimeUnit.MILLISECONDS      // 시간 단위
+        );
     }
 }

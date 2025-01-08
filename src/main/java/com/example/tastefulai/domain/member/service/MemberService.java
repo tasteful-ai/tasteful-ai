@@ -11,4 +11,5 @@ public interface MemberService {
     Member findById(Long memberId);
     MemberResponseDto signup(MemberRequestDto memberRequestDto);
     JwtAuthResponse login(LoginRequestDto loginRequestDto);
+    void logout(String token);
 }
