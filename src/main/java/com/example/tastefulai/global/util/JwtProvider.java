@@ -49,7 +49,7 @@ public class JwtProvider {
     // JWT 유효성 검증
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
+            Jwts.parser()
                     .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
                     .build()
                     .parseClaimsJws(token);
@@ -62,7 +62,7 @@ public class JwtProvider {
 
     // JWT 토큰을 통한 사용자 이메일 추출
     public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
                 .build()
                 .parseClaimsJws(token)
