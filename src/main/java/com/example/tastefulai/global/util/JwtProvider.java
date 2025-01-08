@@ -81,11 +81,4 @@ public class JwtProvider {
     public String generateRefreshToken(String email) {
         return generateToken(email, refreshTokenExpiryMillis);
     }
-
-    private final RedisTemplate<String, String> redisTemplate;
-
-    // 블랙리스트 검증
-    public boolean isTokenBlacklisted(String token) {
-        return redisTemplate.hasKey(token);
-    }
 }
