@@ -4,6 +4,8 @@ import com.example.tastefulai.domain.member.dto.*;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import com.example.tastefulai.global.common.dto.JwtAuthResponse;
+import com.example.tastefulai.global.error.errorcode.ErrorCode;
+import com.example.tastefulai.global.error.exception.CustomException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,5 +40,13 @@ public class MemberController {
         String jwtToken = token.replace("Bearer ", "");
         memberService.logout(jwtToken);
         return new ResponseEntity<>(new CommonResponseDto<>("로그아웃 완료", null), HttpStatus.OK);
+    }
+
+    // 4. 비밀번호 변경
+    @PatchMapping("/{memberId}/passwords")
+    public ResponseEntity<CommonResponseDto<Void>> changePassword(@PathVariable Long memberId,
+                                                 @Valid @RequestBody PasswordChangeRequestDto passwordChangeRequestDto) {
+        memberService.changePassword(memberId, passwordChangeRequestDto);
+        return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 변경 완료",null), HttpStatus.OK);
     }
 }

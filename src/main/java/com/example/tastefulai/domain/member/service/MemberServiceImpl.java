@@ -3,6 +3,7 @@ package com.example.tastefulai.domain.member.service;
 import com.example.tastefulai.domain.member.dto.LoginRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
+import com.example.tastefulai.domain.member.dto.PasswordChangeRequestDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
 import com.example.tastefulai.global.common.dto.JwtAuthResponse;
@@ -115,8 +116,6 @@ public class MemberServiceImpl implements MemberService {
         String accessToken = jwtProvider.generateAccessToken(authentication);
         String refreshToken = jwtProvider.generateRefreshToken(loginRequestDto.getEmail());
 
-//        tokenService.storeRefreshToken(loginRequestDto.getEmail(), refreshToken);
-
         return new JwtAuthResponse("Bearer", accessToken, refreshToken);
     }
 
@@ -136,5 +135,27 @@ public class MemberServiceImpl implements MemberService {
                 accessTokenExpiryMillis,   // TTL: 설정된 만료 시간
                 TimeUnit.MILLISECONDS      // 시간 단위
         );
+    }
+
+    /**
+     * 4. 비밀번호 변경
+     * - 회원 정보 확인
+     * - 비밀번호 확인
+     * - newPassword 설정
+     */
+    public void changePassword(Long memberId, PasswordChangeRequestDto passwordChangeRequestDto) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(passwordChangeRequestDto.getCurrentPassword(), member.getPassword())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD);
+        }
+
+        if (passwordEncoder.matches(passwordChangeRequestDto.getNewPassword(), member.getPassword())) {
+            throw new CustomException(ErrorCode.PASSWORD_SAME_AS_OLD);
+        }
+
+        member.setPassword(passwordEncoder.encode(passwordChangeRequestDto.getNewPassword()));
+        memberRepository.save(member);
     }
 }
