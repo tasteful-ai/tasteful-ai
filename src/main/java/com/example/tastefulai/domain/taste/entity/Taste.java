@@ -6,8 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @Entity
 @NoArgsConstructor
@@ -18,30 +16,20 @@ public class Taste extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ElementCollection
-    @CollectionTable(name = "taste_genres", joinColumns = @JoinColumn(name = "taste_id"))
-    @Column
-    private List<String> genre;     // 선호 음식 장르
+    @Column(name = "genre", nullable = true)
+    private String genre;     // 선호 음식 장르
 
-    @ElementCollection
-    @CollectionTable(name = "taste_like_food", joinColumns = @JoinColumn(name = "taste_id"))
-    @Column
-    private List<String> likeFood;    // 좋아하는 음식
+    @Column(name = "like_food", nullable = true)
+    private String likeFood;    // 좋아하는 음식
 
-    @ElementCollection
-    @CollectionTable(name = "taste_dislike_food", joinColumns = @JoinColumn(name = "taste_id"))
-    @Column
-    private List<String> dislikeFood;   //비선호 음식 장르
+    @Column(name = "dislike_food", nullable = true)
+    private String dislikeFood;   //비선호 음식 장르
 
-    @ElementCollection
-    @CollectionTable(name = "dietaryPreference", joinColumns = @JoinColumn(name = "taste_id"))
-    @Column
-    private List<String> dietaryPreference; //식단 성향
+    @Column(name = "dietary_preference", nullable = true)
+    private String dietaryPreference; //식단 성향
 
-    @ElementCollection
-    @CollectionTable(name = "spicy_level", joinColumns = @JoinColumn(name = "taste_id"))
-    @Column
-    private List<String> spicyLevel;    // 매운 정도
+    @Column(name = "spicy_level", nullable = true)
+    private Integer spicyLevel;    // 매운 정도
 
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,13 +37,43 @@ public class Taste extends BaseEntity {
     private Member member;
 
     // 생성자
-    public Taste(List<String> genre, List<String> likeFood,
-                 List<String> dietaryPreference, List<String> spicyLevel, Member member){
+    public Taste(String genre, String likeFood, String dislikeFood,
+                 String dietaryPreference, Integer spicyLevel, Member member){
         this.genre = genre;
         this.likeFood = likeFood;
+        this.dislikeFood = dislikeFood;
         this.dietaryPreference = dietaryPreference;
         this.spicyLevel = spicyLevel;
         this.member = member;
     }
 
+    public void updateGenre(String newGenre) {
+        if (newGenre != null) {
+            this.genre = newGenre;
+        }
+    }
+
+    public void updateLikeFood(String newLikeFood) {
+        if (newLikeFood != null) {
+            this.likeFood = newLikeFood;
+        }
+    }
+
+    public void updateDisLikeFood(String newDisLikeFood) {
+        if (newDisLikeFood != null) {
+            this.dislikeFood = newDisLikeFood;
+        }
+    }
+
+    public void updateDietaryPreference(String newDietaryPreference) {
+        if (newDietaryPreference != null) {
+            this.dietaryPreference = newDietaryPreference;
+        }
+    }
+
+    public void updateSpicyLevel(Integer newSpicyLevel) {
+        if (newSpicyLevel != null) {
+            this.spicyLevel = newSpicyLevel;
+        }
+    }
 }
