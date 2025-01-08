@@ -1,10 +1,9 @@
 package com.example.tastefulai.domain.chatting.dto;
 
-import com.example.tastefulai.global.common.dto.BaseDtoType;
 import lombok.Getter;
 
 @Getter
-public class ChattingMessageResponseDto implements BaseDtoType {
+public class ChattingMessageResponseDto {
 
     private final String senderNickname;
     private final String message;

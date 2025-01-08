@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 
-public class TokenDto implements BaseDtoType {
+public class TokenDto {
 
     private final String accessToken;
     private final String refreshToken;
