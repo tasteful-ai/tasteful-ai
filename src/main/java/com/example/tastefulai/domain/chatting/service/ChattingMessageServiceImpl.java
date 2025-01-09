@@ -9,6 +9,7 @@ import com.example.tastefulai.domain.chatting.repository.ChattingroomRepository;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class ChattingMessageServiceImpl implements ChattingMessageService {
     public ChattingMessageResponseDto saveMessage(Long memberId, ChattingMessageRequestDto chattingMessageRequestDto) {
         Chattingroom chattingroom = chattingroomRepository.getSingleChattingroom();
 
-        Member member = memberService.findById(memberId);
+        Member member = findMember(memberId);
 
         ChattingMessage chattingMessage = new ChattingMessage(chattingroom, member, chattingMessageRequestDto.getMessage());
         ChattingMessage savedMessage = chattingMessageRepository.save(chattingMessage);
@@ -45,5 +46,10 @@ public class ChattingMessageServiceImpl implements ChattingMessageService {
         return messages.stream()
                 .map(message -> new ChattingMessageResponseDto(message.getSenderNickname(), message.getMessage()))
                 .collect(Collectors.toList());
+    }
+
+    @Cacheable(value = "members", key = "#memberId")
+    public Member findMember(Long memberId) {
+        return memberService.findById(memberId);
     }
 }
