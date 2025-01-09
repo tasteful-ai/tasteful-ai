@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,20 +36,18 @@ public class SecurityConfig {
     }
 
     // 애플리케이션 보안 필터 체인
+    // 스프링시큐리티 버전에 맞게 코드 작성 -> 람다식
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         DefaultSecurityFilterChain build = httpSecurity
-                .httpBasic().disable()
-                .csrf().disable()
-                .cors().and()
-                .authorizeHttpRequests()
-                .requestMatchers(EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청은 인증 없이 접근 허용
-                .anyRequest().authenticated() // 그 외 요청 인증 필요
-                .and()
+//                .httpBasic().disable()
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(request -> request.requestMatchers(EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll().anyRequest().authenticated())
+                 // 회원가입과 로그인 요청은 인증 없이 접근 허용
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
         return build;
     }
 }
+
