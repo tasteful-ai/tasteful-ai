@@ -8,47 +8,50 @@ import com.example.tastefulai.global.error.exception.NotFoundException;
 import com.example.tastefulai.global.error.exception.UnAuthorizedException;
 import com.example.tastefulai.global.error.response.ErrorResponse;
 import io.jsonwebtoken.JwtException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // CustomException 및 하위 예외 처리
     @ExceptionHandler({CustomException.class, BadRequestException.class, ForbiddenException.class, NotFoundException.class, UnAuthorizedException.class})
     public ResponseEntity<ErrorResponse> handleBadRequestException(CustomException customException) {
-
         return ErrorResponse.toResponseEntity(customException.getErrorCode());
     }
-
+    // 유효성 검사 실패 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException customException) {
-
-        return ErrorResponse.toResponseEntity(ErrorCode.INVALID_VALUE);
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException customException) {
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : customException.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());}
+        return ResponseEntity.badRequest().body(errors);
     }
-
+    // AuthenticationException 처리 (토큰 관련 예외)
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthException(AuthenticationException customException) {
-
         return ErrorResponse.toResponseEntity(ErrorCode.INVALID_TOKEN);
     }
-
+    // AccessDeniedException 처리 (권한 부족 예외)
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException customException) {
-
         return ErrorResponse.toResponseEntity(ErrorCode.FORBIDDEN);
     }
-
+    // AuthorizationDeniedException 처리 (권한 부족 예외)
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(AuthorizationDeniedException customException) {
         return ErrorResponse.toResponseEntity(ErrorCode.FORBIDDEN);
     }
-
+    // JwtException 처리 (JWT 토큰 관련 예외)
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ErrorResponse> handleJwtException(JwtException customException) {
         return ErrorResponse.toResponseEntity(ErrorCode.EXPIRED_TOKEN);
