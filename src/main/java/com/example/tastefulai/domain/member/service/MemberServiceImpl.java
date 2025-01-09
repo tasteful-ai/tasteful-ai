@@ -1,5 +1,6 @@
 package com.example.tastefulai.domain.member.service;
 
+import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.GenderRole;
@@ -164,6 +165,16 @@ public class MemberServiceImpl implements MemberService {
 
         // 검증 상태 제거
         clearPasswordVerification(memberId);
+    }
+
+    @Override
+    public ProfileResponseDto changeNickname(Long memberId, String nickname) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        member.changeNickname(nickname);
+        Member changedMember = memberRepository.save(member);
+
+        return new ProfileResponseDto(changedMember.getNickname(), changedMember.getImage().getImageUrl(), changedMember.getCreatedAt().toLocalDate(), "");
     }
 
     // 검증 상태 확인
