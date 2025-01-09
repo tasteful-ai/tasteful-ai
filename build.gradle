@@ -39,7 +39,6 @@ dependencies {
     //spring-security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.security:spring-security-test'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.5'
 
     // lombok
     annotationProcessor 'org.projectlombok:lombok'
