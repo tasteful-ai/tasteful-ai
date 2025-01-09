@@ -2,6 +2,8 @@ package com.example.tastefulai.domain.taste.entity;
 
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.global.common.BaseEntity;
+import com.example.tastefulai.global.error.errorcode.ErrorCode;
+import com.example.tastefulai.global.error.exception.CustomException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,31 +51,34 @@ public class Taste extends BaseEntity {
 
     public void updateGenre(String newGenre) {
         if (newGenre != null) {
-            this.genre = newGenre;
+            this.genre = newGenre.isEmpty() ? null : newGenre; // 빈 문자열은 null로 처리
         }
     }
 
     public void updateLikeFood(String newLikeFood) {
         if (newLikeFood != null) {
-            this.likeFood = newLikeFood;
+            this.likeFood = newLikeFood.isEmpty() ? null : newLikeFood;
         }
     }
 
     public void updateDisLikeFood(String newDisLikeFood) {
         if (newDisLikeFood != null) {
-            this.dislikeFood = newDisLikeFood;
+            this.dislikeFood = newDisLikeFood.isEmpty() ? null : newDisLikeFood;
         }
     }
 
     public void updateDietaryPreference(String newDietaryPreference) {
         if (newDietaryPreference != null) {
-            this.dietaryPreference = newDietaryPreference;
+            this.dietaryPreference = newDietaryPreference.isEmpty() ? null : newDietaryPreference;
         }
     }
 
     public void updateSpicyLevel(Integer newSpicyLevel) {
-        if (newSpicyLevel != null) {
-            this.spicyLevel = newSpicyLevel;
+        // null을 허용하고, 1부터 5까지의 유효한 값만 받아들임
+        if (newSpicyLevel == null || (newSpicyLevel >= 1 && newSpicyLevel <= 5)) {
+            this.spicyLevel = newSpicyLevel;  // spicy level or null
+        } else {
+            throw new CustomException(ErrorCode.INVALID_SPICY_LEVEL);
         }
     }
 }
