@@ -1,15 +1,27 @@
 package com.example.tastefulai.global.config;
 
+import com.example.tastefulai.domain.chatting.redis.RedisSubscriber;
+import com.example.tastefulai.domain.chatting.websocket.enums.RedisChannel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.listener.PatternTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
+
+    //Redis 서버와 연결
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory("localhost", 6379);
+    }
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
@@ -28,5 +40,26 @@ public class RedisConfig {
 
     public ZSetOperations<String, String> zSetOperations(RedisTemplate<String, String> redisTemplate) {
         return redisTemplate.opsForZSet();
+    }
+
+    //Redis Pub/Sub 메시지 리스너 : 수신한 메시지를 처리
+    @Bean
+    public MessageListenerAdapter messageListener(RedisSubscriber redisSubscriber) {
+        return new MessageListenerAdapter(redisSubscriber, "handleMessage");
+    }
+
+    //Redis 채널 구독 및 메시지 수신 처리 : 메시지 리스너를 등록하여 Redis 채널 메시지를 수신
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(
+            RedisConnectionFactory redisConnectionFactory,
+            MessageListenerAdapter messageListener
+    ) {
+        RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
+
+        //특정 채널 "chatroom"을 구독
+        redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
+        redisMessageListenerContainer.addMessageListener(messageListener, new PatternTopic(RedisChannel.CHATROOM.getName()));
+
+        return redisMessageListenerContainer;
     }
 }
