@@ -27,6 +27,10 @@ public class ImageServiceImpl implements ImageService {
 
         Member member = memberRepository.findById(memberId).orElseThrow(()->new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
+        if (member.getImage() != null) {
+            imageRepository.delete(member.getImage());
+        }
+
         Image uploadedImage = s3Uploader.uploadImage(member, image);
 
         imageRepository.save(uploadedImage);
