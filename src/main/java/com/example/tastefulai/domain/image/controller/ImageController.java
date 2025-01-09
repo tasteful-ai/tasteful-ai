@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@RestController("/api/auth/members/{memberId}/profiles")
+@RestController("/api/members/{memberId}/profiles/images")
 @RequiredArgsConstructor
 public class ImageController {
 
