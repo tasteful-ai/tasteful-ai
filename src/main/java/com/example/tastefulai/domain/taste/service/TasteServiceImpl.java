@@ -2,11 +2,10 @@ package com.example.tastefulai.domain.taste.service;
 
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.service.MemberService;
-import com.example.tastefulai.domain.taste.dto.TasteRequestDto;
 import com.example.tastefulai.domain.taste.dto.TasteResponseDto;
 import com.example.tastefulai.domain.taste.entity.Taste;
 import com.example.tastefulai.domain.taste.repository.TasteRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,20 +18,76 @@ public class TasteServiceImpl implements TasteService {
 
     @Override
     @Transactional
-    public TasteResponseDto updateTaste(Long memberId, TasteRequestDto tasteRequestDto) {
+    public TasteResponseDto updateGenre(Long memberId, String genre) {
 
         Member member = memberService.findById(memberId);
         Taste taste = tasteRepository.findByMember(member);
 
-        taste.updateGenre(tasteRequestDto.getGenre());
-        taste.updateLikeFood(tasteRequestDto.getLikeFood());
-        taste.updateDisLikeFood(tasteRequestDto.getDislikeFood());
-        taste.updateDietaryPreference(tasteRequestDto.getDietaryPreference());
-        taste.updateSpicyLevel(tasteRequestDto.getSpicyLevel());
+        taste.updateGenre(genre);
 
         tasteRepository.save(taste);
+
         return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
-                                    taste.getDietaryPreference(), taste.getSpicyLevel());
+                taste.getDietaryPreference(), taste.getSpicyLevel());
+    }
+
+    @Override
+    @Transactional
+    public TasteResponseDto updateLikeFood(Long memberId, String likeFood) {
+
+        Member member = memberService.findById(memberId);
+        Taste taste = tasteRepository.findByMember(member);
+
+        taste.updateLikeFood(likeFood);
+
+        tasteRepository.save(taste);
+
+        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
+                taste.getDietaryPreference(), taste.getSpicyLevel());
+    }
+
+    @Override
+    @Transactional
+    public TasteResponseDto updateDislikeFood(Long memberId, String dislikeFood) {
+
+        Member member = memberService.findById(memberId);
+        Taste taste = tasteRepository.findByMember(member);
+
+        taste.updateDisLikeFood(dislikeFood);
+
+        tasteRepository.save(taste);
+
+        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
+                taste.getDietaryPreference(), taste.getSpicyLevel());
+    }
+
+    @Override
+    @Transactional
+    public TasteResponseDto updateDietaryPreference(Long memberId, String dietaryPreference) {
+
+        Member member = memberService.findById(memberId);
+        Taste taste = tasteRepository.findByMember(member);
+
+        taste.updateDietaryPreference(dietaryPreference);
+
+        tasteRepository.save(taste);
+
+        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
+                taste.getDietaryPreference(), taste.getSpicyLevel());
+    }
+
+    @Override
+    @Transactional
+    public TasteResponseDto updateSpicyLevel(Long memberId, Integer spicyLevel) {
+
+        Member member = memberService.findById(memberId);
+        Taste taste = tasteRepository.findByMember(member);
+
+        taste.updateSpicyLevel(spicyLevel);
+
+        tasteRepository.save(taste);
+
+        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
+                taste.getDietaryPreference(), taste.getSpicyLevel());
     }
 }
-
