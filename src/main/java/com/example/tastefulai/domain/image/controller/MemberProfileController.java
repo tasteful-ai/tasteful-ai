@@ -7,6 +7,7 @@ import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ public class MemberProfileController {
 
     private final MemberService memberService;
 
+    @PatchMapping
     public ResponseEntity<CommonResponseDto<ProfileResponseDto>> changeNickname (@PathVariable Long memberId,
                                                                                  @RequestBody ProfileRequestDto profileRequestDto) {
 
