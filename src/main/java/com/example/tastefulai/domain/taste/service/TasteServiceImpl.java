@@ -90,4 +90,60 @@ public class TasteServiceImpl implements TasteService {
         return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
                 taste.getDietaryPreference(), taste.getSpicyLevel());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TasteResponseDto getGenre(Long memberId) {
+
+        Member member = memberService.findById(memberId);
+        Taste taste = tasteRepository.findByMember(member);
+
+        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
+                taste.getDietaryPreference(), taste.getSpicyLevel());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TasteResponseDto getLikeFood(Long memberId) {
+
+        Member member = memberService.findById(memberId);
+        Taste taste = tasteRepository.findByMember(member);
+
+        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
+                taste.getDietaryPreference(), taste.getSpicyLevel());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TasteResponseDto getDislikeFood(Long memberId) {
+
+        Member member = memberService.findById(memberId);
+
+        Taste taste = tasteRepository.findByMember(member);
+
+        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
+                taste.getDietaryPreference(), taste.getSpicyLevel());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TasteResponseDto getDietaryPreference(Long memberId) {
+
+        Member member = memberService.findById(memberId);
+        Taste taste = tasteRepository.findByMember(member);
+
+        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
+                taste.getDietaryPreference(), taste.getSpicyLevel());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TasteResponseDto getSpicyLevel(Long memberId) {
+
+        Member member = memberService.findById(memberId);
+        Taste taste = tasteRepository.findByMember(member);
+
+        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
+                taste.getDietaryPreference(), taste.getSpicyLevel());
+    }
 }
