@@ -1,15 +1,27 @@
 package com.example.tastefulai.domain.taste.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
 public class TasteRequestDto {
 
-    private final String genres;
-    private final String likeFoods;
-    private final String dislikeFoods;
-    private final String dietaryPreferences;
-    private final Integer spicyLevel;
+    @Size(min = 0, max = 255)
+    private String genres;
+
+    @Size(min = 0, max = 255)
+    private String likeFoods;
+
+    @Size(min = 0, max = 255)
+    private String dislikeFoods;
+
+    @Size(min = 0, max = 255)
+    private String dietaryPreferences;
+
+    @Max(value = 5)
+    private Integer spicyLevel;
 
     public TasteRequestDto(String genres, String likeFoods, String dislikeFoods, String dietaryPreferences, Integer spicyLevel) {
         this.genres = genres;

@@ -50,35 +50,28 @@ public class Taste extends BaseEntity {
     }
 
     public void updateGenres(String newGenres) {
-        if (newGenres != null) {
-            this.genres = newGenres.isEmpty() ? null : newGenres; // 빈 문자열은 null로 처리
-        }
+        this.genres = newGenres != null && !newGenres.isEmpty() ? newGenres : null;
     }
 
     public void updateLikeFoods(String newLikeFoods) {
-        if (newLikeFoods != null) {
-            this.likeFoods = newLikeFoods.isEmpty() ? null : newLikeFoods;
-        }
+        this.likeFoods = newLikeFoods != null && !newLikeFoods.isEmpty() ? newLikeFoods : null;
     }
 
     public void updateDisLikeFoods(String newDisLikeFoods) {
-        if (newDisLikeFoods != null) {
-            this.dislikeFoods = newDisLikeFoods.isEmpty() ? null : newDisLikeFoods;
-        }
+        this.dislikeFoods = newDisLikeFoods != null && !newDisLikeFoods.isEmpty() ? newDisLikeFoods : null;
     }
 
     public void updateDietaryPreferences(String newDietaryPreferences) {
-        if (newDietaryPreferences != null) {
-            this.dietaryPreferences = newDietaryPreferences.isEmpty() ? null : newDietaryPreferences;
-        }
+        this.dietaryPreferences = newDietaryPreferences != null && !newDietaryPreferences.isEmpty() ? newDietaryPreferences : null;
     }
 
     public void updateSpicyLevel(Integer newSpicyLevel) {
-        // null을 허용하고, 1부터 5까지의 유효한 값만 받아들임
+        // 1부터 5까지의 유효한 값만 받아들임
         if (newSpicyLevel == null || (newSpicyLevel >= 1 && newSpicyLevel <= 5)) {
-            this.spicyLevel = newSpicyLevel;  // spicy level or null
+            this.spicyLevel = newSpicyLevel;
         } else {
             throw new CustomException(ErrorCode.INVALID_SPICY_LEVEL);
         }
     }
 }
+

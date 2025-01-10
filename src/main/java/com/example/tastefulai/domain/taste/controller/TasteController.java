@@ -4,6 +4,7 @@ import com.example.tastefulai.domain.taste.dto.TasteRequestDto;
 import com.example.tastefulai.domain.taste.dto.TasteResponseDto;
 import com.example.tastefulai.domain.taste.service.TasteService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class TasteController {
 
     @PatchMapping("/genres")
     public ResponseEntity<CommonResponseDto<String>> updateGenres(@PathVariable Long memberId,
-                                                         @RequestBody TasteRequestDto tasteRequestDto) {
+                                                         @RequestBody @Valid TasteRequestDto tasteRequestDto) {
 
         TasteResponseDto tasteResponseDto = tasteService.updateGenres(memberId, tasteRequestDto.getGenres());
 
@@ -32,7 +33,7 @@ public class TasteController {
 
     @PatchMapping("/likeFoods")
     public ResponseEntity<CommonResponseDto<String>> updateLikeFoods(@PathVariable Long memberId,
-                                                            @RequestBody TasteRequestDto tasteRequestDto) {
+                                                            @RequestBody @Valid TasteRequestDto tasteRequestDto) {
 
         TasteResponseDto tasteResponseDto = tasteService.updateLikeFoods(memberId, tasteRequestDto.getLikeFoods());
 
@@ -41,7 +42,7 @@ public class TasteController {
 
     @PatchMapping("/dislikeFoods")
     public ResponseEntity<CommonResponseDto<String>> updateDislikeFoods(@PathVariable Long memberId,
-                                                               @RequestBody TasteRequestDto tasteRequestDto) {
+                                                               @RequestBody @Valid TasteRequestDto tasteRequestDto) {
 
         TasteResponseDto tasteResponseDto = tasteService.updateDislikeFoods(memberId, tasteRequestDto.getDislikeFoods());
 
@@ -50,7 +51,7 @@ public class TasteController {
 
     @PatchMapping("/dietaryPreferences")
     public ResponseEntity<CommonResponseDto<TasteResponseDto>> updateDietaryPreferences(@PathVariable Long memberId,
-                                                                     @RequestBody TasteRequestDto tasteRequestDto) {
+                                                                     @RequestBody @Valid TasteRequestDto tasteRequestDto) {
 
         TasteResponseDto tasteResponseDto = tasteService.updateDietaryPreferences(memberId, tasteRequestDto.getDietaryPreferences());
 
@@ -59,7 +60,7 @@ public class TasteController {
 
     @PatchMapping("/spicyLevels")
     public ResponseEntity<CommonResponseDto<TasteResponseDto>> updateSpicyLevel(@PathVariable Long memberId,
-                                                              @RequestBody TasteRequestDto tasteRequestDto) {
+                                                              @RequestBody @Valid TasteRequestDto tasteRequestDto) {
 
         TasteResponseDto tasteResponseDto = tasteService.updateSpicyLevel(memberId, tasteRequestDto.getSpicyLevel());
 
