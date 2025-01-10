@@ -21,11 +21,11 @@ public class MemberProfileController {
     private final MemberService memberService;
 
     @PatchMapping
-    public ResponseEntity<CommonResponseDto<ProfileResponseDto>> changeNickname (@PathVariable Long memberId,
-                                                                                 @RequestBody ProfileRequestDto profileRequestDto) {
+    public ResponseEntity<CommonResponseDto<ProfileResponseDto>> updateNickname(@PathVariable Long memberId,
+                                                                                @RequestBody ProfileRequestDto profileRequestDto) {
 
-        ProfileResponseDto profileResponseDto = memberService.changeNickname(memberId, profileRequestDto.getNickname());
+        ProfileResponseDto profileResponseDto = memberService.updateNickname(memberId, profileRequestDto.getNickname());
 
-        return new ResponseEntity<>(new CommonResponseDto<>("닉네임 변경 완료", profileResponseDto),HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("닉네임 변경 완료", profileResponseDto), HttpStatus.OK);
     }
 }
