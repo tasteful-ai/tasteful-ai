@@ -1,5 +1,6 @@
 package com.example.tastefulai.domain.member.service;
 
+import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.GenderRole;
@@ -10,6 +11,7 @@ import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
 import com.example.tastefulai.global.error.exception.NotFoundException;
 import com.example.tastefulai.global.util.JwtProvider;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -92,14 +94,14 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 3. 로그아웃 :
-     * - Redis에 토큰을 블랙리스트로 등록
+     * - Redis 에 토큰을 블랙리스트로 등록
      */
     @Value("${jwt.access-token-expiration}")
     private long accessTokenExpiryMillis;
 
     @Override
     public void logout(String token) {
-        // Redis에 토큰 블랙리스트 등록
+        // Redis 에 토큰 블랙리스트 등록
         redisTemplate.opsForValue().set(
                 token,                     // Key: 토큰
                 "logout",                  // Value: 상태값
@@ -164,6 +166,20 @@ public class MemberServiceImpl implements MemberService {
 
         // 검증 상태 제거
         clearPasswordVerification(memberId);
+    }
+
+    /**
+     *
+     * 7. 닉네임 수정
+     */
+    @Override
+    @Transactional
+    public ProfileResponseDto updateNickname(Long memberId, String nickname) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        member.updateNickname(nickname);
+
+        return Member.toDto(member);
     }
 
     // 검증 상태 확인

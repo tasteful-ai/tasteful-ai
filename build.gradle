@@ -68,8 +68,11 @@ dependencies {
     testImplementation 'com.h2database:h2'
 
     // s3
-//    implementation 'software.amzon.awssdk:s3:2.20.89'
-//    implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.1.1'
+    implementation 'software.amazon.awssdk:s3:2.20.89'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.1.1'
+
+    //Tika
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.7.0'
 }
 
 dependencyManagement {
