@@ -86,7 +86,7 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
     }
 
-    public static ProfileResponseDto toDto(Member member) {
+    public static ProfileResponseDto toProfileDto(Member member) {
 
         String memberImageUrl = (member.getImage() == null) ? null : member.getImage().getImageUrl();
 
