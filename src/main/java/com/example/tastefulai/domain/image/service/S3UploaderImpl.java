@@ -39,7 +39,7 @@ public class S3UploaderImpl implements S3Uploader {
     @Override
     public Image uploadImage(Member member, MultipartFile image) throws IOException {
 
-        //이미지 확장자 확인
+        // 이미지 확장자 확인
         isValidExtension(image);
 
         //UUID 이름 생성
@@ -47,7 +47,7 @@ public class S3UploaderImpl implements S3Uploader {
         String uuid = UUID.randomUUID().toString();
         String uniqueName = uuid + "_" + originalName.replaceAll("\\s", "_");
 
-        //이미지를 S3에 저장
+        // 이미지를 S3에 저장
         try {
             s3Client.putObject(
                     PutObjectRequest.builder()
@@ -66,17 +66,17 @@ public class S3UploaderImpl implements S3Uploader {
         return new Image (uniqueName, image.getContentType(), image.getSize(), imageUrl, member);
     }
 
-    //파일의 확장자를 검증 (png, jpeg, jpg)
+    // 파일의 확장자를 검증 (png, jpeg, jpg)
     @Override
     public void isValidExtension(MultipartFile image) throws IOException {
 
-        //파일 이름의 확장자를 검사
+        // 파일 이름의 확장자를 검사
         String extension = StringUtils.getFilenameExtension(image.getOriginalFilename());
         if (!ALLOWED_EXTENSIONS.contains(extension)){
             throw new BadRequestException(ErrorCode.INVALID_FILE);
         };
 
-        //파일의 MIME 타입을 검사
+        // 파일의 MIME 타입을 검사
         Tika tika = new Tika();
         String mimeType = tika.detect(image.getInputStream());
         if (!ALLOWED_MIMETYPE.contains(mimeType)) {

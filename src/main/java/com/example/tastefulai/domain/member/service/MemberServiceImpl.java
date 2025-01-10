@@ -168,7 +168,10 @@ public class MemberServiceImpl implements MemberService {
         clearPasswordVerification(memberId);
     }
 
-    //닉네임 변경
+    /**
+     *
+     * 7. 닉네임 수정
+     */
     @Override
     @Transactional
     public ProfileResponseDto updateNickname(Long memberId, String nickname) {

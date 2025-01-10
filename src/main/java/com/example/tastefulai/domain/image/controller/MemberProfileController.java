@@ -20,6 +20,7 @@ public class MemberProfileController {
 
     private final MemberService memberService;
 
+    // 닉네임 수정 (이후 MemberController 로 이동 예정)
     @PatchMapping
     public ResponseEntity<CommonResponseDto<ProfileResponseDto>> updateNickname(@PathVariable Long memberId,
                                                                                 @RequestBody ProfileRequestDto profileRequestDto) {
