@@ -33,8 +33,8 @@ public class MemberServiceImpl implements MemberService {
     private static final String VERIFY_PASSWORD_KEY = "verify-password:";
 
     @Override
-    public Member findById(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     /**
@@ -118,7 +118,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(currentPassword,member.getPassword())) {
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD);
         }
 

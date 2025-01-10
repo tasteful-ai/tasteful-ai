@@ -26,10 +26,10 @@ public class ChattingMessageServiceImpl implements ChattingMessageService {
 
     @Override
     @Transactional
-    public ChattingMessageResponseDto saveMessage(Long memberId, ChattingMessageRequestDto chattingMessageRequestDto) {
+    public ChattingMessageResponseDto saveMessage(String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto) {
         Chattingroom chattingroom = chattingroomRepository.getSingleChattingroom();
 
-        Member member = findMember(memberId);
+        Member member = memberService.findByEmail(memberEmail);
 
         ChattingMessage chattingMessage = new ChattingMessage(chattingroom, member, chattingMessageRequestDto.getMessage());
         ChattingMessage savedMessage = chattingMessageRepository.save(chattingMessage);
@@ -48,8 +48,8 @@ public class ChattingMessageServiceImpl implements ChattingMessageService {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "members", key = "#memberId")
-    public Member findMember(Long memberId) {
-        return memberService.findById(memberId);
+    @Cacheable(value = "members", key = "#memberEmail")
+    public Member findMember(String memberEmail) {
+        return memberService.findByEmail(memberEmail);
     }
 }

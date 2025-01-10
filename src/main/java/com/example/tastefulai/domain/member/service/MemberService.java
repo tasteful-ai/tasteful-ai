@@ -8,7 +8,7 @@ import com.example.tastefulai.global.common.dto.JwtAuthResponse;
 
 public interface MemberService {
 
-    Member findById(Long memberId);
+    Member findByEmail(String email);
 
     MemberResponseDto signup(String email, String password, String nickname, Integer age, GenderRole genderRole, MemberRole memberRole);
 
