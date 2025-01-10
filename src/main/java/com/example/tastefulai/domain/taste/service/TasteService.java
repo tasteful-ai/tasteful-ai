@@ -1,6 +1,8 @@
 package com.example.tastefulai.domain.taste.service;
 
+import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.taste.dto.TasteResponseDto;
+import com.example.tastefulai.domain.taste.entity.Taste;
 
 public interface TasteService {
 
@@ -15,4 +17,6 @@ public interface TasteService {
     TasteResponseDto getDislikeFoods(Long memberId);
     TasteResponseDto getDietaryPreferences(Long memberId);
     TasteResponseDto getSpicyLevel(Long memberId);
+
+    Taste findOrCreateTaste(Member member);
 }
