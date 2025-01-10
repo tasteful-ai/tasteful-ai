@@ -38,16 +38,6 @@ public class MemberServiceImpl implements MemberService {
     private static final String ACCESS_TOKEN_KEY = "access_token:";
     private final MemberDetailsServiceImpl memberDetailsServiceImpl;
 
-    @Override
-    public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-    }
-
-    @Override
-    public Member findById(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
-    }
-
     /**
      * 1. 회원 가입 :
      * - 중복 닉네임 확인,
@@ -206,4 +196,15 @@ public class MemberServiceImpl implements MemberService {
     private void removeRefreshToken(String email) {
         redisTemplate.delete(REFRESH_TOKEN_KEY + email);
     }
+    
+    @Override
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    @Override
+    public Member findById(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+    }
+
 }
