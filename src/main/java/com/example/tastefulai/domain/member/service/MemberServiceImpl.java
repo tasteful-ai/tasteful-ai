@@ -94,14 +94,14 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 3. 로그아웃 :
-     * - Redis에 토큰을 블랙리스트로 등록
+     * - Redis 에 토큰을 블랙리스트로 등록
      */
     @Value("${jwt.access-token-expiration}")
     private long accessTokenExpiryMillis;
 
     @Override
     public void logout(String token) {
-        // Redis에 토큰 블랙리스트 등록
+        // Redis 에 토큰 블랙리스트 등록
         redisTemplate.opsForValue().set(
                 token,                     // Key: 토큰
                 "logout",                  // Value: 상태값
@@ -120,7 +120,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(currentPassword,member.getPassword())) {
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD);
         }
 
@@ -168,15 +168,15 @@ public class MemberServiceImpl implements MemberService {
         clearPasswordVerification(memberId);
     }
 
+    //닉네임 변경
     @Override
     @Transactional
-    public ProfileResponseDto changeNickname(Long memberId, String nickname) {
+    public ProfileResponseDto updateNickname(Long memberId, String nickname) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-        member.changeNickname(nickname);
-        Member changedMember = memberRepository.save(member);
+        member.updateNickname(nickname);
 
-        return new ProfileResponseDto(changedMember.getNickname(), changedMember.getImage().getImageUrl(), changedMember.getCreatedAt().toLocalDate(), "");
+        return Member.toDto(member);
     }
 
     // 검증 상태 확인
