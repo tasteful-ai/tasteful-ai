@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -35,19 +34,31 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // 애플리케이션 보안 필터 체인
-    // 스프링시큐리티 버전에 맞게 코드 작성 -> 람다식
+    // 애플리케이션 보안 설정(Spring Security 6.x 이상 대응)
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        DefaultSecurityFilterChain build = httpSecurity
-//                .httpBasic().disable()
+        return httpSecurity
+                //브라우저 팝업창 비활성화
+                .httpBasic(AbstractHttpConfigurer::disable)
+
+                // CSRF 비활성화
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers(EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll().anyRequest().authenticated())
-                 // 회원가입과 로그인 요청은 인증 없이 접근 허용
+
+                // 요청 권한 설정
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                                .requestMatchers(EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청 허용
+                                .anyRequest().authenticated() // 그 외 요청 인증 필요
+                )
+
+                // JWT 인증 필터 추가
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // 세션 정책 설정 (무상태)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 최종 보안 필터 체인 빌드
                 .build();
-        return build;
+
     }
 }
 

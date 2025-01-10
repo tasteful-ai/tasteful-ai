@@ -7,45 +7,34 @@ import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
 import com.example.tastefulai.global.common.dto.JwtAuthResponse;
+import com.example.tastefulai.global.config.auth.MemberDetailsServiceImpl;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
 import com.example.tastefulai.global.error.exception.NotFoundException;
 import com.example.tastefulai.global.util.JwtProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
-    private final AuthenticationManager authenticationManager;
     private final RedisTemplate<String, Object> redisTemplate;
     private static final String VERIFY_PASSWORD_KEY = "verify-password:";
+    private static final String REFRESH_TOKEN_KEY = "refreshToken:";
+    private static final String ACCESS_TOKEN_KEY = "access_token:";
+    private final MemberDetailsServiceImpl memberDetailsServiceImpl;
 
-    @Override
-    public Member findById(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
-    }
-
-    /**
-     * 1. 회원 가입 :
-     * - 중복 닉네임 확인,
-     * - 이메일 중복 여부 확인,
-     * - 이메일 형식 확인,
-     * - 비밀번호 패턴 확인,
-     */
+    // 1. 회원가입
     public MemberResponseDto signup(String email, String password, String nickname,
                                     Integer age, GenderRole genderRole, MemberRole memberRole) {
 
@@ -61,82 +50,64 @@ public class MemberServiceImpl implements MemberService {
         String encodedPassword = passwordEncoder.encode(password);
         Member member = new Member(email, encodedPassword, nickname, age, genderRole, memberRole, null);
         memberRepository.save(member);
+
         return new MemberResponseDto(member.getId(), member.getMemberRole(), member.getEmail(), member.getNickname());
     }
 
-    /**
-     * 2. 로그인 :
-     * - 사용자 확인
-     * - 비밀번호 확인
-     * - 인증 객체 생성 및 유효성 확인
-     */
+    // 2. 로그인
     public JwtAuthResponse login(String email, String password) {
         // 사용자 확인
         Member member = this.memberRepository.findActiveByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 비밀번호 확인
-        if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD);
-        }
+        validatePassword(password, member.getPassword());
 
-        // 인증 객체 생성 및 유효성 확인
-        Authentication authentication = this.authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
-        );
-
-        // JMT 토큰 생성
-        String accessToken = jwtProvider.generateAccessToken(authentication);
+        // JWT 토큰 생성
+        String accessToken = jwtProvider.generateAccessToken(email);
         String refreshToken = jwtProvider.generateRefreshToken(email);
 
-        return new JwtAuthResponse("Bearer", accessToken, refreshToken);
+        // RefreshToken을 Redis에 저장
+        storeRefreshToken(email, refreshToken);
+
+        return new JwtAuthResponse(accessToken, refreshToken);
     }
 
-    /**
-     * 3. 로그아웃 :
-     * - Redis 에 토큰을 블랙리스트로 등록
-     */
-    @Value("${jwt.access-token-expiration}")
-    private long accessTokenExpiryMillis;
 
+    // 3. 로그아웃
     @Override
     public void logout(String token) {
-        // Redis 에 토큰 블랙리스트 등록
+        // AccessToken 블랙리스트 등록
         redisTemplate.opsForValue().set(
-                token,                     // Key: 토큰
-                "logout",                  // Value: 상태값
-                accessTokenExpiryMillis,   // TTL: 설정된 만료 시간
-                TimeUnit.MILLISECONDS      // 시간 단위
+                "blacklist:" + token,
+                "invalid",
+                jwtProvider.getAccessTokenExpiryMillis(),
+                TimeUnit.MILLISECONDS
         );
+        log.info("AccessToken 블랙리스트 등록 완료: {}", token);
     }
 
-    /**
-     * 4. 비밀번호 변경 :
-     * - 회원 정보 확인
-     * - 비밀번호 확인
-     * - newPassword 설정
-     */
-    public void changePassword(Long memberId, String currentPassword, String newPassword) {
-        Member member = memberRepository.findById(memberId)
+
+    // 4. 비밀번호 변경
+    @Transactional
+    public void changePassword(String email, String currentPassword, String newPassword, String currentAccessToken) {
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD);
-        }
+        // 현재 비밀번호 검증
+        validatePassword(currentPassword, member.getPassword());
 
         if (passwordEncoder.matches(newPassword, member.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_SAME_AS_OLD);
         }
-
-        member.setPassword(passwordEncoder.encode(newPassword));
+        // 비밀번호 변경
+        member.changePassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
+
+        removeRefreshToken(email);
     }
 
-    /**
-     * 5. 비밀번호 검증 :
-     * - 회원 정보 확인
-     * - 비밀번호 검증
-     */
+    // 5. 비밀번호 검증
     public void verifyPassword(Long memberId, String password) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -148,10 +119,9 @@ public class MemberServiceImpl implements MemberService {
         redisTemplate.opsForValue().set(VERIFY_PASSWORD_KEY + memberId, "true");
     }
 
-    /**
-     * 6. 회원 탈퇴 :
-     * - 현재 비밀번호 입력 후 탈퇴 진행
-     */
+
+    // 6. 회원 탈퇴
+    @Transactional
     public void deleteMember(Long memberId) {
         if (!isPasswordVerified(memberId)) {
             throw new CustomException(ErrorCode.VERIFY_PASSWORD_REQUIRED);
@@ -199,5 +169,30 @@ public class MemberServiceImpl implements MemberService {
     // 검증 상태 제거
     public void clearPasswordVerification(Long memberId) {
         redisTemplate.delete(VERIFY_PASSWORD_KEY + memberId);
+    }
+
+    @Override
+    public Member findById(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+    }
+
+    // 비밀번호 검증 공통 로직
+    private void validatePassword(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD);
+        }
+    }
+
+    private void storeRefreshToken(String email, String refreshToken) {
+        redisTemplate.opsForValue().set(
+                REFRESH_TOKEN_KEY + email,
+                refreshToken,
+                jwtProvider.getRefreshTokenExpiryMillis(),
+                TimeUnit.MILLISECONDS
+        );
+    }
+
+    private void removeRefreshToken(String email) {
+        redisTemplate.delete(REFRESH_TOKEN_KEY + email);
     }
 }
