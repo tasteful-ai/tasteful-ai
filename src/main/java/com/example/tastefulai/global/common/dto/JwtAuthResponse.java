@@ -5,12 +5,10 @@ import lombok.Getter;
 @Getter
 public class JwtAuthResponse {
 
-    private String tokenType = "Bearer";
-    private String accessToken;
-    private String refreshToken;
+    private final String accessToken;
+    private final String refreshToken;
 
-    public JwtAuthResponse(String tokenType, String accessToken, String refreshToken) {
-        this.tokenType = tokenType;
+    public JwtAuthResponse(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
