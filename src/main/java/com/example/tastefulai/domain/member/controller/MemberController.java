@@ -70,16 +70,16 @@ public class MemberController {
     // 4. 비밀번호 변경
     @Transactional
     @PatchMapping("/passwords")
-    public ResponseEntity<CommonResponseDto<Void>> changePassword(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
+    public ResponseEntity<CommonResponseDto<Void>> updatePassword(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
                                                                   @RequestHeader("Authorization") String authorizationHeader,
-                                                                  @Valid @RequestBody PasswordChangeRequestDto passwordChangeRequestDto) {
+                                                                  @Valid @RequestBody PasswordUpdateRequestDto passwordUpdateRequestDto) {
 
         String email = memberDetailsImpl.getUsername();
-        String currentPassword = passwordChangeRequestDto.getCurrentPassword();
-        String newPassword = passwordChangeRequestDto.getNewPassword();
+        String currentPassword = passwordUpdateRequestDto.getCurrentPassword();
+        String newPassword = passwordUpdateRequestDto.getNewPassword();
         String currentAccessToken = authorizationHeader.replace("Bearer ", "");
 
-        memberService.changePassword(email, currentPassword, newPassword, currentAccessToken);
+        memberService.updatePassword(email, currentPassword, newPassword, currentAccessToken);
 
         return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 변경 완료", null), HttpStatus.OK);
     }

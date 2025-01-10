@@ -79,7 +79,7 @@ public class Member extends BaseEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void changePassword(String password) {
+    public void updatePassword(String password) {
         this.password = password;
     }
 
