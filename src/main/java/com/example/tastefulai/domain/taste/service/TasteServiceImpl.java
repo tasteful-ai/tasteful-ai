@@ -25,7 +25,6 @@ public class TasteServiceImpl implements TasteService {
         Taste taste = findOrCreateTaste(member);
 
         taste.updateGenres(genres);
-        tasteRepository.save(taste);
 
         return new TasteResponseDto(taste.getGenres(), taste.getLikeFoods(), taste.getDislikeFoods(),
                 taste.getDietaryPreferences(), taste.getSpicyLevel());
@@ -39,7 +38,6 @@ public class TasteServiceImpl implements TasteService {
         Taste taste = findOrCreateTaste(member);
 
         taste.updateLikeFoods(likeFoods);
-        tasteRepository.save(taste);
 
         return new TasteResponseDto(taste.getGenres(), taste.getLikeFoods(), taste.getDislikeFoods(),
                 taste.getDietaryPreferences(), taste.getSpicyLevel());
@@ -53,7 +51,6 @@ public class TasteServiceImpl implements TasteService {
         Taste taste = findOrCreateTaste(member);
 
         taste.updateDisLikeFoods(dislikeFoods);
-        tasteRepository.save(taste);
 
         return new TasteResponseDto(taste.getGenres(), taste.getLikeFoods(), taste.getDislikeFoods(),
                 taste.getDietaryPreferences(), taste.getSpicyLevel());
@@ -67,7 +64,6 @@ public class TasteServiceImpl implements TasteService {
         Taste taste = findOrCreateTaste(member);
 
         taste.updateDietaryPreferences(dietaryPreferences);
-        tasteRepository.save(taste);
 
         return new TasteResponseDto(taste.getGenres(), taste.getLikeFoods(), taste.getDislikeFoods(),
                 taste.getDietaryPreferences(), taste.getSpicyLevel());
@@ -81,7 +77,6 @@ public class TasteServiceImpl implements TasteService {
         Taste taste = findOrCreateTaste(member);
 
         taste.updateSpicyLevel(spicyLevel);
-        tasteRepository.save(taste);
 
         return new TasteResponseDto(taste.getGenres(), taste.getLikeFoods(), taste.getDislikeFoods(),
                 taste.getDietaryPreferences(), taste.getSpicyLevel());
