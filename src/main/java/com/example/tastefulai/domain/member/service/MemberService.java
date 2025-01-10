@@ -11,13 +11,15 @@ public interface MemberService {
 
     Member findByEmail(String email);
 
+    Member findById(Long memberId);
+
     MemberResponseDto signup(String email, String password, String nickname, Integer age, GenderRole genderRole, MemberRole memberRole);
 
     JwtAuthResponse login(String email, String password);
 
     void logout(String token);
 
-    void changePassword(Long memberId, String currentPassword, String newPassword);
+    void changePassword(String email, String currentPassword, String newPassword, String currentAccessToken);
 
     void verifyPassword(Long memberId, String password);
 
