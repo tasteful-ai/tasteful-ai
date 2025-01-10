@@ -16,6 +16,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBadRequestException(CustomException customException) {
         return ErrorResponse.toResponseEntity(customException.getErrorCode());
     }
+
     // 유효성 검사 실패 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException customException) {
@@ -36,24 +38,34 @@ public class GlobalExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage());}
         return ResponseEntity.badRequest().body(errors);
     }
+
     // AuthenticationException 처리 (토큰 관련 예외)
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthException(AuthenticationException customException) {
         return ErrorResponse.toResponseEntity(ErrorCode.INVALID_TOKEN);
     }
+
     // AccessDeniedException 처리 (권한 부족 예외)
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException customException) {
         return ErrorResponse.toResponseEntity(ErrorCode.FORBIDDEN);
     }
+
     // AuthorizationDeniedException 처리 (권한 부족 예외)
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(AuthorizationDeniedException customException) {
         return ErrorResponse.toResponseEntity(ErrorCode.FORBIDDEN);
     }
+
     // JwtException 처리 (JWT 토큰 관련 예외)
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ErrorResponse> handleJwtException(JwtException customException) {
         return ErrorResponse.toResponseEntity(ErrorCode.EXPIRED_TOKEN);
+    }
+
+    // 파일 크기 제한 예외 처리
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxSizeException(MaxUploadSizeExceededException customException) {
+        return ErrorResponse.toResponseEntity(ErrorCode.LARGE_FILE);
     }
 }
