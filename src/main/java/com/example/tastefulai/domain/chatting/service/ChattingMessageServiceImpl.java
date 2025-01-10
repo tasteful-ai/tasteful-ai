@@ -4,6 +4,7 @@ import com.example.tastefulai.domain.chatting.dto.ChattingMessageRequestDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 import com.example.tastefulai.domain.chatting.entity.ChattingMessage;
 import com.example.tastefulai.domain.chatting.entity.Chattingroom;
+import com.example.tastefulai.domain.chatting.redis.service.RedisMessageService;
 import com.example.tastefulai.domain.chatting.repository.ChattingMessageRepository;
 import com.example.tastefulai.domain.chatting.repository.ChattingroomRepository;
 import com.example.tastefulai.domain.member.entity.Member;
@@ -23,6 +24,7 @@ public class ChattingMessageServiceImpl implements ChattingMessageService {
     private final ChattingMessageRepository chattingMessageRepository;
     private final ChattingroomRepository chattingroomRepository;
     private final MemberService memberService;
+    private final RedisMessageService redisMessageService;
 
     @Override
     @Transactional
@@ -31,25 +33,32 @@ public class ChattingMessageServiceImpl implements ChattingMessageService {
 
         Member member = memberService.findByEmail(memberEmail);
 
+        //DB에 메시지 저장
         ChattingMessage chattingMessage = new ChattingMessage(chattingroom, member, chattingMessageRequestDto.getMessage());
-        ChattingMessage savedMessage = chattingMessageRepository.save(chattingMessage);
+        chattingMessageRepository.save(chattingMessage);
 
-        return new ChattingMessageResponseDto(savedMessage.getSenderNickname(), savedMessage.getMessage());
+        //Redis 캐싱 저장
+        ChattingMessageResponseDto chattingMessageResponseDto = new ChattingMessageResponseDto(member.getNickname(), chattingMessage.getMessage());
+        redisMessageService.saveMessage(chattingMessageResponseDto);
+
+        return chattingMessageResponseDto;
     }
 
     @Override
     public List<ChattingMessageResponseDto> getMessages() {
-        Chattingroom chattingroom = chattingroomRepository.getSingleChattingroom();
 
-        List<ChattingMessage> messages = chattingMessageRepository.findTop50ByChattingroomOrderByCreatedAtDesc(chattingroom);
+        //Redis에서 메시지 조회
+        List<ChattingMessageResponseDto> cachedMessages = redisMessageService.getRecentMessages();
 
-        return messages.stream()
-                .map(message -> new ChattingMessageResponseDto(message.getSenderNickname(), message.getMessage()))
-                .collect(Collectors.toList());
-    }
+        if (cachedMessages.isEmpty()) {
+            Chattingroom chattingroom = chattingroomRepository.getSingleChattingroom();
+            List<ChattingMessage> messages = chattingMessageRepository.findTop50ByChattingroomOrderByCreatedAtDesc(chattingroom);
 
-    @Cacheable(value = "members", key = "#memberEmail")
-    public Member findMember(String memberEmail) {
-        return memberService.findByEmail(memberEmail);
+            return messages.stream()
+                    .map(message -> new ChattingMessageResponseDto(message.getSenderNickname(), message.getMessage()))
+                    .collect(Collectors.toList());
+        }
+
+        return cachedMessages;
     }
 }
