@@ -72,9 +72,8 @@ public class JwtProvider {
     }
 
     // Access-Token 생성
-    public String generateAccessToken(Authentication authentication) {
-        String username = authentication.getName();
-        return generateToken(username, accessTokenExpiryMillis);
+    public String generateAccessToken(String email) {
+        return generateToken(email, accessTokenExpiryMillis);
     }
 
     // Refresh-Token 생성

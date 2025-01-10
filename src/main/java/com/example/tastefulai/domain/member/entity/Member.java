@@ -79,7 +79,8 @@ public class Member extends BaseEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void setPassword(String password) {
+    public void changePassword(String password) {
+        this.password = password;
     }
 
     public void updateNickname(String nickname) {
