@@ -4,15 +4,15 @@ import com.example.tastefulai.domain.taste.dto.TasteResponseDto;
 
 public interface TasteService {
 
-    TasteResponseDto updateGenre(Long memberId, String genre);
-    TasteResponseDto updateLikeFood(Long memberId, String likeFood);
-    TasteResponseDto updateDislikeFood(Long memberId, String dislikeFood);
-    TasteResponseDto updateDietaryPreference(Long memberId, String dietaryPreference);
+    TasteResponseDto updateGenres(Long memberId, String genres);
+    TasteResponseDto updateLikeFoods(Long memberId, String likeFood);
+    TasteResponseDto updateDislikeFoods(Long memberId, String dislikeFood);
+    TasteResponseDto updateDietaryPreferences(Long memberId, String dietaryPreferences);
     TasteResponseDto updateSpicyLevel(Long memberId, Integer spicyLevel);
 
-    TasteResponseDto getGenre(Long memberId);
-    TasteResponseDto getLikeFood(Long memberId);
-    TasteResponseDto getDislikeFood(Long memberId);
-    TasteResponseDto getDietaryPreference(Long memberId);
+    TasteResponseDto getGenres(Long memberId);
+    TasteResponseDto getLikeFoods(Long memberId);
+    TasteResponseDto getDislikeFoods(Long memberId);
+    TasteResponseDto getDietaryPreferences(Long memberId);
     TasteResponseDto getSpicyLevel(Long memberId);
 }

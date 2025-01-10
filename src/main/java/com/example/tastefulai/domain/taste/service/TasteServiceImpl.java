@@ -22,66 +22,66 @@ public class TasteServiceImpl implements TasteService {
 
     @Override
     @Transactional
-    public TasteResponseDto updateGenre(Long memberId, String genre) {
+    public TasteResponseDto updateGenres(Long memberId, String genres) {
 
         Member member = memberService.findById(memberId);
         Optional<Taste> optionalTaste = tasteRepository.findByMember(member);
 
         Taste taste = optionalTaste.orElse(new Taste(null, null, null, null, null, member));
 
-        taste.updateGenre(genre);
+        taste.updateGenres(genres);
         tasteRepository.save(taste);
 
-        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
-                taste.getDietaryPreference(), taste.getSpicyLevel());
+        return new TasteResponseDto(taste.getGenres(), taste.getLikeFoods(), taste.getDislikeFoods(),
+                taste.getDietaryPreferences(), taste.getSpicyLevel());
     }
 
     @Override
     @Transactional
-    public TasteResponseDto updateLikeFood(Long memberId, String likeFood) {
+    public TasteResponseDto updateLikeFoods(Long memberId, String likeFoods) {
 
         Member member = memberService.findById(memberId);
         Optional<Taste> optionalTaste = tasteRepository.findByMember(member);
 
         Taste taste = optionalTaste.orElse(new Taste(null, null, null, null, null, member));
 
-        taste.updateLikeFood(likeFood);
+        taste.updateLikeFoods(likeFoods);
         tasteRepository.save(taste);
 
-        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
-                taste.getDietaryPreference(), taste.getSpicyLevel());
+        return new TasteResponseDto(taste.getGenres(), taste.getLikeFoods(), taste.getDislikeFoods(),
+                taste.getDietaryPreferences(), taste.getSpicyLevel());
     }
 
     @Override
     @Transactional
-    public TasteResponseDto updateDislikeFood(Long memberId, String dislikeFood) {
+    public TasteResponseDto updateDislikeFoods(Long memberId, String dislikeFoods) {
 
         Member member = memberService.findById(memberId);
         Optional<Taste> optionalTaste = tasteRepository.findByMember(member);
 
         Taste taste = optionalTaste.orElse(new Taste(null, null, null, null, null, member));
 
-        taste.updateDisLikeFood(dislikeFood);
+        taste.updateDisLikeFoods(dislikeFoods);
         tasteRepository.save(taste);
 
-        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
-                taste.getDietaryPreference(), taste.getSpicyLevel());
+        return new TasteResponseDto(taste.getGenres(), taste.getLikeFoods(), taste.getDislikeFoods(),
+                taste.getDietaryPreferences(), taste.getSpicyLevel());
     }
 
     @Override
     @Transactional
-    public TasteResponseDto updateDietaryPreference(Long memberId, String dietaryPreference) {
+    public TasteResponseDto updateDietaryPreferences(Long memberId, String dietaryPreferences) {
 
         Member member = memberService.findById(memberId);
         Optional<Taste> optionalTaste = tasteRepository.findByMember(member);
 
         Taste taste = optionalTaste.orElse(new Taste(null, null, null, null, null, member));
 
-        taste.updateDietaryPreference(dietaryPreference);
+        taste.updateDietaryPreferences(dietaryPreferences);
         tasteRepository.save(taste);
 
-        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
-                taste.getDietaryPreference(), taste.getSpicyLevel());
+        return new TasteResponseDto(taste.getGenres(), taste.getLikeFoods(), taste.getDislikeFoods(),
+                taste.getDietaryPreferences(), taste.getSpicyLevel());
     }
 
     @Override
@@ -96,13 +96,13 @@ public class TasteServiceImpl implements TasteService {
         taste.updateSpicyLevel(spicyLevel);
         tasteRepository.save(taste);
 
-        return new TasteResponseDto(taste.getGenre(), taste.getLikeFood(), taste.getDislikeFood(),
-                taste.getDietaryPreference(), taste.getSpicyLevel());
+        return new TasteResponseDto(taste.getGenres(), taste.getLikeFoods(), taste.getDislikeFoods(),
+                taste.getDietaryPreferences(), taste.getSpicyLevel());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public TasteResponseDto getGenre(Long memberId) {
+    public TasteResponseDto getGenres(Long memberId) {
 
         Member member = memberService.findById(memberId);
         Optional<Taste> optionalTaste = tasteRepository.findByMember(member);
@@ -110,17 +110,17 @@ public class TasteServiceImpl implements TasteService {
         Taste taste = optionalTaste.orElse(new Taste("", "", "", "", null, member));
 
         return new TasteResponseDto(
-                taste.getGenre() != null ? taste.getGenre() : "",
-                taste.getLikeFood() != null ? taste.getLikeFood() : "",
-                taste.getDislikeFood() != null ? taste.getDislikeFood() : "",
-                taste.getDietaryPreference() != null ? taste.getDietaryPreference() : "",
+                taste.getGenres() != null ? taste.getGenres() : "",
+                taste.getLikeFoods() != null ? taste.getLikeFoods() : "",
+                taste.getDislikeFoods() != null ? taste.getDislikeFoods() : "",
+                taste.getDietaryPreferences() != null ? taste.getDietaryPreferences() : "",
                 taste.getSpicyLevel() != null ? taste.getSpicyLevel() : null
         );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public TasteResponseDto getLikeFood(Long memberId) {
+    public TasteResponseDto getLikeFoods(Long memberId) {
 
         Member member = memberService.findById(memberId);
         Optional<Taste> optionalTaste = tasteRepository.findByMember(member);
@@ -128,17 +128,17 @@ public class TasteServiceImpl implements TasteService {
         Taste taste = optionalTaste.orElse(new Taste("", "", "", "", null, member));
 
         return new TasteResponseDto(
-                taste.getGenre() != null ? taste.getGenre() : "",
-                taste.getLikeFood() != null ? taste.getLikeFood() : "",
-                taste.getDislikeFood() != null ? taste.getDislikeFood() : "",
-                taste.getDietaryPreference() != null ? taste.getDietaryPreference() : "",
+                taste.getGenres() != null ? taste.getGenres() : "",
+                taste.getLikeFoods() != null ? taste.getLikeFoods() : "",
+                taste.getDislikeFoods() != null ? taste.getDislikeFoods() : "",
+                taste.getDietaryPreferences() != null ? taste.getDietaryPreferences() : "",
                 taste.getSpicyLevel() != null ? taste.getSpicyLevel() : null
         );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public TasteResponseDto getDislikeFood(Long memberId) {
+    public TasteResponseDto getDislikeFoods(Long memberId) {
 
         Member member = memberService.findById(memberId);
         Optional<Taste> optionalTaste = tasteRepository.findByMember(member);
@@ -146,17 +146,17 @@ public class TasteServiceImpl implements TasteService {
         Taste taste = optionalTaste.orElse(new Taste("", "", "", "", null, member));
 
         return new TasteResponseDto(
-                taste.getGenre() != null ? taste.getGenre() : "",
-                taste.getLikeFood() != null ? taste.getLikeFood() : "",
-                taste.getDislikeFood() != null ? taste.getDislikeFood() : "",
-                taste.getDietaryPreference() != null ? taste.getDietaryPreference() : "",
+                taste.getGenres() != null ? taste.getGenres() : "",
+                taste.getLikeFoods() != null ? taste.getLikeFoods() : "",
+                taste.getDislikeFoods() != null ? taste.getDislikeFoods() : "",
+                taste.getDietaryPreferences() != null ? taste.getDietaryPreferences() : "",
                 taste.getSpicyLevel() != null ? taste.getSpicyLevel() : null
         );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public TasteResponseDto getDietaryPreference(Long memberId) {
+    public TasteResponseDto getDietaryPreferences(Long memberId) {
 
         Member member = memberService.findById(memberId);
         Optional<Taste> optionalTaste = tasteRepository.findByMember(member);
@@ -164,10 +164,10 @@ public class TasteServiceImpl implements TasteService {
         Taste taste = optionalTaste.orElse(new Taste("", "", "", "", null, member));
 
         return new TasteResponseDto(
-                taste.getGenre() != null ? taste.getGenre() : "",
-                taste.getLikeFood() != null ? taste.getLikeFood() : "",
-                taste.getDislikeFood() != null ? taste.getDislikeFood() : "",
-                taste.getDietaryPreference() != null ? taste.getDietaryPreference() : "",
+                taste.getGenres() != null ? taste.getGenres() : "",
+                taste.getLikeFoods() != null ? taste.getLikeFoods() : "",
+                taste.getDislikeFoods() != null ? taste.getDislikeFoods() : "",
+                taste.getDietaryPreferences() != null ? taste.getDietaryPreferences() : "",
                 taste.getSpicyLevel() != null ? taste.getSpicyLevel() : null
         );
     }
@@ -182,10 +182,10 @@ public class TasteServiceImpl implements TasteService {
         Taste taste = optionalTaste.orElse(new Taste("", "", "", "", null, member));
 
         return new TasteResponseDto(
-                taste.getGenre() != null ? taste.getGenre() : "",
-                taste.getLikeFood() != null ? taste.getLikeFood() : "",
-                taste.getDislikeFood() != null ? taste.getDislikeFood() : "",
-                taste.getDietaryPreference() != null ? taste.getDietaryPreference() : "",
+                taste.getGenres() != null ? taste.getGenres() : "",
+                taste.getLikeFoods() != null ? taste.getLikeFoods() : "",
+                taste.getDislikeFoods() != null ? taste.getDislikeFoods() : "",
+                taste.getDietaryPreferences() != null ? taste.getDietaryPreferences() : "",
                 taste.getSpicyLevel() != null ? taste.getSpicyLevel() : null
         );
     }

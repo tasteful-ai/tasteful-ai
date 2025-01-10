@@ -5,18 +5,18 @@ import lombok.Getter;
 @Getter
 public class TasteResponseDto {
 
-    private String genre;
-    private String likeFood;
-    private String dislikeFood;
-    private String dietaryPreference;
+    private String genres;
+    private String likeFoods;
+    private String dislikeFoods;
+    private String dietaryPreferences;
     private Integer spicyLevel;
 
-    public TasteResponseDto(String genre, String likeFood,
-                            String dislikeFood, String dietaryPreference, Integer spicyLevel) {
-        this.genre = genre;
-        this.likeFood = likeFood;
-        this.dislikeFood = dislikeFood;
-        this.dietaryPreference = dietaryPreference;
+    public TasteResponseDto(String genres, String likeFoods,
+                            String dislikeFoods, String dietaryPreferences, Integer spicyLevel) {
+        this.genres = genres;
+        this.likeFoods = likeFoods;
+        this.dislikeFoods = dislikeFoods;
+        this.dietaryPreferences = dietaryPreferences;
         this.spicyLevel = spicyLevel;
     }
 }
