@@ -1,5 +1,6 @@
 package com.example.tastefulai.domain.member.service;
 
+import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.GenderRole;
@@ -16,9 +17,11 @@ public interface MemberService {
 
     void logout(String token);
 
-    void changePassword(Long memberId, String currentPassword, String newPassword);
+    void changePassword(String email, String currentPassword, String newPassword, String currentAccessToken);
 
     void verifyPassword(Long memberId, String password);
 
     void deleteMember(Long memberId);
+
+    ProfileResponseDto updateNickname(Long memberId, String nickname);
 }

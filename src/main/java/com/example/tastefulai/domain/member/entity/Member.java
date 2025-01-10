@@ -1,5 +1,6 @@
 package com.example.tastefulai.domain.member.entity;
 
+import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
 import com.example.tastefulai.domain.image.entity.Image;
 import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
@@ -78,5 +79,18 @@ public class Member extends BaseEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void setPassword(String password) {}
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public static ProfileResponseDto toDto(Member member) {
+
+        String memberImageUrl = (member.getImage() == null) ? null : member.getImage().getImageUrl();
+
+        return new ProfileResponseDto(member.getNickname(), memberImageUrl, member.getCreatedAt().toLocalDate(), "");
+    }
 }
