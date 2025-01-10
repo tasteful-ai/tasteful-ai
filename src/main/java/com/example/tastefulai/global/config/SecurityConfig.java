@@ -43,10 +43,7 @@ public class SecurityConfig {
 //                .httpBasic().disable()
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        request -> request.requestMatchers(EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll()
-                                .requestMatchers("/ws-chat").permitAll()
-
-                                .requestMatchers(EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청 허용
+                        request -> request.requestMatchers(EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll()// 회원가입과 로그인 요청 허용
                                 .anyRequest().authenticated() // 그 외 요청 인증 필요
                 )
 
