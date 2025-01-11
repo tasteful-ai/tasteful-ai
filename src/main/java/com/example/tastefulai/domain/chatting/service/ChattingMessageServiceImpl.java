@@ -61,4 +61,16 @@ public class ChattingMessageServiceImpl implements ChattingMessageService {
 
         return cachedMessages;
     }
+
+    @Override
+    public void processReceivedMessage(ChattingMessageResponseDto chattingMessageResponseDto) {
+        Chattingroom chattingroom = chattingroomRepository.getSingleChattingroom();
+
+        Member sender = memberService.findByEmail(chattingMessageResponseDto.getSenderNickname());
+
+        ChattingMessage chattingMessage = new ChattingMessage(chattingroom, sender, chattingMessageResponseDto.getMessage());
+        chattingMessageRepository.save(chattingMessage);
+
+        redisMessageService.saveMessage(chattingMessageResponseDto);
+    }
 }

@@ -10,4 +10,6 @@ public interface ChattingMessageService {
     ChattingMessageResponseDto saveMessage(String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto);
 
     List<ChattingMessageResponseDto> getMessages();
+
+    void processReceivedMessage(ChattingMessageResponseDto chattingMessageResponseDto);
 }
