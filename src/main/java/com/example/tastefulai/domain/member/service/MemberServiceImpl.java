@@ -149,7 +149,15 @@ public class MemberServiceImpl implements MemberService {
 
         member.updateNickname(nickname);
 
-        return Member.toDto(member);
+        return Member.toProfileDto(member);
+    }
+
+    @Override
+    public ProfileResponseDto getMember(Long memberId) {
+
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return Member.toProfileDto(member);
     }
 
     // 검증 상태 확인
