@@ -26,4 +26,6 @@ public interface MemberService {
     void deleteMember(Long memberId);
 
     ProfileResponseDto updateNickname(Long memberId, String nickname);
+
+    ProfileResponseDto getMember(Long memberId);
 }

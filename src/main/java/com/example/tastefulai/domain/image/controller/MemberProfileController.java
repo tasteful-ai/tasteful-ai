@@ -7,6 +7,7 @@ import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,5 +29,13 @@ public class MemberProfileController {
         ProfileResponseDto profileResponseDto = memberService.updateNickname(memberId, profileRequestDto.getNickname());
 
         return new ResponseEntity<>(new CommonResponseDto<>("닉네임 변경 완료", profileResponseDto), HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonResponseDto<ProfileResponseDto>> getProfile(@PathVariable Long memberId) {
+
+        ProfileResponseDto profileResponseDto = memberService.getMember(memberId);
+
+        return new ResponseEntity<>(new CommonResponseDto<>("프로필 조회 완료", profileResponseDto), HttpStatus.OK);
     }
 }
