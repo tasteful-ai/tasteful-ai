@@ -62,7 +62,7 @@ public class RedisConfig {
 
         //특정 채널 "chatroom"을 구독
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
-        redisMessageListenerContainer.addMessageListener(messageListener, new PatternTopic(RedisChannel.CHATROOM.getName()));
+        redisMessageListenerContainer.addMessageListener(messageListener, new PatternTopic("chatroom:*"));
 
         return redisMessageListenerContainer;
     }
