@@ -11,4 +11,6 @@ public interface S3Uploader {
     Image uploadImage(Member member, MultipartFile image) throws IOException;
 
     void isValidExtension(MultipartFile image) throws IOException;
+
+    void deleteS3Image(String imageName);
 }
