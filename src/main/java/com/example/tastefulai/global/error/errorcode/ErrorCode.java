@@ -20,6 +20,7 @@ public enum ErrorCode {
     VERIFY_PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "비밀번호 검증이 필요합니다."),
     PASSWORD_CHANGE_FAILED(HttpStatus.BAD_REQUEST, "비밀번호가 변경되지 않았습니다.."),
     INVALID_SPICY_LEVEL (HttpStatus.BAD_REQUEST, "유효하지 않은 매운 정도 값입니다."),
+    NO_IMAGE_TO_DELETE (HttpStatus.BAD_REQUEST, "삭제할 파일이 존재하지 않습니다."),
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "로그인 해주세요."),

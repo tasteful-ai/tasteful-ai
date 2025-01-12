@@ -63,7 +63,7 @@ public class S3UploaderImpl implements S3Uploader {
 
         String imageUrl = String.format("https://%s.s3.amazonaws.com/%s", bucket, uniqueName);
 
-        return new Image (uniqueName, image.getContentType(), image.getSize(), imageUrl, member);
+        return new Image(uniqueName, image.getContentType(), image.getSize(), imageUrl, member);
     }
 
     // 파일의 확장자를 검증 (png, jpeg, jpg)
@@ -72,15 +72,26 @@ public class S3UploaderImpl implements S3Uploader {
 
         // 파일 이름의 확장자를 검사
         String extension = StringUtils.getFilenameExtension(image.getOriginalFilename());
-        if (!ALLOWED_EXTENSIONS.contains(extension)){
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
             throw new BadRequestException(ErrorCode.INVALID_FILE);
-        };
+        }
+        ;
 
         // 파일의 MIME 타입을 검사
         Tika tika = new Tika();
         String mimeType = tika.detect(image.getInputStream());
         if (!ALLOWED_MIMETYPE.contains(mimeType)) {
             throw new BadRequestException(ErrorCode.INVALID_FILE);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteS3Image(String imageName) {
+        try {
+            s3Client.deleteObject(builder -> builder.bucket(bucket).key(imageName).build());
+        } catch (CustomException customException) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
         }
     }
 }
