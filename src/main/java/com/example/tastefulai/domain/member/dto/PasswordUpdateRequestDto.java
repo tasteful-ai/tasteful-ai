@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class PasswordChangeRequestDto {
+public class PasswordUpdateRequestDto {
 
     @NotBlank(message = "현재 비밀번호는 필수 입력 값입니다.")
     private final String currentPassword;
@@ -12,7 +12,7 @@ public class PasswordChangeRequestDto {
     @NotBlank(message = "새 비밀번호는 필수 입력 값입니다.")
     private final String newPassword;
 
-    public PasswordChangeRequestDto(String currentPassword, String newPassword) {
+    public PasswordUpdateRequestDto(String currentPassword, String newPassword) {
         this.currentPassword = currentPassword;
         this.newPassword = newPassword;
     }
