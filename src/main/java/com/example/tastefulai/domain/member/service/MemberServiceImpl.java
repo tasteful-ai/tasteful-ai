@@ -16,9 +16,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -204,7 +201,7 @@ public class MemberServiceImpl implements MemberService {
     private void removeRefreshToken(String email) {
         redisTemplate.delete(REFRESH_TOKEN_KEY + email);
     }
-    
+
     @Override
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));

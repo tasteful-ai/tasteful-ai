@@ -72,14 +72,14 @@ public class MemberController {
     @PatchMapping("/passwords")
     public ResponseEntity<CommonResponseDto<Void>> changePassword(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
                                                                   @RequestHeader("Authorization") String authorizationHeader,
-                                                                  @Valid @RequestBody PasswordChangeRequestDto passwordChangeRequestDto) {
+                                                                  @Valid @RequestBody PasswordUpdateRequestDto passwordChangeRequestDto) {
 
         String email = memberDetailsImpl.getUsername();
         String currentPassword = passwordChangeRequestDto.getCurrentPassword();
         String newPassword = passwordChangeRequestDto.getNewPassword();
         String currentAccessToken = authorizationHeader.replace("Bearer ", "");
 
-        memberService.changePassword(email, currentPassword, newPassword, currentAccessToken);
+        memberService.updatePassword(email, currentPassword, newPassword, currentAccessToken);
 
         return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 변경 완료", null), HttpStatus.OK);
     }
@@ -92,7 +92,7 @@ public class MemberController {
 
         memberService.verifyPassword(memberId, password);
 
-        return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 검증 완료",null), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 검증 완료", null), HttpStatus.OK);
     }
 
     // 6. 회원탈퇴
@@ -101,7 +101,7 @@ public class MemberController {
 
         memberService.deleteMember(memberId);
 
-        return new ResponseEntity<>(new CommonResponseDto<>("회원 탈퇴 완료",null), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("회원 탈퇴 완료", null), HttpStatus.OK);
     }
 
     private ResponseCookie createCookie(String name, String value, long maxAge) {
