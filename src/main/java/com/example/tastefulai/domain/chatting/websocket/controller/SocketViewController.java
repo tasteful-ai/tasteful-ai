@@ -8,6 +8,6 @@ public class SocketViewController {
 
     @GetMapping("/test")
     public String test() {
-        return "index";
+        return "websocket";
     }
 }
