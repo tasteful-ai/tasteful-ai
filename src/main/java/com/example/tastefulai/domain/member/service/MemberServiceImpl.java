@@ -105,7 +105,7 @@ public class MemberServiceImpl implements MemberService {
 
     // 4. 비밀번호 변경
     @Transactional
-    public void changePassword(String email, String currentPassword, String newPassword, String currentAccessToken) {
+    public void updatePassword(String email, String currentPassword, String newPassword, String currentAccessToken) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -116,7 +116,7 @@ public class MemberServiceImpl implements MemberService {
             throw new CustomException(ErrorCode.PASSWORD_SAME_AS_OLD);
         }
         // 비밀번호 변경
-        member.changePassword(passwordEncoder.encode(newPassword));
+        member.updatePassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
 
         removeRefreshToken(email);
