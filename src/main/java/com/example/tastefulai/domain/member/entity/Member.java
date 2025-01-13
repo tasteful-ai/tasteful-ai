@@ -50,7 +50,7 @@ public class Member extends BaseEntity {
     private LocalDateTime deletedAt;
 
     // 연관 관계
-    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Image image;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -85,6 +85,10 @@ public class Member extends BaseEntity {
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void updateImage(Image image) {
+        this.image = image;
     }
 
     public static ProfileResponseDto toProfileDto(Member member) {

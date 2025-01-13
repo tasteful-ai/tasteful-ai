@@ -26,7 +26,7 @@ public class Image extends BaseEntity {
     private String imageUrl;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
     public Image(String fileName, String fileType, Long fileSize, String imageUrl, Member member) {
