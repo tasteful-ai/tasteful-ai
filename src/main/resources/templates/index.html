@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h1>WebSocket, STOMP, Redis Test</h1>
+<div>
+    <label for="message">Enter Message:</label>
+    <input type="text" id="message" placeholder="Type your message here">
+    <button onclick="sendMessage()">Send Message</button>
+</div>
+<div>
+    <h2>Console Output</h2>
+    <textarea id="consoleOutput" cols="80" rows="20" readonly></textarea>
+</div>
+<script>
+    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VydGVzdEBnbWFpbC5jb20iLCJpYXQiOjE3MzY3MzcyMjQsImV4cCI6MTczNjc0MDgyNH0.93j2i4nEy2z5a0MSuJJHYXHkeeu2_3o7G3AD3EQmZAY"; // Replace with a valid JWT token
+    const endpoint = "http://localhost:8080/ws-chat";
+
+    // Set up SockJS and STOMP client
+    const socket = new SockJS(endpoint);
+    const stompClient = Stomp.over(socket);
+
+    // Disable debug logs in the console
+    stompClient.debug = null;
+
+    // Connect to WebSocket with Authorization header
+    stompClient.connect(
+        {Authorization: `Bearer ${token}`},
+        (frame) => {
+            logMessage(`Connected: ${frame}`);
+            subscribeToTopic();
+        },
+        (error) => logMessage(`Connection error: ${error}`)
+    );
+
+    // Subscribe to the topic
+    function subscribeToTopic() {
+        stompClient.subscribe('/sub/chat', (message) => {
+            logMessage(`Received message: ${message.body}`);
+        });
+    }
+
+    // Send a message to the server
+    function sendMessage() {
+        const messageInput = document.getElementById("message");
+        const message = messageInput.value;
+        if (!message) {
+            logMessage("Message cannot be empty!");
+            return;
+        }
+        const payload = JSON.stringify({
+            sender: "testUser",
+            message: message
+        });
+        stompClient.send('/pub/chat', {}, payload);
+        logMessage(`Message sent: ${message}`);
+        messageInput.value = "";
+    }
+
+    // Log messages to the output textarea
+    function logMessage(message) {
+        const output = document.getElementById("consoleOutput");
+        output.value += `[${new Date().toISOString()}] ${message}\n`;
+        output.scrollTop = output.scrollHeight;
+    }
+</script>
+</body>
+</html>
