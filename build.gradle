@@ -35,12 +35,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     //spring-security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     testImplementation 'org.springframework.security:spring-security-test'
 
     // lombok
@@ -82,19 +82,7 @@ dependencies {
     implementation 'org.springframework.ai:spring-ai-openai'
     implementation "org.springframework.boot:spring-boot-starter-webflux"
     implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
-//    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
-
-//    // Vaadin
-//    implementation "com.vaadin:vaadin-bom:24.4.0.beta3"
-//    implementation "com.vaadin:vaadin-spring-boot-starter"
-//    implementation "org.springframework.boot:spring-boot-devtools"
 }
-
-//dependencyManagement {
-//    imports {
-//        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
-//    }
-//}
 
 tasks.named('test') {
     useJUnitPlatform()
