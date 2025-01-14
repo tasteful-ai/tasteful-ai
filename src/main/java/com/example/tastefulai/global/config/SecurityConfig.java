@@ -5,6 +5,7 @@ import com.example.tastefulai.global.constant.EndpointConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,6 +30,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // 인증 관리자 설정
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -41,13 +43,17 @@ public class SecurityConfig {
                 //브라우저 팝업창 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
 
+                // CORS 설정 활성화
+                .cors(cors -> cors.configure(httpSecurity))
+
                 // CSRF 비활성화
                 .csrf(AbstractHttpConfigurer::disable)
 
                 // 요청 권한 설정
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                                .requestMatchers(EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청 허용
-                                .anyRequest().authenticated() // 그 외 요청 인증 필요
+                        .requestMatchers("/map","location",EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청 허용
+                        .requestMatchers("/api/location/**").authenticated()
+                        .anyRequest().authenticated() // 그 외 요청 인증 필요
                 )
 
                 // JWT 인증 필터 추가

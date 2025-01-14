@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사용자 위치 기반 맛집 검색</title>
+  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_JAVASCRIPT_API&libraries=services"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #container {
+      display: flex;
+      flex: 1;
+    }
+
+    #map {
+      flex: 6;
+      height: 100%;
+    }
+
+    #placesList {
+      flex: 4;
+      height: 100%;
+      overflow-y: auto;
+      border-left: 1px solid #ddd;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    #placesList li {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+    }
+
+    #placesList li:hover {
+      background: #f5f5f5;
+    }
+
+    #pagination {
+      margin: 10px 0;
+      text-align: center;
+      clear: both;
+    }
+
+    #pagination a {
+      margin: 0 5px;
+      text-decoration: none;
+      color: #333;
+    }
+
+    #pagination a:hover {
+      text-decoration: underline;
+    }
+
+    header {
+      padding: 10px;
+      background: #f8f8f8;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    header input {
+      padding: 5px;
+      margin-right: 5px;
+      width: 200px;
+    }
+
+    header button {
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>사용자 위치 기반 맛집 검색</h1>
+  <input type="text" id="keyword" placeholder="검색어를 입력하세요" value="맛집">
+  <button onclick="searchPlaces()">검색</button>
+</header>
+<div id="container">
+  <div id="map"></div>
+  <ul id="placesList"></ul>
+</div>
+<div id="pagination"></div>
+
+<script>
+  var mapContainer = document.getElementById('map');
+  var mapOption = {
+    center: new kakao.maps.LatLng(37.566826, 126.9786567), // 기본 좌표 (서울 중심)
+    level: 5 // 확대 레벨
+  };
+
+  var map = new kakao.maps.Map(mapContainer, mapOption);
+  var ps = new kakao.maps.services.Places(); // 장소 검색 객체 생성
+  var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 }); // 인포윈도우 생성
+  var currentPosition = null;
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+            function(position) {
+              currentPosition = new kakao.maps.LatLng(position.coords.latitude, position.coords.longitude);
+              map.setCenter(currentPosition);
+            },
+            function(error) {
+              alert("위치 정보를 가져올 수 없어 기본 위치를 사용합니다.");
+            }
+    );
+  } else {
+    alert("위치 정보 기능을 지원하지 않는 브라우저입니다.");
+  }
+
+  function searchPlaces() {
+    var keyword = document.getElementById('keyword').value.trim();
+
+    if (!keyword) {
+      alert('검색어를 입력해주세요!');
+      return;
+    }
+
+    ps.keywordSearch(keyword, placesSearchCB, {
+      location: currentPosition || map.getCenter(), // 사용자 위치 기반 검색
+      radius: 5000 // 5km 반경
+    });
+  }
+
+  function placesSearchCB(data, status, pagination) {
+    if (status === kakao.maps.services.Status.OK) {
+      displayPlaces(data); // 검색 결과 목록 표시
+      displayPagination(pagination); // 페이지 네비게이션 표시
+    } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+      alert('검색 결과가 없습니다.');
+    } else if (status === kakao.maps.services.Status.ERROR) {
+      alert('검색 중 오류가 발생했습니다.');
+    }
+  }
+
+  function displayPlaces(places) {
+    var listEl = document.getElementById('placesList');
+    var bounds = new kakao.maps.LatLngBounds();
+
+    listEl.innerHTML = '';
+
+    for (var i = 0; i < places.length; i++) {
+      var place = places[i];
+      var itemEl = document.createElement('li'); // 목록 아이템 생성
+
+      itemEl.innerHTML = `
+        <span>${i + 1}. </span>
+        <strong>${place.place_name}</strong><br>
+        <small>${place.road_address_name || place.address_name}</small><br>
+        <small>${place.phone || '전화번호 없음'}</small>
+      `;
+
+      listEl.appendChild(itemEl);
+      (function(marker, title) {
+        kakao.maps.event.addListener(marker, 'mouseover', function() {
+          infowindow.setContent(`<div style="padding:5px;">${title}</div>`);
+          infowindow.open(map, marker);
+        });
+
+        kakao.maps.event.addListener(marker, 'mouseout', function() {
+          infowindow.close();
+        });
+
+        itemEl.onmouseover = function() {
+          infowindow.setContent(`<div style="padding:5px;">${title}</div>`);
+          infowindow.open(map, marker);
+        };
+
+        itemEl.onmouseout = function() {
+          infowindow.close();
+        };
+      })(displayMarker(place), place.place_name);
+
+      bounds.extend(new kakao.maps.LatLng(place.y, place.x));
+    }
+
+    map.setBounds(bounds);
+  }
+
+  function displayMarker(place) {
+    var marker = new kakao.maps.Marker({
+      map: map,
+      position: new kakao.maps.LatLng(place.y, place.x)
+    });
+    return marker;
+  }
+
+  function displayPagination(pagination) {
+    var paginationEl = document.getElementById('pagination');
+    paginationEl.innerHTML = '';
+
+    for (var i = 1; i <= pagination.last; i++) {
+      var a = document.createElement('a');
+      a.href = '#';
+      a.innerHTML = i;
+
+      if (i === pagination.current) {
+        a.style.fontWeight = 'bold';
+      } else {
+        a.onclick = (function(i) {
+          return function() {
+            pagination.gotoPage(i);
+          };
+        })(i);
+      }
+
+      paginationEl.appendChild(a);
+    }
+  }
+</script>
+</body>
+</html>
