@@ -17,7 +17,7 @@ public interface MemberService {
 
     void logout(String token);
 
-    void changePassword(String email, String currentPassword, String newPassword, String currentAccessToken);
+    void updatePassword(String email, String currentPassword, String newPassword, String currentAccessToken);
 
     void verifyPassword(Long memberId, String password);
 

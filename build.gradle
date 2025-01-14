@@ -34,6 +34,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
@@ -71,6 +73,9 @@ dependencies {
 
     //Tika
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.7.0'
+
+    // kakao api
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     // OpenAI API 연동을 위한 WebClient
     implementation "org.springframework.ai:spring-ai-openai-spring-boot-starter"
