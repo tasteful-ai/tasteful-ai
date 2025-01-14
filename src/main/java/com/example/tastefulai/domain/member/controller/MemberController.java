@@ -7,6 +7,8 @@ import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import com.example.tastefulai.global.common.dto.JwtAuthResponse;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
+import com.example.tastefulai.global.error.errorcode.ErrorCode;
+import com.example.tastefulai.global.error.exception.CustomException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -70,40 +74,52 @@ public class MemberController {
     // 4. 비밀번호 변경
     @Transactional
     @PatchMapping("/passwords")
-    public ResponseEntity<CommonResponseDto<Void>> changePassword(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
+    public ResponseEntity<CommonResponseDto<Void>> updatePassword(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
                                                                   @RequestHeader("Authorization") String authorizationHeader,
-                                                                  @Valid @RequestBody PasswordChangeRequestDto passwordChangeRequestDto) {
+                                                                  @Valid @RequestBody PasswordUpdateRequestDto passwordUpdateRequestDto) {
 
         String email = memberDetailsImpl.getUsername();
-        String currentPassword = passwordChangeRequestDto.getCurrentPassword();
-        String newPassword = passwordChangeRequestDto.getNewPassword();
+        String currentPassword = passwordUpdateRequestDto.getCurrentPassword();
+        String newPassword = passwordUpdateRequestDto.getNewPassword();
         String currentAccessToken = authorizationHeader.replace("Bearer ", "");
 
-        memberService.changePassword(email, currentPassword, newPassword, currentAccessToken);
+        memberService.updatePassword(email, currentPassword, newPassword, currentAccessToken);
 
         return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 변경 완료", null), HttpStatus.OK);
     }
 
     // 5. 비밀번호 검증
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("/members/{memberId}/check")
     public ResponseEntity<CommonResponseDto<Void>> verifyPassword(@PathVariable Long memberId,
                                                                   @Valid @RequestBody PasswordVerifyRequestDto passwordVerifyRequestDto) {
         String password = passwordVerifyRequestDto.getPassword();
+
+        // 현재 로그인된 사용자 정보 조회
+        MemberDetailsImpl currentUser = (MemberDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // 현재 로그인된 사용자와 사용자 ID 비교
+        if(!currentUser.getId().equals(memberId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MEMBER);
+        }
 
         memberService.verifyPassword(memberId, password);
 
         return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 검증 완료",null), HttpStatus.OK);
     }
 
-    // 6. 회원탈퇴
+    // 6. 일반 사용자 = 자신의 계정 삭제
+    @PreAuthorize("hasRole('USER') or hasRole('OWNER')")
     @DeleteMapping("/members/{memberId}")
-    public ResponseEntity<CommonResponseDto<Void>> delete(@PathVariable Long memberId) {
+    public ResponseEntity<CommonResponseDto<Void>> deleteOwnAccount(@PathVariable Long memberId) {
 
         memberService.deleteMember(memberId);
 
         return new ResponseEntity<>(new CommonResponseDto<>("회원 탈퇴 완료",null), HttpStatus.OK);
     }
 
+
+    // ** 공통 로직 **
     private ResponseCookie createCookie(String name, String value, long maxAge) {
         return ResponseCookie.from(name, value)
                 .httpOnly(true)
