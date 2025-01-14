@@ -2,6 +2,7 @@ package com.example.tastefulai.global.config.filter;
 
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
+import com.example.tastefulai.global.common.service.RedisService;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
@@ -29,6 +30,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisService redisService;
 
     // 요청시 실행하는 메서드
     @Override
@@ -42,7 +44,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // 토큰 유효성 검증
             if (jwtProvider.validateToken(token)) {
                 // 블랙리스트 확인
-                if (isBlacklisted(token)) {
+                if (redisService.isBlacklisted(token)) {
                     throw new CustomException(ErrorCode.INVALID_TOKEN);
                 }
 
@@ -69,10 +71,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // 요청 Header를 통한 "Authorization" 값 추출
         String bearerToken = httpServletRequest.getHeader("Authorization");
         return (bearerToken != null && bearerToken.startsWith("Bearer ")) ? bearerToken.substring(7) : null;
-    }
-
-    private boolean isBlacklisted(String token) {
-        // Redis에서 블랙리스트에 해당 토큰이 있는지 확인
-        return redisTemplate.hasKey("BLACKLIST:" + token);
     }
 }
