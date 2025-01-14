@@ -85,11 +85,11 @@ dependencies {
 //    implementation "org.springframework.boot:spring-boot-devtools"
 }
 
-dependencyManagement {
-    imports {
+//dependencyManagement {
+//    imports {
 //        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
-    }
-}
+//    }
+//}
 
 tasks.named('test') {
     useJUnitPlatform()

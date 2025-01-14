@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
 @SpringBootApplication
-//@ConfigurationPropertiesScan("com.example")
 public class TastefulAiApplication {
 
     public static void main(String[] args) {
