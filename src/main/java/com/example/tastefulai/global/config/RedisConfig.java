@@ -20,11 +20,21 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     //Redis 서버와 연결
-    @Bean
+    @Bean(name = "chatRedisConnectionFactory")
     public RedisConnectionFactory redisConnectionFactory() {
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory("localhost", 6379);
         log.info("Redis 연결 생성: {}:{}", lettuceConnectionFactory.getHostName(), lettuceConnectionFactory.getPort());
         return lettuceConnectionFactory;
+    }
+
+    @Bean(name = "chatRedisTemplate")
+    public RedisTemplate<String, Object> chatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+
+        return redisTemplate;
     }
 
     @Bean
@@ -55,13 +65,13 @@ public class RedisConfig {
     //Redis 채널 구독 및 메시지 수신 처리 : 메시지 리스너를 등록하여 Redis 채널 메시지를 수신
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
-            RedisConnectionFactory redisConnectionFactory,
+            RedisConnectionFactory chatRedisConnectionFactory,
             MessageListenerAdapter messageListener
     ) {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
 
         //특정 채널 "chatroom"을 구독
-        redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
+        redisMessageListenerContainer.setConnectionFactory(chatRedisConnectionFactory);
         redisMessageListenerContainer.addMessageListener(messageListener, new PatternTopic("chatroom:*"));
 
         return redisMessageListenerContainer;
