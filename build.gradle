@@ -84,6 +84,10 @@ dependencies {
 
     //thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+    // kakao api
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 dependencyManagement {

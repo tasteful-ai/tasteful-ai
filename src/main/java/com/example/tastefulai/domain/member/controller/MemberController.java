@@ -72,11 +72,11 @@ public class MemberController {
     @PatchMapping("/passwords")
     public ResponseEntity<CommonResponseDto<Void>> changePassword(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
                                                                   @RequestHeader("Authorization") String authorizationHeader,
-                                                                  @Valid @RequestBody PasswordUpdateRequestDto passwordChangeRequestDto) {
+                                                                  @Valid @RequestBody PasswordChangeRequestDto passwordChangeRequestDto) {
 
         String email = memberDetailsImpl.getUsername();
-        String currentPassword = passwordChangeRequestDto.getCurrentPassword();
-        String newPassword = passwordChangeRequestDto.getNewPassword();
+        String currentPassword = passwordUpdateRequestDto.getCurrentPassword();
+        String newPassword = passwordUpdateRequestDto.getNewPassword();
         String currentAccessToken = authorizationHeader.replace("Bearer ", "");
 
         memberService.updatePassword(email, currentPassword, newPassword, currentAccessToken);

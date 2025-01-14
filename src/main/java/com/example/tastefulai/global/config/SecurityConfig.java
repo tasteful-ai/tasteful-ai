@@ -34,16 +34,16 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // 인증 관리자 설정
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // 애플리케이션 보안 필터 체인
-    // 스프링시큐리티 버전에 맞게 코드 작성 -> 람다식
+    // 애플리케이션 보안 설정(Spring Security 6.x 이상 대응)
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        DefaultSecurityFilterChain build = httpSecurity
+        return httpSecurity
                 //브라우저 팝업창 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
 
@@ -54,20 +54,22 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
 
                 // 요청 권한 설정
-                .authorizeHttpRequests(
-                        request -> request.requestMatchers(EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll()// 회원가입과 로그인 요청 허용
-                                .requestMatchers("/ws-chat/**").permitAll()
-                                .requestMatchers("/test").permitAll()
-
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // OPTIONS 허용
-                                .anyRequest().authenticated() // 그 외 요청 인증 필요
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .requestMatchers("/map","location",EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청 허용
+                        .requestMatchers("/api/location/**").authenticated()
+                        .anyRequest().authenticated() // 그 외 요청 인증 필요
+                        .requestMatchers("/ws-chat/**").permitAll()
+                        .requestMatchers("/test").permitAll()
                 )
+
                 // JWT 인증 필터 추가
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // 세션 정책 설정 (무상태)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 최종 보안 필터 체인 빌드
                 .build();
-        return build;
-    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
