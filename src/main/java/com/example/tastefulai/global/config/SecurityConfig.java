@@ -5,7 +5,6 @@ import com.example.tastefulai.global.constant.EndpointConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity  //@Configuration 어노테이션 포함 및 보안 기능 활성화
@@ -51,8 +53,10 @@ public class SecurityConfig {
 
                 // 요청 권한 설정
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers("/map","location",EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청 허용
+                        .requestMatchers("/map", "location", EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청 허용
                         .requestMatchers("/api/location/**").authenticated()
+                        .requestMatchers("/ws-chat/**").permitAll()
+                        .requestMatchers("/test").permitAll()
                         .anyRequest().authenticated() // 그 외 요청 인증 필요
                 )
 
@@ -64,7 +68,6 @@ public class SecurityConfig {
 
                 // 최종 보안 필터 체인 빌드
                 .build();
-
     }
 }
 

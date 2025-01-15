@@ -7,10 +7,10 @@ import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,10 +25,11 @@ public class ChattingMessageContoller {
 
     @PostMapping
     public ResponseEntity<CommonResponseDto<ChattingMessageResponseDto>> sendMessage(
-            @RequestHeader("Member-Id") Long memberId,
+            Authentication authentication,
             @RequestBody ChattingMessageRequestDto chattingMessageRequestDto) {
 
-        ChattingMessageResponseDto chattingMessageResponseDto = chattingMessageService.saveMessage(memberId, chattingMessageRequestDto);
+        String memberEmail = authentication.getName();
+        ChattingMessageResponseDto chattingMessageResponseDto = chattingMessageService.saveMessage(memberEmail, chattingMessageRequestDto);
 
         return new ResponseEntity<>(new CommonResponseDto<>("메시지 전송 성공", chattingMessageResponseDto), HttpStatus.CREATED);
     }
