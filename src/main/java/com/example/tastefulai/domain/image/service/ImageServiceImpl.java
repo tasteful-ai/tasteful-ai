@@ -25,13 +25,11 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     @Transactional
-    public ImageResponseDto uploadImage(Long memberId, MultipartFile image) throws IOException {
-
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+    public ImageResponseDto uploadImage(Member member, MultipartFile image) throws IOException {
 
         // 기존에 저장된 사진을 db와 S3에서 삭제
         if (member.getImage() != null) {
-            deleteImage(memberId);
+            deleteImage(member);
         }
 
         // S3에 사진 저장
@@ -45,9 +43,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     @Transactional
-    public void deleteImage(Long memberId) {
-
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+    public void deleteImage(Member member) {
 
         Image image = member.getImage();
         if (image == null) {

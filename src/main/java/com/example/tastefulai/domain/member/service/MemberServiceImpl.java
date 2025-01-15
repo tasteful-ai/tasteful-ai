@@ -155,18 +155,17 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public ProfileResponseDto updateNickname(Long memberId, String nickname) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+    public ProfileResponseDto updateNickname(Member member, String nickname) {
 
         member.updateNickname(nickname);
+
+        memberRepository.save(member);
 
         return Member.toProfileDto(member);
     }
 
     @Override
-    public ProfileResponseDto getMember(Long memberId) {
-
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+    public ProfileResponseDto getMemberProfile(Member member) {
 
         return Member.toProfileDto(member);
     }
