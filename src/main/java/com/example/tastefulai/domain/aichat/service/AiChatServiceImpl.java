@@ -2,42 +2,48 @@ package com.example.tastefulai.domain.aichat.service;
 
 import com.example.tastefulai.domain.aichat.dto.AiChatRequestDto;
 import com.example.tastefulai.domain.aichat.dto.AiChatResponseDto;
-import com.example.tastefulai.global.config.AiConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class AiChatServiceImpl implements AiChatService {
 
     private final ChatClient chatClient;
-    private final AiConfig aiConfig;
+    private final ObjectMapper objectMapper;
 
     @Override
     public AiChatResponseDto createMenuRecommendation(AiChatRequestDto aiChatRequestDto) {
 
-        // ChatClient를 사용해 AI 메시지 전달 및 응답 받기
+        // 프롬프트 사용
+        String prompt = "오늘 점심메뉴를 하나만 추천해주세요. 응답은 JSON 형식으로 {'recommendation': '메뉴이름'}으로 작성해주세요.";
+
+        // ChatClient를 사용해 AI에게 메시지 전달 및 응답 받음
         String response = chatClient.prompt()
-                .user(aiChatRequestDto.message())
+                .user(prompt)
                 .call()
                 .content();
 
-        // 응답에서 메뉴 추천 하나만 추출
-        String singleRecommendation = parseSingleRecommendation(response);
+        // JSON 응답 파싱
+        try {
+            Map<String, String> responseMap = objectMapper.readValue(response, Map.class);
 
-        return new AiChatResponseDto(singleRecommendation.trim());
-    }
+            String recommendation = responseMap.get("recommendation");
 
-    private String parseSingleRecommendation(String recommendation) {
+            if (recommendation == null || recommendation.isEmpty()) {
 
-        // 간단한 줄바꿈이나 마침표를 기준으로 첫 번째 메뉴만 반환
-        if (recommendation == null || recommendation.isEmpty()) {
+                return new AiChatResponseDto("추천할 메뉴가 없습니다.");
+            }
 
-            return "추천할 메뉴가 없습니다.";
+            return new AiChatResponseDto(recommendation.trim());
+        } catch (Exception exception) {
+
+            // 파싱 오류 시 기본 메시지 반환
+            return new AiChatResponseDto("추천할 메뉴를 파싱하는 데 실패했습니다.");
         }
-        String[] parts = recommendation.split("[\n.,]]");
-
-        return parts.length > 0 ? parts[0] : recommendation;
     }
 }
