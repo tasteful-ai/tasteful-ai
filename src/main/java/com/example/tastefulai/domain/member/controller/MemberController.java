@@ -105,7 +105,7 @@ public class MemberController {
 
         memberService.verifyPassword(memberId, password);
 
-        return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 검증 완료",null), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 검증 완료", null), HttpStatus.OK);
     }
 
     // 6. 일반 사용자 = 자신의 계정 삭제
@@ -115,7 +115,7 @@ public class MemberController {
 
         memberService.deleteMember(memberId);
 
-        return new ResponseEntity<>(new CommonResponseDto<>("회원 탈퇴 완료",null), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("회원 탈퇴 완료", null), HttpStatus.OK);
     }
 
 

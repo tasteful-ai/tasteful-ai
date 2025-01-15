@@ -34,13 +34,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     //spring-security
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     testImplementation 'org.springframework.security:spring-security-test'
 
     // lombok
@@ -58,6 +56,11 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
+    //websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    testImplementation 'org.springframework:spring-websocket'
+    testImplementation 'org.springframework:spring-messaging'
+
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.jetbrains:annotations:24.0.1'
@@ -74,8 +77,20 @@ dependencies {
     //Tika
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.7.0'
 
+    // H2 Database for testing
+    testImplementation 'com.h2database:h2'
+
+    // MockMVC for controller testing
+    testImplementation 'org.mockito:mockito-core:5.4.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.4.0'
+
+    //thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
     // kakao api
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+
 
     // OpenAI API 연동을 위한 WebClient
     implementation "org.springframework.ai:spring-ai-openai-spring-boot-starter"

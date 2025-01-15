@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -34,7 +35,13 @@ public class MemberServiceImpl implements MemberService {
     private static final String ACCESS_TOKEN_KEY = "access_token:";
     private final MemberDetailsServiceImpl memberDetailsServiceImpl;
 
-    // 1. 회원가입
+    /**
+     * 1. 회원 가입 :
+     * - 중복 닉네임 확인,
+     * - 이메일 중복 여부 확인,
+     * - 이메일 형식 확인,
+     * - 비밀번호 패턴 확인,
+     */
     public MemberResponseDto signup(String email, String password, String nickname,
                                     Integer age, GenderRole genderRole, MemberRole memberRole) {
 
@@ -54,7 +61,12 @@ public class MemberServiceImpl implements MemberService {
         return new MemberResponseDto(member.getId(), member.getMemberRole(), member.getEmail(), member.getNickname());
     }
 
-    // 2. 로그인
+    /**
+     * 2. 로그인 :
+     * - 사용자 확인
+     * - 비밀번호 확인
+     * - 인증 객체 생성 및 유효성 확인
+     */
     public JwtAuthResponse login(String email, String password) {
         // 사용자 확인
         Member member = this.memberRepository.findActiveByEmail(email)
@@ -139,7 +151,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
-     *
      * 7. 닉네임 수정
      */
     @Override
@@ -170,11 +181,6 @@ public class MemberServiceImpl implements MemberService {
         redisTemplate.delete(VERIFY_PASSWORD_KEY + memberId);
     }
 
-    @Override
-    public Member findById(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
-    }
-
     // 비밀번호 검증 공통 로직
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
@@ -194,4 +200,15 @@ public class MemberServiceImpl implements MemberService {
     private void removeRefreshToken(String email) {
         redisTemplate.delete(REFRESH_TOKEN_KEY + email);
     }
+
+    @Override
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    @Override
+    public Member findById(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+    }
+
 }
