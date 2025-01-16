@@ -20,7 +20,7 @@ public class AiChatServiceImpl implements AiChatService {
     public AiChatResponseDto createMenuRecommendation(AiChatRequestDto aiChatRequestDto) {
 
         // 프롬프트 사용
-        String prompt = "오늘 점심메뉴를 하나만 추천해주세요. 응답은 JSON 형식으로 {'recommendation': '메뉴이름'}으로 작성해주세요.";
+        String prompt = "오늘 점심메뉴를 하나만 추천해. 응답은 반드시 JSON 형식으로, 큰따옴표만 사용해서. {\"recommendation\": \"메뉴 이름\"}";
 
         // ChatClient를 사용해 AI에게 메시지 전달 및 응답 받음
         String response = chatClient.prompt()
