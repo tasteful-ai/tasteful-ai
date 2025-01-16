@@ -22,6 +22,8 @@ public enum ErrorCode {
     INVALID_SPICY_LEVEL (HttpStatus.BAD_REQUEST, "유효하지 않은 매운 정도 값입니다."),
     NO_IMAGE_TO_DELETE (HttpStatus.BAD_REQUEST, "삭제할 파일이 존재하지 않습니다."),
     ADMIN_CANNOT_REMOVE_ADMIN(HttpStatus.BAD_REQUEST, "관리자는 다른 관리자를 삭제할 수 없습니다. "),
+    INVALID_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 요청입니다."),
+    INVALID_JSON(HttpStatus.BAD_REQUEST, "JSON 데이터 형식이 올바르지 않습니다."),
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "로그인 해주세요."),
@@ -46,5 +48,13 @@ public enum ErrorCode {
     ErrorCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
         this.message = message;
+    }
+
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
