@@ -27,8 +27,8 @@ public class RedisConfig {
         return lettuceConnectionFactory;
     }
 
-    @Bean(name = "chatRedisTemplate")
-    public RedisTemplate<String, Object> chatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    @Bean(name = "redisTemplate") // 현재는 채팅과 AI가 redisTemplate 공유. 추후 수정
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
@@ -46,6 +46,16 @@ public class RedisConfig {
 
         return redisTemplate;
     }
+
+//    @Bean(name = "aiChatRedisTemplate") // 추후 수정
+//    public RedisTemplate<String, Object> aiChatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+//        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+//        redisTemplate.setConnectionFactory(redisConnectionFactory);
+//        redisTemplate.setKeySerializer(new StringRedisSerializer());
+//        redisTemplate.setValueSerializer(new StringRedisSerializer());
+//
+//        return redisTemplate;
+//    }
 
     @Bean
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
