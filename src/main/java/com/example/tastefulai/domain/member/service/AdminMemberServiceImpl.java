@@ -43,4 +43,26 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         targetMember.softDelete();
         adminMemberRepository.save(targetMember);
     }
+
+    // 권한 변경 - 관리자용
+    @Override
+    @Transactional
+    public void updateMemberRole(Long memberId, String memberRole) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+
+        // 현재 사용자가 ADMIN 권한을 가지고 있지 않으면 예외 처리
+        if (!isAdmin) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_OPERATION);
+        }
+
+        // 변경 대상 회원 확인
+        Member targetMember = adminMemberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        targetMember.updateMemberRole(MemberRole.valueOf(memberRole));
+
+        adminMemberRepository.save(targetMember);
+    }
 }

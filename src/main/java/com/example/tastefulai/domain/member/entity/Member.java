@@ -56,13 +56,6 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Taste> tastes = new ArrayList<>();
 
-    public List<GrantedAuthority> getAuthorities() {
-        return List.of(memberRole)
-                .stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
-                .collect(Collectors.toList());
-    }
-
     // 생성자
     public Member(String email, String password, String nickname, Integer age,
                   GenderRole genderRole, MemberRole memberRole, LocalDateTime deletedAt) {
@@ -73,6 +66,13 @@ public class Member extends BaseEntity {
         this.genderRole = genderRole;
         this.memberRole = memberRole;
         this.deletedAt = deletedAt;
+    }
+
+    public List<GrantedAuthority> getAuthorities() {
+        return List.of(memberRole)
+                .stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                .collect(Collectors.toList());
     }
 
     public void softDelete() {
@@ -96,5 +96,9 @@ public class Member extends BaseEntity {
         String memberImageUrl = (member.getImage() == null) ? null : member.getImage().getImageUrl();
 
         return new ProfileResponseDto(member.getNickname(), memberImageUrl, member.getCreatedAt().toLocalDate(), "");
+    }
+
+    public void updateMemberRole(MemberRole memberRole) {
+        this.memberRole = memberRole;
     }
 }
