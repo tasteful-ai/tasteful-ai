@@ -9,18 +9,22 @@ import com.example.tastefulai.global.error.exception.UnAuthorizedException;
 import com.example.tastefulai.global.error.response.ErrorResponse;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@ControllerAdvice
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -67,5 +71,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxSizeException(MaxUploadSizeExceededException customException) {
         return ErrorResponse.toResponseEntity(ErrorCode.LARGE_FILE);
+    }
+
+    // 잘못된 데이터 요청 예외 처리
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleJsonParseException(HttpMessageNotReadableException ex) {
+        return ErrorResponse.toResponseEntity(ErrorCode.INVALID_JSON);
+    }
+
+    // 존재하지 않는 URL 요청 또는 잘못된 경로 접근 예외 처리
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NoHandlerFoundException ex) {
+        return ErrorResponse.toResponseEntity(ErrorCode.NOT_FOUND);
     }
 }
