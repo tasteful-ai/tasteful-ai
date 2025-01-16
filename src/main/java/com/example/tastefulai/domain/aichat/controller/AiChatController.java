@@ -4,8 +4,11 @@ import com.example.tastefulai.domain.aichat.dto.AiChatRequestDto;
 import com.example.tastefulai.domain.aichat.dto.AiChatResponseDto;
 import com.example.tastefulai.domain.aichat.service.AiChatService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
+import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +23,12 @@ public class AiChatController {
     private final AiChatService aiChatService;
 
     @PostMapping
-    public ResponseEntity<CommonResponseDto<AiChatResponseDto>> createMenuRecommendation(
-            @RequestBody AiChatRequestDto aiChatRequestDto
-    ) {
-        // 일반 회원 권한 인증 로직 추가 예정
+//    @PreAuthorize("hasRole('USER')") // USER 권한을 가진 사용자만 접근 가능
+    public ResponseEntity<CommonResponseDto<AiChatResponseDto>> createMenuRecommendation(@RequestBody AiChatRequestDto aiChatRequestDto,
+                                                                                         @AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
-        AiChatResponseDto aiChatResponseDto = aiChatService.createMenuRecommendation(aiChatRequestDto);
+        Long memberId = memberDetailsImpl.getId();
+        AiChatResponseDto aiChatResponseDto = aiChatService.createMenuRecommendation(aiChatRequestDto, memberId);
 
         return new ResponseEntity<>(
                 new CommonResponseDto<>("AI 메뉴 추천 완료", aiChatResponseDto),
