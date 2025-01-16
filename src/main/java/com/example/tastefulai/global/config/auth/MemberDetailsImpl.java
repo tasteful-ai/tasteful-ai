@@ -53,6 +53,15 @@ public class MemberDetailsImpl implements UserDetails {
     }
 
     /**
+     * 사용자의 자격 증명 반환.
+     *
+     * @return 사용자 ID
+     */
+    public Long getId() {
+        return this.member.getId();
+    }
+
+    /**
      * 계정 만료.
      *
      * @return 사용 여부
