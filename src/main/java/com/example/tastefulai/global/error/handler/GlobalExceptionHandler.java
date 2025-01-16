@@ -5,9 +5,11 @@ import com.example.tastefulai.global.error.exception.BadRequestException;
 import com.example.tastefulai.global.error.exception.CustomException;
 import com.example.tastefulai.global.error.exception.ForbiddenException;
 import com.example.tastefulai.global.error.exception.NotFoundException;
+import com.example.tastefulai.global.error.exception.ServiceUnavailableException;
 import com.example.tastefulai.global.error.exception.UnAuthorizedException;
 import com.example.tastefulai.global.error.response.ErrorResponse;
 import io.jsonwebtoken.JwtException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -67,5 +69,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxSizeException(MaxUploadSizeExceededException customException) {
         return ErrorResponse.toResponseEntity(ErrorCode.LARGE_FILE);
+    }
+
+    // 메뉴 추천 요청 횟수 초과 예외 처리
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<String> handleRequestLimitExceededException(ServiceUnavailableException ex) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(ex.getMessage());
     }
 }
