@@ -1,3 +1,232 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>WebSocket Test</title>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>WebSocket, STOMP, Redis Test</h1>-->
+<!--<div>-->
+<!--    <label for="message">Enter Message:</label>-->
+<!--    <input type="text" id="message" placeholder="Type your message here">-->
+<!--    <button onclick="sendMessage()">Send Message</button>-->
+<!--</div>-->
+<!--<div>-->
+<!--    <h2>Console Output</h2>-->
+<!--    <textarea id="consoleOutput" cols="80" rows="20" readonly></textarea>-->
+<!--</div>-->
+<!--<script>-->
+<!--    const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VydGVzdEBnbWFpbC5jb20iLCJpYXQiOjE3MzY5NjQ5OTcsImV4cCI6MTczNjk2ODU5N30.yAfe9ZOPBNvxvByv8sTeyPrJG5jWRYPQ3_IcKBjCnwo";-->
+<!--    const endpoint = "http://localhost:8080/ws-chat";-->
+
+<!--    // Initialize STOMP client-->
+<!--    const socket = new SockJS(endpoint);-->
+<!--    const stompClient = Stomp.over(socket);-->
+
+<!--    // Disable debug logs in the console-->
+<!--    stompClient.debug = (msg) => {-->
+<!--    };-->
+
+<!--    // Connect to WebSocket with Authorization header-->
+<!--    function connect() {-->
+<!--        const headers = {Authorization: `Bearer ${token}`};-->
+<!--        stompClient.connect(-->
+<!--            headers,-->
+<!--            (frame) => {-->
+<!--                logMessage(`Connected: ${frame}`);-->
+<!--                subscribeToTopic();-->
+<!--            },-->
+<!--            (error) => logMessage(`Connection error: ${error}`)-->
+<!--        );-->
+<!--    }-->
+
+<!--    // Subscribe to a topic-->
+<!--    function subscribeToTopic() {-->
+<!--        stompClient.subscribe('/sub/chat', (message) => {-->
+<!--            logMessage(`Received message: ${message.body}`);-->
+<!--        });-->
+<!--    }-->
+
+<!--    // Send a message to the server-->
+<!--    function sendMessage() {-->
+<!--        const messageInput = document.getElementById("message");-->
+<!--        const message = messageInput.value;-->
+<!--        if (!message) {-->
+<!--            logMessage("Message cannot be empty!");-->
+<!--            return;-->
+<!--        }-->
+<!--        const payload = JSON.stringify({-->
+<!--            sender: "testUser",-->
+<!--            message: message,-->
+<!--        });-->
+<!--        const headers = {Authorization: `Bearer ${token}`}; // Include the token in headers-->
+<!--        stompClient.send('/pub/chat', headers, payload);-->
+<!--        logMessage(`Message sent: ${message}`);-->
+<!--        messageInput.value = "";-->
+<!--    }-->
+
+<!--    // Log messages to the output textarea-->
+<!--    function logMessage(message) {-->
+<!--        const output = document.getElementById("consoleOutput");-->
+<!--        output.value += `[${new Date().toISOString()}] ${message}\n`;-->
+<!--        output.scrollTop = output.scrollHeight;-->
+<!--    }-->
+
+<!--    // Automatically connect on page load-->
+<!--    connect();-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>WebSocket Test</title>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>WebSocket, STOMP, Redis Test</h1>-->
+
+<!--<div>-->
+<!--    <h2>Login</h2>-->
+<!--    <input type="email" id="email" placeholder="Email">-->
+<!--    <input type="password" id="password" placeholder="Password">-->
+<!--    <button onclick="login()">Login</button>-->
+<!--</div>-->
+
+<!--<div>-->
+<!--    <h2>Send Message</h2>-->
+<!--    <input type="text" id="message" placeholder="Message">-->
+<!--    <button onclick="sendMessage()">Send</button>-->
+<!--</div>-->
+
+<!--<div>-->
+<!--    <h2>Received Messages</h2>-->
+<!--    <textarea id="messages" rows="10" cols="80" readonly></textarea>-->
+<!--</div>-->
+
+<!--<div>-->
+<!--    <h2>Console Output</h2>-->
+<!--    <textarea id="consoleOutput" cols="80" rows="20" readonly></textarea>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    let stompClient = null;-->
+<!--    let token = null;-->
+
+<!--    // Login and fetch token-->
+<!--    async function login() {-->
+<!--        const email = document.getElementById("email").value;-->
+<!--        const password = document.getElementById("password").value;-->
+
+<!--        if (!email || !password) {-->
+<!--            alert("Email and password are required!");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        try {-->
+<!--            const response = await fetch("http://localhost:8080/api/auth/login", {-->
+<!--                method: "POST",-->
+<!--                headers: {-->
+<!--                    "Content-Type": "application/json"-->
+<!--                },-->
+<!--                body: JSON.stringify({email, password})-->
+<!--            });-->
+
+<!--            if (!response.ok) {-->
+<!--                logMessage(`Login failed with status: ${response.status}`);-->
+<!--                const errorText = await response.text();-->
+<!--                logMessage(`Response body: ${errorText}`);-->
+<!--                alert("Login failed! Check your credentials.");-->
+<!--                return;-->
+<!--            }-->
+
+<!--            const data = await response.json();-->
+<!--            logMessage(`Login response data: ${JSON.stringify(data)}`);-->
+
+<!--            if (!data || !data.data) {-->
+<!--                logMessage(`Invalid token data: ${JSON.stringify(data)}`);-->
+<!--                alert("Failed to retrieve token from login response.");-->
+<!--                return;-->
+<!--            }-->
+
+<!--            token = `Bearer ${data.data}`;-->
+<!--            logMessage(`Token received and set: ${token}`);-->
+<!--            connectWebSocket();-->
+<!--        } catch (error) {-->
+<!--            logMessage(`Login error: ${error}`);-->
+<!--            alert("An error occurred during login. Check the console for details.");-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Connect WebSocket-->
+<!--    function connectWebSocket() {-->
+<!--        if (!token) {-->
+<!--            alert("You must login first!");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        const socket = new SockJS("http://localhost:8080/ws-chat");-->
+<!--        stompClient = Stomp.over(socket);-->
+
+<!--        stompClient.debug = (msg) => logMessage(msg);-->
+
+<!--        stompClient.connect(-->
+<!--            {Authorization: token},-->
+<!--            (frame) => {-->
+<!--                logMessage(`Connected to WebSocket: ${frame}`);-->
+<!--                subscribeToTopic();-->
+<!--            },-->
+<!--            (error) => {-->
+<!--                logMessage(`WebSocket connection error: ${error}`);-->
+<!--                alert("Failed to connect to WebSocket. Check the console for details.");-->
+<!--            }-->
+<!--        );-->
+<!--    }-->
+
+<!--    // Subscribe to topic-->
+<!--    function subscribeToTopic() {-->
+<!--        stompClient.subscribe("/sub/chat", (message) => {-->
+<!--            const messagesArea = document.getElementById("messages");-->
+<!--            messagesArea.value += `[${new Date().toISOString()}] ${message.body}\n`;-->
+<!--        });-->
+<!--    }-->
+
+<!--    // Send message-->
+<!--    function sendMessage() {-->
+<!--        if (!stompClient || !token) {-->
+<!--            alert("You must login and connect to WebSocket first!");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        const message = document.getElementById("message").value;-->
+<!--        if (!message) {-->
+<!--            alert("Message cannot be empty!");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        stompClient.send("/pub/chat", {Authorization: token}, JSON.stringify({message}));-->
+<!--        logMessage(`Message sent: ${message}`);-->
+<!--        document.getElementById("message").value = "";-->
+<!--    }-->
+
+<!--    // Log messages to the output textarea-->
+<!--    function logMessage(message) {-->
+<!--        const output = document.getElementById("consoleOutput");-->
+<!--        output.value += `[${new Date().toISOString()}] ${message}\n`;-->
+<!--        output.scrollTop = output.scrollHeight;-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,66 +238,151 @@
 </head>
 <body>
 <h1>WebSocket, STOMP, Redis Test</h1>
+
 <div>
-    <label for="message">Enter Message:</label>
-    <input type="text" id="message" placeholder="Type your message here">
-    <button onclick="sendMessage()">Send Message</button>
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
 </div>
+
 <div>
-    <h2>Console Output</h2>
-    <textarea id="consoleOutput" cols="80" rows="20" readonly></textarea>
+    <h2>Send Message</h2>
+    <input type="text" id="message" placeholder="Message">
+    <button onclick="sendMessage()">Send</button>
 </div>
+
+<div>
+    <h2>Received Messages</h2>
+    <textarea id="messages" rows="10" cols="80" readonly></textarea>
+</div>
+
 <script>
-    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VydGVzdEBnbWFpbC5jb20iLCJpYXQiOjE3MzY3NjcwMTgsImV4cCI6MTczNjc3MDYxOH0.AeLXgepQClgoohoZgkjAl7KfwpsxjN0EZ0FX_nMHHHY";
-    const endpoint = "http://localhost:8080/ws-chat";
+    let stompClient = null;
+    let token = null;
 
-    // Set up SockJS and STOMP client
-    const socket = new SockJS(endpoint);
-    const stompClient = Stomp.over(socket);
+    // Login and fetch token
+    async function login() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-    // Disable debug logs in the console
-    stompClient.debug = (msg) => console.log(msg);
-
-    // Connect to WebSocket with Authorization header
-    stompClient.connect(
-        {Authorization: `Bearer ${token}`},
-        (frame) => {
-            logMessage(`Connected: ${frame}`);
-            subscribeToTopic();
-        },
-        (error) => logMessage(`Connection error: ${error}`)
-    );
-
-    // Subscribe to the topic
-    function subscribeToTopic() {
-        stompClient.subscribe('/sub/chat', (message) => {
-            logMessage(`Received message: ${message.body}`);
-        });
-    }
-
-    // Send a message to the server
-    function sendMessage() {
-        const messageInput = document.getElementById("message");
-        const message = messageInput.value;
-        if (!message) {
-            logMessage("Message cannot be empty!");
+        if (!email || !password) {
+            alert("Email and password are required!");
             return;
         }
-        const payload = JSON.stringify({
-            sender: "testUser",
-            message: message
-        });
-        stompClient.send('/pub/chat', {Authorization: `Bearer ${token}`}, payload);
-        logMessage(`Message sent: ${message}`);
-        messageInput.value = "";
+
+        try {
+            const response = await fetch("http://localhost:8080/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({email, password})
+            });
+
+            if (!response.ok) {
+                console.error("Login failed with status:", response.status);
+                const errorText = await response.text();
+                console.error("Response body:", errorText);
+                alert("Login failed! Check your credentials.");
+                return;
+            }
+
+            const responseData = await response.json();
+            console.log("Login response data:", responseData);
+
+            if (responseData.data && responseData.data.accessToken) {
+                token = `${responseData.data.accessToken}`;
+                console.log("Access Token received:", token);
+
+                connectWebSocket(); // Connect to WebSocket after successful login
+            } else {
+                console.error("Invalid token data:", responseData);
+                alert("Failed to retrieve token from login response.");
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            alert("An error occurred during login. Check the console for details.");
+        }
+
     }
 
-    // Log messages to the output textarea
-    function logMessage(message) {
-        const output = document.getElementById("consoleOutput");
-        output.value += `[${new Date().toISOString()}] ${message}\n`;
-        output.scrollTop = output.scrollHeight;
+    // // Connect WebSocket
+    // function connectWebSocket() {
+    //     if (!token) {
+    //         alert("You must login first!");
+    //         return;
+    //     }
+    //
+    //     const socket = new SockJS("http://localhost:8080/ws-chat");
+    //     stompClient = Stomp.over(socket);
+    //
+    //     stompClient.connect(
+    //         {Authorization: token}, // Include token in headers
+    //         (frame) => {
+    //             console.log("Connected to WebSocket:", frame);
+    //             subscribeToTopic();
+    //         },
+    //         (error) => {
+    //             console.error("WebSocket connection error:", error);
+    //             alert("Failed to connect to WebSocket. Check the console for details.");
+    //         }
+    //     );
+    // }
+
+    function connectWebSocket() {
+        if (!token) {
+            alert("You must login first!");
+            return;
+        }
+
+        // Create a SockJS WebSocket connection
+        const socket = new SockJS("/ws-chat");
+        stompClient = Stomp.over(socket);
+
+        // Include the token in the Authorization header
+        const headers = {
+            Authorization: `Bearer ${token}` // Bearer token 형식
+        };
+
+        stompClient.connect(
+            headers, // Pass the headers object here
+            (frame) => {
+                console.log("Connected to WebSocket:", frame);
+                subscribeToTopic(); // Subscribe to desired topic
+            },
+            (error) => {
+                console.error("WebSocket connection error:", error);
+                alert("Failed to connect to WebSocket. Check the console for details.");
+            }
+        );
+    }
+
+    // Subscribe to topic
+    function subscribeToTopic() {
+        stompClient.subscribe("/sub/chat", (message) => {
+            const messagesArea = document.getElementById("messages");
+            messagesArea.value += `[${new Date().toISOString()}] ${message.body}\n`;
+        });
+    }
+
+    // Send message
+    function sendMessage() {
+        if (!stompClient || !token) {
+            alert("You must login and connect to WebSocket first!");
+            return;
+        }
+
+        const message = document.getElementById("message").value;
+        if (!message) {
+            alert("Message cannot be empty!");
+            return;
+        }
+
+        stompClient.send("/pub/chat", {Authorization: token}, JSON.stringify({message}));
+        document.getElementById("message").value = "";
     }
 </script>
 </body>
 </html>
+
