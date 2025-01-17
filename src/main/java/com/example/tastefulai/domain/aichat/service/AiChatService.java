@@ -5,5 +5,5 @@ import com.example.tastefulai.domain.aichat.dto.AiChatResponseDto;
 
 public interface AiChatService {
 
-    AiChatResponseDto createMenuRecommendation(AiChatRequestDto aiChatRequestDto);
+    AiChatResponseDto createMenuRecommendation(AiChatRequestDto aiChatRequestDto, Long memberId);
 }

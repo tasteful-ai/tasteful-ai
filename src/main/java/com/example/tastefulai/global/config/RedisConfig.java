@@ -13,13 +13,14 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Slf4j
 @Configuration
 public class RedisConfig {
 
-    //Redis 서버와 연결
+    // Redis 서버와 연결
     @Bean(name = "chatRedisConnectionFactory")
     public RedisConnectionFactory redisConnectionFactory() {
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory("localhost", 6379);
@@ -27,17 +28,7 @@ public class RedisConfig {
         return lettuceConnectionFactory;
     }
 
-    @Bean(name = "chatRedisTemplate")
-    public RedisTemplate<String, Object> chatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-
-        return redisTemplate;
-    }
-
-    @Bean
+    @Bean(name = "redisTemplate") // 현재는 채팅과 AI가 redisTemplate 공유. 추후 수정
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
@@ -46,6 +37,26 @@ public class RedisConfig {
 
         return redisTemplate;
     }
+
+    @Bean(name = "aiRedisTemplate")
+    public RedisTemplate<String, Integer> aiRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Integer> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Integer.class));
+
+        return redisTemplate;
+    }
+
+//    @Bean(name = "aiChatRedisTemplate") // 추후 수정
+//    public RedisTemplate<String, Object> aiChatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+//        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+//        redisTemplate.setConnectionFactory(redisConnectionFactory);
+//        redisTemplate.setKeySerializer(new StringRedisSerializer());
+//        redisTemplate.setValueSerializer(new StringRedisSerializer());
+//
+//        return redisTemplate;
+//    }
 
     @Bean
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
@@ -56,13 +67,13 @@ public class RedisConfig {
         return redisTemplate.opsForZSet();
     }
 
-    //Redis Pub/Sub 메시지 리스너 : 수신한 메시지를 처리
+    // Redis Pub/Sub 메시지 리스너 : 수신한 메시지를 처리
     @Bean
     public MessageListenerAdapter messageListener(RedisSubscriber redisSubscriber) {
         return new MessageListenerAdapter(redisSubscriber, "handleMessage");
     }
 
-    //Redis 채널 구독 및 메시지 수신 처리 : 메시지 리스너를 등록하여 Redis 채널 메시지를 수신
+    // Redis 채널 구독 및 메시지 수신 처리 : 메시지 리스너를 등록하여 Redis 채널 메시지를 수신
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisConnectionFactory chatRedisConnectionFactory,
@@ -70,7 +81,7 @@ public class RedisConfig {
     ) {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
 
-        //특정 채널 "chatroom"을 구독
+        // 특정 채널 "chatroom"을 구독
         redisMessageListenerContainer.setConnectionFactory(chatRedisConnectionFactory);
         redisMessageListenerContainer.addMessageListener(messageListener, new PatternTopic("chatroom:*"));
 
