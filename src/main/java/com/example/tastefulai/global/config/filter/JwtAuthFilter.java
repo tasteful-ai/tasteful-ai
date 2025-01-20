@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Date;
 
 @Component
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -31,6 +31,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedisService redisService;
+
+    public JwtAuthFilter(JwtProvider jwtProvider, MemberRepository memberRepository, RedisTemplate<String, Object> redisTemplate, RedisService redisService) {
+        this.jwtProvider = jwtProvider;
+        this.memberRepository = memberRepository;
+        this.redisTemplate = redisTemplate;
+        this.redisService = redisService;
+    }
+
 
     // 요청시 실행하는 메서드
     @Override

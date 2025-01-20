@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity  //@Configuration 어노테이션 포함 및 보안 기능 활성화
@@ -46,9 +47,14 @@ public class SecurityConfig {
                 .cors(cors -> cors.configure(httpSecurity))
 
                 // CSRF 비활성화
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/ws-chat/**")
-                        .disable()
+//                .csrf(csrf -> csrf
+//                        .ignoringRequestMatchers("/ws-chat/**")
+//                        .disable()
+//                )
+//                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(c ->
+                        c.ignoringRequestMatchers(EndpointConstants.AUTH_LOGIN)
+                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
 
                 // 요청 권한 설정

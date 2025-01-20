@@ -29,6 +29,13 @@ public class StompHandler implements ChannelInterceptor {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
 
+
+    @Override
+    public boolean preReceive(MessageChannel channel) {
+        return true;
+    }
+
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel messageChannel) {
 
@@ -38,7 +45,6 @@ public class StompHandler implements ChannelInterceptor {
             String token = stompHeaderAccessor.getFirstNativeHeader("Authorization");
 
             if (token == null || !token.startsWith("Bearer ")) {
-                log.warn("Authorization header is missing");
                 throw new CustomException(ErrorCode.INVALID_AUTHORIZATION_HEADER);
             }
 
@@ -59,7 +65,6 @@ public class StompHandler implements ChannelInterceptor {
             log.info("Authentication before setting SecurityContext: {}", authentication);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("Authentication set for user: {}", email);
         }
 
         return message;

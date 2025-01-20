@@ -46,7 +46,6 @@ public enum ErrorCode {
     // 503 SERVICE_UNAVAILABLE
     TOO_MANY_REQUESTS(HttpStatus.SERVICE_UNAVAILABLE, "오늘의 메뉴 추천 요청 횟수를 초과했습니다.");
 
-
     private final HttpStatus httpStatus;
     private final String message;
 
