@@ -1,7 +1,6 @@
 package com.example.tastefulai.domain.chatting.websocket.interceptor;
 
 import com.example.tastefulai.global.util.JwtProvider;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
