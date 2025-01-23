@@ -13,18 +13,21 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class RedisPublisher {
 
-    private final RedisTemplate<String, Object> chatRedisTemplate;
+    private final RedisTemplate<String, String> pubSubRedisTemplate;
     private final ObjectMapper objectMapper;
 
-    private static final String CHANNEL = "chatroom";
-
-    public void publishMessage(ChattingMessageResponseDto chattingMessageResponseDto) {
+    public void publishMessage(Long chattingroomId, ChattingMessageResponseDto chattingMessageResponseDto) {
         try {
+            String channel = getChannelName(chattingroomId);
             String serializedMessage = objectMapper.writeValueAsString(chattingMessageResponseDto);
-            chatRedisTemplate.convertAndSend(CHANNEL, serializedMessage);
-            log.info("Redis 채널 '{}'로 메시지 발행: {}", CHANNEL, serializedMessage);
+            pubSubRedisTemplate.convertAndSend(channel, serializedMessage);
+            log.info("Redis 채널 '{}'로 메시지 발행: {}", channel, serializedMessage);
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("Redis 메시지 직렬화 오류: {}", jsonProcessingException.getMessage());
         }
+    }
+
+    private String getChannelName(Long chattingroomId) {
+        return "chatroom:" + chattingroomId;
     }
 }
