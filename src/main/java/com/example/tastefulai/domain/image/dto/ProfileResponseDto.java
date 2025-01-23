@@ -16,19 +16,12 @@ public class ProfileResponseDto {
 
     private LocalDate createdAt;
 
-    private List<Taste> tastes;
-
-    public ProfileResponseDto(String nickname, String imageUrl, LocalDate createdAt, List<Taste> tastes) {
-        this.nickname = nickname;
-        this.imageUrl = imageUrl;
-        this.createdAt = createdAt;
-        this.tastes = tastes;
-    }
+    private String tastes;
 
     public ProfileResponseDto(Member member, String imageUrl) {
         this.nickname = member.getNickname();
         this.imageUrl = imageUrl;
         this.createdAt = member.getCreatedAt().toLocalDate();
-        this.tastes = member.getTastes();
+        this.tastes = "";
     }
 }
