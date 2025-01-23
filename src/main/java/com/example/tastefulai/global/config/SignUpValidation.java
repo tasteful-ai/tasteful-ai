@@ -23,13 +23,8 @@ public class SignUpValidation {
             throw new CustomException(ErrorCode.PASSWORD_PATTERN_ERROR);
         }
 
-        // 중복 닉네임 확인
-        if (memberRepository.existsByNickname(memberRequestDto.getNickname())) {
-            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
-        }
-
-        // 이메일 중복 여부 확인
-        if (memberRepository.existsByEmail(memberRequestDto.getEmail())) {
+        // 중복 닉네임/이메일 확인
+        if (memberRepository.existsByEmailOrNickname(memberRequestDto.getNickname(), memberRequestDto.getEmail())) {
             throw new CustomException(ErrorCode.DUPLICATE_RESOURCE);
         }
     }
