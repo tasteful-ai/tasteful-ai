@@ -1,8 +1,5 @@
 package com.example.tastefulai.domain.image.service;
 
-import com.example.tastefulai.domain.image.entity.Image;
-import com.example.tastefulai.domain.image.repository.ImageRepository;
-import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.BadRequestException;
 import com.example.tastefulai.global.error.exception.CustomException;
@@ -37,7 +34,7 @@ public class S3UploaderImpl implements S3Uploader {
 
     @Transactional
     @Override
-    public Image uploadImage(Member member, MultipartFile image) throws IOException {
+    public String uploadImage( MultipartFile image) throws IOException {
 
         // 이미지 확장자 확인
         isValidExtension(image);
@@ -61,9 +58,7 @@ public class S3UploaderImpl implements S3Uploader {
             throw new CustomException(ErrorCode.BAD_REQUEST);
         }
 
-        String imageUrl = String.format("https://%s.s3.amazonaws.com/%s", bucket, uniqueName);
-
-        return new Image(uniqueName, image.getContentType(), image.getSize(), imageUrl, member);
+        return String.format("https://%s.s3.amazonaws.com/%s", bucket, uniqueName);
     }
 
     // 파일의 확장자를 검증 (png, jpeg, jpg)
@@ -75,7 +70,6 @@ public class S3UploaderImpl implements S3Uploader {
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
             throw new BadRequestException(ErrorCode.INVALID_FILE);
         }
-        ;
 
         // 파일의 MIME 타입을 검사
         Tika tika = new Tika();
