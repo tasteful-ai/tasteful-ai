@@ -11,12 +11,13 @@ import lombok.Getter;
 @Getter
 public class MemberRequestDto {
 
+    @NotNull(message = "회원 역할을 입력해주세요.(ADMIN, USER, OWNER)")
     private final MemberRole memberRole;
 
-    @NotBlank(message = "이메일을 입력해주세요")
+    @NotBlank(message = "이메일을 입력해주세요.")
     private final String email;
 
-    @NotBlank(message = "비밀번호를 입력해주세요")
+    @NotBlank(message = "비밀번호를 입력해주세요.")
     private final String password;
 
     @NotBlank(message = "닉네임을 입력해주세요.")
@@ -27,6 +28,7 @@ public class MemberRequestDto {
     @Min(value = 1, message = "나이는 1 이상이어야 합니다.")
     private final Integer age;
 
+    @NotNull(message = "성별 정보를 입력해주세요. (MALE, FEMALE, OTHER)")
     private final GenderRole genderRole;
 
     public MemberRequestDto(MemberRole memberRole, String email, String password,
