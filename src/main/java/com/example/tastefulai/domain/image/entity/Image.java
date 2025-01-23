@@ -25,7 +25,7 @@ public class Image extends BaseEntity {
     @Column(nullable = false)
     private String imageUrl;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
@@ -38,5 +38,9 @@ public class Image extends BaseEntity {
     }
 
     public Image() {
+    }
+
+    public void updateImage(Member member) {
+        this.member = member;
     }
 }
