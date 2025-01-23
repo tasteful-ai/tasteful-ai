@@ -1,13 +1,15 @@
 package com.example.tastefulai.domain.member.service;
 
 import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
+import com.example.tastefulai.domain.member.dto.MemberRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
 import com.example.tastefulai.global.common.dto.JwtAuthResponse;
-import com.example.tastefulai.global.config.auth.MemberDetailsServiceImpl;
+import com.example.tastefulai.global.common.service.RedisService;
+import com.example.tastefulai.global.config.SignUpValidation;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
 import com.example.tastefulai.global.error.exception.NotFoundException;
@@ -26,47 +28,31 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class MemberServiceImpl implements MemberService {
 
+    private final SignUpValidation signUpValidation;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisService redisService;
     private static final String VERIFY_PASSWORD_KEY = "verify-password:";
     private static final String REFRESH_TOKEN_KEY = "refreshToken:";
-    private static final String ACCESS_TOKEN_KEY = "access_token:";
-    private final MemberDetailsServiceImpl memberDetailsServiceImpl;
 
-    /**
-     * 1. 회원 가입 :
-     * - 중복 닉네임 확인,
-     * - 이메일 중복 여부 확인,
-     * - 이메일 형식 확인,
-     * - 비밀번호 패턴 확인,
-     */
-    public MemberResponseDto signup(String email, String password, String nickname,
-                                    Integer age, GenderRole genderRole, MemberRole memberRole) {
+    // 1. 회원가입
+    public MemberResponseDto signup( MemberRole memberRole, String email, String password, String nickname,
+                                    Integer age, GenderRole genderRole) {
+        // 유효성 검사
+        MemberRequestDto memberRequestDto = new MemberRequestDto(memberRole, email, password, nickname, age, genderRole);
+        signUpValidation.validateMemberRequest(memberRequestDto, memberRepository);
 
-        // 중복 닉네임 확인
-        if (memberRepository.existsByNickname(nickname)) {
-            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
-        }
-        // 이메일 중복 여부 확인
-        if (memberRepository.existsByEmail(email)) {
-            throw new CustomException(ErrorCode.DUPLICATE_RESOURCE);
-        }
-
+        // 비밀번호 암호화 및 회원 생성
         String encodedPassword = passwordEncoder.encode(password);
-        Member member = new Member(email, encodedPassword, nickname, age, genderRole, memberRole, null);
+        Member member = new Member(memberRole, email, encodedPassword, nickname, age, genderRole, null);
         memberRepository.save(member);
 
         return new MemberResponseDto(member.getId(), member.getMemberRole(), member.getEmail(), member.getNickname());
     }
 
-    /**
-     * 2. 로그인 :
-     * - 사용자 확인
-     * - 비밀번호 확인
-     * - 인증 객체 생성 및 유효성 확인
-     */
+    // 2. 로그인
     public JwtAuthResponse login(String email, String password) {
         // 사용자 확인
         Member member = this.memberRepository.findActiveByEmail(email)
@@ -150,9 +136,8 @@ public class MemberServiceImpl implements MemberService {
         clearPasswordVerification(memberId);
     }
 
-    /**
-     * 7. 닉네임 수정
-     */
+
+    // 7. 닉네임 수정
     @Override
     @Transactional
     public ProfileResponseDto updateNickname(Member member, String nickname) {
@@ -169,6 +154,8 @@ public class MemberServiceImpl implements MemberService {
 
         return Member.toProfileDto(member);
     }
+
+    // **** 공통 메서드 **** //
 
     // 검증 상태 확인
     public boolean isPasswordVerified(Long memberId) {
