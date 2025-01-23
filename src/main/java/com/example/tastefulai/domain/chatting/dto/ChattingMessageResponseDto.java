@@ -11,12 +11,15 @@ public class ChattingMessageResponseDto {
 
     private final String senderNickname;
     private final String message;
+    private final Long chattingroomId;
 
     @JsonCreator
     public ChattingMessageResponseDto(
             @JsonProperty("senderNickname") String senderNickname,
-            @JsonProperty("message") String message) {
+            @JsonProperty("message") String message,
+            @JsonProperty("chattingroomId") Long chattingroomId) {
         this.senderNickname = senderNickname;
         this.message = message;
+        this.chattingroomId = chattingroomId;
     }
 }
