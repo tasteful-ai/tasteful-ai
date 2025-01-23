@@ -5,14 +5,12 @@ import com.example.tastefulai.domain.member.repository.MemberRepository;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
 import org.springframework.stereotype.Component;
-import java.util.regex.Pattern;
+
+import static com.example.tastefulai.global.config.ValidationPatterns.EMAIL_PATTERN;
+import static com.example.tastefulai.global.config.ValidationPatterns.PASSWORD_PATTERN;
 
 @Component
 public class SignUpValidation {
-
-    // 비밀번호 및 이메일 정규식 상수화
-    private final Pattern passwordPattern = Pattern.compile(ValidationPatterns.PASSWORD_PATTERN);
-    private final Pattern emailPattern = Pattern.compile(ValidationPatterns.EMAIL_PATTERN);
 
     public void validateMemberRequest(MemberRequestDto memberRequestDto, MemberRepository memberRepository) {
         // 이메일 형식 확인
@@ -37,10 +35,10 @@ public class SignUpValidation {
     }
 
     public boolean isValidPassword(String password) {
-        return password != null && passwordPattern.matcher(password).matches();
+        return password != null && PASSWORD_PATTERN.matcher(password).matches();
     }
 
     public boolean isValidEmail(String email) {
-        return email != null && emailPattern.matcher(email).matches();
+        return email != null && EMAIL_PATTERN.matcher(email).matches();
     }
 }
