@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public interface S3Uploader {
 
-    String uploadImage(MultipartFile image) throws IOException;
+    Image uploadImage(MultipartFile image, Member member) throws IOException;
 
     void isValidExtension(MultipartFile image) throws IOException;
 
