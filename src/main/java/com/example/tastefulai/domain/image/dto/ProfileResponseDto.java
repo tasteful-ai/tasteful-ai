@@ -1,8 +1,11 @@
 package com.example.tastefulai.domain.image.dto;
 
+import com.example.tastefulai.domain.member.entity.Member;
+import com.example.tastefulai.domain.taste.entity.Taste;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 public class ProfileResponseDto {
@@ -13,12 +16,19 @@ public class ProfileResponseDto {
 
     private LocalDate createdAt;
 
-    private String tastes;
+    private List<Taste> tastes;
 
-    public ProfileResponseDto(String nickname, String imageUrl, LocalDate createdAt, String tastes) {
+    public ProfileResponseDto(String nickname, String imageUrl, LocalDate createdAt, List<Taste> tastes) {
         this.nickname = nickname;
         this.imageUrl = imageUrl;
         this.createdAt = createdAt;
         this.tastes = tastes;
+    }
+
+    public ProfileResponseDto(Member member, String imageUrl) {
+        this.nickname = member.getNickname();
+        this.imageUrl = imageUrl;
+        this.createdAt = member.getCreatedAt().toLocalDate();
+        this.tastes = member.getTastes();
     }
 }
