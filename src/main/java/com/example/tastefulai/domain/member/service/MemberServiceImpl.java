@@ -40,7 +40,7 @@ public class MemberServiceImpl implements MemberService {
     private static final String REFRESH_TOKEN_KEY = "refreshToken:";
 
     // 1. 회원가입
-    public MemberResponseDto signup( MemberRole memberRole, String email, String password, String nickname,
+    public MemberResponseDto signup(MemberRole memberRole, String email, String password, String nickname,
                                     Integer age, GenderRole genderRole) {
         // 유효성 검사
         MemberRequestDto memberRequestDto = new MemberRequestDto(memberRole, email, password, nickname, age, genderRole);
@@ -140,7 +140,6 @@ public class MemberServiceImpl implements MemberService {
 
 
     // 7. 닉네임 수정
-    @Override
     @Transactional
     public ProfileResponseDto updateNickname(Member member, String nickname) {
 
@@ -153,7 +152,6 @@ public class MemberServiceImpl implements MemberService {
         return new ProfileResponseDto(member, imageUrl);
     }
 
-    @Override
     public ProfileResponseDto getMemberProfile(Member member) {
 
         String imageUrl = imageRepository.findImageUrlByMemberId(member.getId());
