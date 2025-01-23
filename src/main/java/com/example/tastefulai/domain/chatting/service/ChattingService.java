@@ -15,4 +15,6 @@ public interface ChattingService {
     ChattingMessageResponseDto createMessage(String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto);
 
     List<ChattingMessageResponseDto> getMessages(Long chattingroomId);
+
+    void processReceivedMessage(ChattingMessageResponseDto chattingMessageResponseDto);
 }

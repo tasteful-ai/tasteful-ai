@@ -12,6 +12,7 @@ import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
+import com.example.tastefulai.global.error.exception.NotFoundException;
 import com.example.tastefulai.global.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -63,13 +64,13 @@ public class ChattingServiceImpl implements ChattingService {
                 chattingMessage.getMessage(),
                 chattingroom.getId());
 
-        redisMessageService.saveMessage(chattingMessageResponseDto);
+        redisMessageService.saveMessage(chattingroom.getId(), chattingMessageResponseDto);
         return chattingMessageResponseDto;
     }
 
     @Override
     public List<ChattingMessageResponseDto> getMessages(Long chattingroomId) {
-        List<ChattingMessageResponseDto> cachedMessages = redisMessageService.getRecentMessages();
+        List<ChattingMessageResponseDto> cachedMessages = redisMessageService.getRecentMessages(chattingroomId);
 
         if (cachedMessages.isEmpty()) {
             List<ChattingMessage> messages = chattingMessageRepository.findTop50ByChattingroomIdOrderByCreatedAtDesc(chattingroomId);
@@ -84,6 +85,15 @@ public class ChattingServiceImpl implements ChattingService {
         return cachedMessages;
     }
 
+    @Override
+    @Transactional
+    public void processReceivedMessage(ChattingMessageResponseDto chattingMessageResponseDto) {
+        Chattingroom chattingroom = chattingroomRepository.findChattingroomByIdOrThrow(chattingMessageResponseDto.getChattingroomId());
+        Member sender = memberService.findByEmail(chattingMessageResponseDto.getSenderNickname());
+
+        ChattingMessage chattingMessage = new ChattingMessage(chattingroom, sender, chattingMessageResponseDto.getMessage());
+        chattingMessageRepository.save(chattingMessage);
+    }
 
     private void validateAdminRole(Member admin) {
         if (!admin.getMemberRole().equals(MemberRole.ADMIN)) {
