@@ -37,6 +37,7 @@ public enum ErrorCode {
 
     // 403 FORBIDDEN
     FORBIDDEN(HttpStatus.FORBIDDEN, "권한이 없습니다."),
+    FORBIDDEN_ADMIN_ONLY(HttpStatus.FORBIDDEN, "ADMIN 권한만 사용할 수 있습니다."),
 
     // 404 NOT_FOUND
     NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 페이지를 찾을 수 없습니다."),
