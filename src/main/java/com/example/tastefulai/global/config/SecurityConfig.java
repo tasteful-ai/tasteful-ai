@@ -47,15 +47,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configure(httpSecurity))
 
                 // CSRF 비활성화
-//                .csrf(csrf -> csrf
-//                        .ignoringRequestMatchers("/ws-chat/**")
-//                        .disable()
-//                )
-//                .csrf(AbstractHttpConfigurer::disable)
-                .csrf(c ->
-                        c.ignoringRequestMatchers(EndpointConstants.AUTH_LOGIN)
-                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                )
+                .csrf(AbstractHttpConfigurer::disable)
 
                 // 요청 권한 설정
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
