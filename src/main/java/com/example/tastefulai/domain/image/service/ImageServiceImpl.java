@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class ImageServiceImpl {
+public class ImageServiceImpl implements ImageService{
 
     private final ImageRepository imageRepository;
     private final S3Uploader s3Uploader;
@@ -20,20 +20,22 @@ public class ImageServiceImpl {
     public ImageResponseDto uploadImage(Member member, MultipartFile image) throws IOException {
 
         // S3 업로드
-        String imgUrl = s3Uploader.uploadImage(image);
+        Image uploadImage = s3Uploader.uploadImage(image, member);
 
         // 기존에 저장된 사진을 db와 S3에서 삭제
         deleteImage(member);
 
         // db에 새로운 사진 저장
-        Image savedImage = imageRepository.save(new Image(image.getOriginalFilename(), image.getContentType(), image.getSize(), imgUrl, member));
+        Image savedImage = imageRepository.save(uploadImage);
 
         return new ImageResponseDto(savedImage.getImageUrl());
     }
 
     public void deleteImage(Member member) {
         Image existImage = imageRepository.findByMemberId(member.getId());
-        s3Uploader.deleteS3Image(existImage.getFileName());
-        imageRepository.delete(existImage);
+        if (existImage != null){
+            s3Uploader.deleteS3Image(existImage.getFileName());
+            imageRepository.delete(existImage);
+        }
     }
 }
