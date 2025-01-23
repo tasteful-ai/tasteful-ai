@@ -1,6 +1,7 @@
 package com.example.tastefulai.domain.member.service;
 
 import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
+import com.example.tastefulai.domain.image.repository.ImageRepository;
 import com.example.tastefulai.domain.member.dto.MemberRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
@@ -30,6 +31,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final SignUpValidation signUpValidation;
     private final MemberRepository memberRepository;
+    private final ImageRepository imageRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -146,13 +148,17 @@ public class MemberServiceImpl implements MemberService {
 
         memberRepository.save(member);
 
-        return Member.toProfileDto(member);
+        String imageUrl = imageRepository.findImageUrlByMemberId(member.getId());
+
+        return new ProfileResponseDto(member, imageUrl);
     }
 
     @Override
     public ProfileResponseDto getMemberProfile(Member member) {
 
-        return Member.toProfileDto(member);
+        String imageUrl = imageRepository.findImageUrlByMemberId(member.getId());
+
+        return new ProfileResponseDto(member, imageUrl);
     }
 
     // **** 공통 메서드 **** //
