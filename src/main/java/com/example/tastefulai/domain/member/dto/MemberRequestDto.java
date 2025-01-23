@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 public class MemberRequestDto {
 
-    @NotNull(message = "회원 역할을 입력해주세요.(ADMIN, USER, OWNER)")
+    @NotNull(message = "회원 역할을 입력해주세요.(ADMIN, USER)")
     private final MemberRole memberRole;
 
     @NotBlank(message = "이메일을 입력해주세요.")

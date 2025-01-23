@@ -42,6 +42,7 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<CommonResponseDto<JwtAuthResponse>> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
         JwtAuthResponse jwtAuthResponse = memberService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
+
         return new ResponseEntity<>(new CommonResponseDto<>("로그인 성공", jwtAuthResponse), HttpStatus.OK);
     }
 
@@ -51,6 +52,7 @@ public class MemberController {
     public ResponseEntity<CommonResponseDto<String>> logout(@RequestHeader("Authorization") String token) {
         String jwtToken = token.replace("Bearer ", "");
         memberService.logout(jwtToken);
+
         return new ResponseEntity<>(new CommonResponseDto<>("로그아웃 완료", null), HttpStatus.OK);
     }
 
@@ -73,7 +75,7 @@ public class MemberController {
 
 
     // 5. 비밀번호 검증
-//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("/members/{memberId}/check")
     public ResponseEntity<CommonResponseDto<Void>> verifyPassword(@PathVariable Long memberId,
                                                                   @Valid @RequestBody PasswordVerifyRequestDto passwordVerifyRequestDto,
@@ -91,8 +93,8 @@ public class MemberController {
     }
 
 
-    // 6. 계정 삭제(사용자용)
-//    @PreAuthorize("hasRole('USER') or hasRole('OWNER')")
+    // 6. 계정 삭제
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DeleteMapping("/members/{memberId}")
     public ResponseEntity<CommonResponseDto<Void>> deleteOwnAccount(@PathVariable Long memberId) {
 
