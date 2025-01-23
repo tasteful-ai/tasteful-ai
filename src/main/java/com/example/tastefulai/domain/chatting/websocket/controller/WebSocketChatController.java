@@ -26,8 +26,8 @@ public class WebSocketChatController {
         String sender = memberDetails.getUsername();
         log.info("메시지 발신자: {}", sender);
 
-        redisPublisher.publishMessage(new ChattingMessageResponseDto(sender, chatMessageDto.getMessage(), chatMessageDto.getChattingroomId()));
-
+        ChattingMessageResponseDto chattingMessageResponseDto = new ChattingMessageResponseDto(sender, chatMessageDto.getMessage(), chatMessageDto.getChattingroomId());
+        redisPublisher.publishMessage(chatMessageDto.getChattingroomId(), chattingMessageResponseDto);
         log.info("Redis 메시지 전송 완료");
     }
 }

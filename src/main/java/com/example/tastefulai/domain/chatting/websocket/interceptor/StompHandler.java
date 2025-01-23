@@ -29,13 +29,6 @@ public class StompHandler implements ChannelInterceptor {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
 
-
-    @Override
-    public boolean preReceive(MessageChannel channel) {
-        return true;
-    }
-
-
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel messageChannel) {
 
@@ -44,14 +37,7 @@ public class StompHandler implements ChannelInterceptor {
         if (StompCommand.CONNECT.equals(stompHeaderAccessor.getCommand())) {
             String token = stompHeaderAccessor.getFirstNativeHeader("Authorization");
 
-            if (token == null || !token.startsWith("Bearer ")) {
-                throw new CustomException(ErrorCode.INVALID_AUTHORIZATION_HEADER);
-            }
-
-            token = token.substring(7);
-
-            if (!jwtProvider.validateToken(token)) {
-                log.error("Invalid JWT Token: {}", token);
+            if (token == null || !jwtProvider.validateToken(token)) {
                 throw new CustomException(ErrorCode.INVALID_TOKEN);
             }
 
