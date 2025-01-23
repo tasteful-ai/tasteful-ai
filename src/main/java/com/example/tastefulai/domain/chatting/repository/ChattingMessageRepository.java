@@ -11,8 +11,6 @@ public interface ChattingMessageRepository extends JpaRepository<ChattingMessage
 
     List<ChattingMessage> findTop50ByChattingroomIdOrderByCreatedAtDesc(Long chattingroomId);
 
-    List<ChattingMessage> findByChattingroomIdAndCreatedAtBetween(Long chattingroomId, LocalDateTime endDate);
-
     @Transactional
     int deleteByCreatedAtBefore(LocalDateTime dateTime);
 }
