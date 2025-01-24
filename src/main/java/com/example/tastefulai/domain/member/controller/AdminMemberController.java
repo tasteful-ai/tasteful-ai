@@ -16,25 +16,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/admins/members")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminMemberController {
 
     private final AdminMemberService adminMemberService;
 
-    // 회원 삭제 - 관리자용
-    @PreAuthorize("hasRole('ADMIN')")
+    // 회원 삭제 - ADMIN 전용
     @DeleteMapping("/{memberId}")
     public ResponseEntity<CommonResponseDto<Void>> deleteMemberByAdmin(@PathVariable Long memberId) {
         adminMemberService.deleteMemberByAdmin(memberId);
 
-        return new ResponseEntity<>(new CommonResponseDto<>("회원 삭제 완료",null), HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 
-    // 멤버 권한 변경 - 관리자용
-    @PreAuthorize("hasRole('ADMIN')")
+    // 멤버 권한 변경 - ADMIN 전용
     @PatchMapping("/{memberId}/roles")
     public ResponseEntity<CommonResponseDto<Void>> updateMemberRolesByAdmin(@PathVariable Long memberId,
-                                                                            @RequestParam("role") String memberRole) {
-
+                                                                            @RequestParam("memberRole") String memberRole) {
         adminMemberService.updateMemberRole(memberId, memberRole);
 
         return new ResponseEntity<>(new CommonResponseDto<>("권한 변경 완료", null), HttpStatus.OK);
