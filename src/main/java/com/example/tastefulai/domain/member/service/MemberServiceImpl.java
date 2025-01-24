@@ -41,6 +41,7 @@ public class MemberServiceImpl implements MemberService {
     private static final String REFRESH_TOKEN_KEY = "refreshToken:";
 
     // 1. 회원가입
+    @Override
     public MemberResponseDto signup( MemberRole memberRole, String email, String password, String nickname,
                                     Integer age, GenderRole genderRole) {
         // 유효성 검사
@@ -57,6 +58,7 @@ public class MemberServiceImpl implements MemberService {
 
 
     // 2. 로그인
+    @Override
     public JwtAuthResponse login(String email, String password) {
 
         // 유효성 검사
@@ -91,6 +93,7 @@ public class MemberServiceImpl implements MemberService {
 
 
     // 4. 비밀번호 변경
+    @Override
     @Transactional
     public void updatePassword(String email, String currentPassword, String newPassword, String currentAccessToken) {
 
@@ -115,6 +118,7 @@ public class MemberServiceImpl implements MemberService {
 
 
     // 5. 비밀번호 검증
+    @Override
     public void verifyPassword(Long memberId, String password) {
         // 유효성 검사
         PasswordVerifyRequestDto passwordVerifyRequestDto = new PasswordVerifyRequestDto(password);
@@ -129,6 +133,7 @@ public class MemberServiceImpl implements MemberService {
 
 
     // 6. 회원 탈퇴
+    @Override
     @Transactional
     public void deleteMember(Long memberId) {
         if (!isPasswordVerified(memberId)) {
