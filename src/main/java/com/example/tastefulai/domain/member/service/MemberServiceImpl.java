@@ -141,22 +141,21 @@ public class MemberServiceImpl implements MemberService {
 
     // 7. 닉네임 수정
     @Transactional
-    public ProfileResponseDto updateNickname(Member member, String nickname) {
+    public void updateNickname(Long memberId, String nickname) {
+
+        Member member = findById(memberId);
 
         member.updateNickname(nickname);
 
         memberRepository.save(member);
-
-        String imageUrl = imageRepository.findImageUrlByMemberId(member.getId());
-
-        return new ProfileResponseDto(member, imageUrl);
     }
 
-    public ProfileResponseDto getMemberProfile(Member member) {
+    // 8. 프로필 조회
+    public ProfileResponseDto getMemberProfile(Long memberId) {
 
-        String imageUrl = imageRepository.findImageUrlByMemberId(member.getId());
+        Member member = findById(memberId);
 
-        return new ProfileResponseDto(member, imageUrl);
+        return Member.toDto(member);
     }
 
     // **** 공통 메서드 **** //
