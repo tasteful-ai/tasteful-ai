@@ -21,9 +21,11 @@ public enum ErrorCode {
     INVALID_JSON(HttpStatus.BAD_REQUEST, "JSON 데이터 형식이 올바르지 않습니다."),
     CANNOT_MODIFY_DEACTIVATED_MEMBER(HttpStatus.BAD_REQUEST, "탈퇴한 사용자는 권한을 변경할 수 없습니다."),
     CANNOT_CHANGE_TO_SAME_ROLE(HttpStatus.BAD_REQUEST, "이미 동일한 권한입니다."),
+    PASSWORD_CANNOT_BE_EMPTY(HttpStatus.BAD_REQUEST, "비밀번호는 필수 입력 값입니다. "),
+    INVALID_TOKEN_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 토큰 형식입니다."),
 
     // 401 UNAUTHORIZED
-    UNAUTHORIZED_PASSWORD(HttpStatus.UNAUTHORIZED, "잘못된 비밀번호 입니다."),
+    UNAUTHORIZED_PASSWORD(HttpStatus.UNAUTHORIZED, "잘못된 비밀번호입니다."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "본인이 아닙니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않는 토큰입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
