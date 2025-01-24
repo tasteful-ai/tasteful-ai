@@ -20,6 +20,9 @@ public class MemberValidation {
 
     // 회원가입 유효성 검사
     public void validateSignUp(MemberRequestDto memberRequestDto) {
+        if (memberRequestDto == null) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST);
+        }
         validateEmail(memberRequestDto.getEmail());
         validatePassword(memberRequestDto.getPassword());
         validateNicknameOrEmail(memberRequestDto.getEmail(), memberRequestDto.getNickname());
@@ -27,12 +30,18 @@ public class MemberValidation {
 
     // 로그인 유효성 검사
     public void validateLogin(LoginRequestDto loginRequestDto) {
+        if (loginRequestDto == null) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST);
+        }
         validateEmail(loginRequestDto.getEmail());
         validatePasswordNotEmpty(loginRequestDto.getPassword());
     }
 
     // 비밀번호 변경 유효성 검사
     public void validatePasswordUpdate(PasswordUpdateRequestDto passwordUpdateRequestDto) {
+        if (passwordUpdateRequestDto == null) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST);
+        }
         validatePassword(passwordUpdateRequestDto.getCurrentPassword());
         validatePassword(passwordUpdateRequestDto.getNewPassword());
     }
