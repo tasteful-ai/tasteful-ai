@@ -29,18 +29,17 @@ public class Image extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
-    public Image(String fileName, String fileType, Long fileSize, String imageUrl, Member member) {
+    public Image(String fileName, String fileType, Long fileSize, String imageUrl) {
         this.fileName = fileName;
         this.fileType = fileType;
         this.fileSize = fileSize;
         this.imageUrl = imageUrl;
-        this.member = member;
     }
 
     public Image() {
     }
 
-    public void updateImage(Member member) {
+    public void updateMember(Member member) {
         this.member = member;
     }
 }

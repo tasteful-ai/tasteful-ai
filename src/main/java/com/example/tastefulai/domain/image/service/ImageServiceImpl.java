@@ -17,10 +17,14 @@ public class ImageServiceImpl implements ImageService{
     private final ImageRepository imageRepository;
     private final S3Uploader s3Uploader;
 
+    @Override
     public ImageResponseDto uploadImage(Member member, MultipartFile image) throws IOException {
 
-        // S3 업로드
-        Image uploadImage = s3Uploader.uploadImage(image, member);
+        // S3 업로드  -> member 저장을 안한 Image 반환
+        Image uploadImage = s3Uploader.uploadImage(image);
+
+        // Member 정보 세팅
+        uploadImage.updateMember(member);
 
         // 기존에 저장된 사진을 db와 S3에서 삭제
         deleteImage(member);
@@ -31,6 +35,7 @@ public class ImageServiceImpl implements ImageService{
         return new ImageResponseDto(savedImage.getImageUrl());
     }
 
+    @Override
     public void deleteImage(Member member) {
         Image existImage = imageRepository.findByMemberId(member.getId());
         if (existImage != null){
