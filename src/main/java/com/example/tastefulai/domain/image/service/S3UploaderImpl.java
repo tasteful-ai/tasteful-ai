@@ -36,7 +36,7 @@ public class S3UploaderImpl implements S3Uploader {
 
     @Transactional
     @Override
-    public Image uploadImage( MultipartFile image, Member member) throws IOException {
+    public Image uploadImage( MultipartFile image) throws IOException {
 
         // 이미지 확장자 확인
         isValidExtension(image);
@@ -62,7 +62,7 @@ public class S3UploaderImpl implements S3Uploader {
 
         String imageUrl = String.format("https://%s.s3.amazonaws.com/%s", bucket, uniqueName);
 
-        return new Image(uniqueName, image.getContentType(), image.getSize(), imageUrl, member);
+        return new Image(uniqueName, image.getContentType(), image.getSize(), imageUrl);
     }
 
     // 파일의 확장자를 검증 (png, jpeg, jpg)
