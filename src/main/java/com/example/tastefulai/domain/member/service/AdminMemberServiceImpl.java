@@ -34,30 +34,9 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         adminMemberRepository.save(targetMember);
     }
 
-    // 권한 변경 - ADMIN 전용
-    @Override
-    @Transactional
-    public void updateMemberRole(Long memberId, String memberRole) {
-        // ADMIN 권한 검증
-        validateAdminPermission();
-
-        // 삭제 대상 사용자 확인
-        Member targetMember = findMemberById(memberId);
-
-        //  탈퇴 회원 여부 확인
-        if (targetMember.getDeletedAt() != null) {
-            throw new CustomException(ErrorCode.CANNOT_MODIFY_DEACTIVATED_MEMBER);
-        }
-
-        // 동일 권한 사용자간 변경 방지
-        validateNotSameRoleForUpdate(targetMember);
-
-        targetMember.updateMemberRole(MemberRole.valueOf(memberRole));
-        adminMemberRepository.save(targetMember);
-    }
-
-
-    // **** 공통 메서드 ****
+    /**
+     * **** 공통 메서드 ****
+     */
 
     // ADMIN 권한 검증
     private void validateAdminPermission() {
@@ -81,13 +60,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     private void validateNotAdminRoleForDeletion(Member targetMember) {
         if (targetMember.getMemberRole() == MemberRole.ADMIN) {
             throw new CustomException(ErrorCode.ADMIN_CANNOT_REMOVE_ADMIN);
-        }
-    }
-
-    // 동일한 권한으로 변경할 수 없도록
-    private void validateNotSameRoleForUpdate(Member targetMember) {
-        if (targetMember.getMemberRole() == MemberRole.ADMIN) {
-            throw new CustomException(ErrorCode.CANNOT_CHANGE_TO_SAME_ROLE);
         }
     }
 }

@@ -3,20 +3,15 @@ package com.example.tastefulai.domain.member.controller;
 import com.example.tastefulai.domain.member.service.AdminMemberService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admins/members")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class AdminMemberController {
 
     private final AdminMemberService adminMemberService;
@@ -27,14 +22,5 @@ public class AdminMemberController {
         adminMemberService.deleteMemberByAdmin(memberId);
 
         return ResponseEntity.noContent().build();
-    }
-
-    // 멤버 권한 변경 - ADMIN 전용
-    @PatchMapping("/{memberId}/roles")
-    public ResponseEntity<CommonResponseDto<Void>> updateMemberRolesByAdmin(@PathVariable Long memberId,
-                                                                            @RequestParam("memberRole") String memberRole) {
-        adminMemberService.updateMemberRole(memberId, memberRole);
-
-        return new ResponseEntity<>(new CommonResponseDto<>("권한 변경 완료", null), HttpStatus.OK);
     }
 }
