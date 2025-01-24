@@ -42,6 +42,7 @@ public class MemberServiceImpl implements MemberService {
 
     // 1. 회원가입
     @Override
+    @Transactional
     public MemberResponseDto signup( MemberRole memberRole, String email, String password, String nickname,
                                     Integer age, GenderRole genderRole) {
         // 유효성 검사
