@@ -5,7 +5,6 @@ import com.example.tastefulai.domain.member.dto.LoginRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.dto.PasswordUpdateRequestDto;
-import com.example.tastefulai.domain.member.dto.PasswordVerifyRequestDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
@@ -108,9 +107,6 @@ public class MemberServiceImpl implements MemberService {
         // 현재 비밀번호 검증
         validatePassword(currentPassword, member.getPassword());
 
-        if (passwordEncoder.matches(newPassword, member.getPassword())) {
-            throw new CustomException(ErrorCode.PASSWORD_SAME_AS_OLD);
-        }
         // 비밀번호 변경
         member.updatePassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
@@ -122,8 +118,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void verifyPassword(Long memberId, String password) {
         // 유효성 검사
-        PasswordVerifyRequestDto passwordVerifyRequestDto = new PasswordVerifyRequestDto(password);
-        memberValidation.validatePassword(passwordVerifyRequestDto.getPassword());
+        memberValidation.validatePassword(password);
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));

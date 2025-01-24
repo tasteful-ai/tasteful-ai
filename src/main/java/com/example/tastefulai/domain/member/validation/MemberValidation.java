@@ -44,12 +44,20 @@ public class MemberValidation {
         }
         validatePassword(passwordUpdateRequestDto.getCurrentPassword());
         validatePassword(passwordUpdateRequestDto.getNewPassword());
+        validateDifferentPasswords(passwordUpdateRequestDto.getCurrentPassword(), passwordUpdateRequestDto.getNewPassword());
     }
 
     // 비밀번호 검증
     public void validatePassword(String password) {
         if (!isValidPassword(password)) {
             throw new CustomException(ErrorCode.PASSWORD_PATTERN_ERROR);
+        }
+    }
+
+    // 비밀번호 동일 여부 확인
+    private void validateDifferentPasswords(String currentPassword, String newPassword) {
+        if (currentPassword.equals(newPassword)) {
+            throw new CustomException(ErrorCode.PASSWORD_SAME_AS_OLD);
         }
     }
 
