@@ -22,7 +22,7 @@ public class MemberValidation {
     public void validateSignUp(MemberRequestDto memberRequestDto) {
         validateEmail(memberRequestDto.getEmail());
         validatePassword(memberRequestDto.getPassword());
-        validateNicknameAndEmail(memberRequestDto.getNickname(), memberRequestDto.getEmail());
+        validateNicknameOrEmail(memberRequestDto.getEmail(), memberRequestDto.getNickname());
     }
 
     // 로그인 유효성 검사
@@ -52,8 +52,8 @@ public class MemberValidation {
     }
 
     // 닉네임/이메일 중복 확인
-    public void validateNicknameAndEmail(String nickName, String email) {
-        if (memberRepository.existsByEmailOrNickname(nickName, email)) {
+    public void validateNicknameOrEmail(String email, String nickName) {
+        if (memberRepository.existsByEmailOrNickname(email, nickName)) {
             throw new CustomException(ErrorCode.DUPLICATE_RESOURCE);
         }
     }
