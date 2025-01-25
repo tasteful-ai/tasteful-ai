@@ -2,7 +2,6 @@ package com.example.tastefulai.domain.image.controller;
 
 import com.example.tastefulai.domain.image.dto.ProfileRequestDto;
 import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
-import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
@@ -25,22 +24,22 @@ public class MemberProfileController {
 
     // 닉네임 수정 (이후 MemberController 로 이동 예정)
     @PatchMapping
-    public ResponseEntity<CommonResponseDto<ProfileResponseDto>> updateNickname(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
-                                                                                @RequestBody ProfileRequestDto profileRequestDto) {
+    public ResponseEntity<CommonResponseDto<Void>> updateNickname(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
+                                                                  @RequestBody ProfileRequestDto profileRequestDto) {
 
-        Member member = memberDetailsImpl.getMember();
+        Long memberId = memberDetailsImpl.getId();
 
-        ProfileResponseDto profileResponseDto = memberService.updateNickname(member, profileRequestDto.getNickname());
+        memberService.updateNickname(memberId, profileRequestDto.getNickname());
 
-        return new ResponseEntity<>(new CommonResponseDto<>("닉네임 변경 완료", profileResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("닉네임 변경 완료", null), HttpStatus.OK);
     }
 
     @GetMapping
     public ResponseEntity<CommonResponseDto<ProfileResponseDto>> getProfile(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
-        Member member = memberDetailsImpl.getMember();
+        Long memberId = memberDetailsImpl.getId();
 
-        ProfileResponseDto profileResponseDto = memberService.getMemberProfile(member);
+        ProfileResponseDto profileResponseDto = memberService.getMemberProfile(memberId);
 
         return new ResponseEntity<>(new CommonResponseDto<>("프로필 조회 완료", profileResponseDto), HttpStatus.OK);
     }

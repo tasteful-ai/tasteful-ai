@@ -2,6 +2,7 @@ package com.example.tastefulai.global.config;
 
 import com.example.tastefulai.global.config.filter.JwtAuthFilter;
 import com.example.tastefulai.global.constant.EndpointConstants;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity  //@Configuration 어노테이션 포함 및 보안 기능 활성화
@@ -52,7 +52,13 @@ public class SecurityConfig {
                 // 요청 권한 설정
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/map", "location", EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청 허용
-                        .requestMatchers("/api/location/**").authenticated()
+                        .requestMatchers("/api/location/**").authenticated() // 인증이 필요!
+                        .requestMatchers(
+                                "/api/admins/**"
+
+
+
+                        ).hasRole("ADMIN")
                         .requestMatchers("/ws-chat/**").permitAll()
                         .requestMatchers("/test").permitAll()
                         .anyRequest().authenticated() // 그 외 요청 인증 필요
@@ -64,10 +70,24 @@ public class SecurityConfig {
                 // 세션 정책 설정 (무상태)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+                // 예외 처리
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // 인증 실패 처리: 401 Unauthorized 반환
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Authentication failed\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            // 권한 부족 처리: 403 Forbidden 반환
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Access denied\"}");
+                        })
+                )
+
                 // 최종 보안 필터 체인 빌드
                 .build();
     }
-
-
 }
 
