@@ -91,7 +91,7 @@ public class Member extends BaseEntity {
         this.memberRole = memberRole;
     }
 
-    public static ProfileResponseDto toDto (Member member) {
+    public static ProfileResponseDto toProfileDto (Member member) {
 
         return new ProfileResponseDto(
                 member.getNickname(),
