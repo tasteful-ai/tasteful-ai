@@ -42,7 +42,7 @@ public class MemberServiceImpl implements MemberService {
     // 1. 회원가입
     @Override
     @Transactional
-    public MemberResponseDto signup( MemberRole memberRole, String email, String password, String nickname,
+    public MemberResponseDto signup(MemberRole memberRole, String email, String password, String nickname,
                                     Integer age, GenderRole genderRole) {
         // 유효성 검사
         MemberRequestDto memberRequestDto = new MemberRequestDto(memberRole, email, password, nickname, age, genderRole);
@@ -76,7 +76,7 @@ public class MemberServiceImpl implements MemberService {
         String accessToken = jwtProvider.generateAccessToken(email);
         String refreshToken = jwtProvider.generateRefreshToken(email);
 
-        // RefreshToken을 Redis에 저장
+        // RefreshToken 을 Redis 에 저장
         storeRefreshToken(email, refreshToken);
 
         return new JwtAuthResponse(accessToken, refreshToken);
@@ -160,7 +160,7 @@ public class MemberServiceImpl implements MemberService {
 
     // 8. 프로필 조회
     @Override
-    public ProfileResponseDto getMemberProfile(Member member) {
+    public ProfileResponseDto getMemberProfile(Long memberId) {
 
         Member member = findById(memberId);
 
