@@ -1,7 +1,6 @@
 package com.example.tastefulai.domain.image.service;
 
 import com.example.tastefulai.domain.image.entity.Image;
-import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.BadRequestException;
 import com.example.tastefulai.global.error.exception.CustomException;
@@ -36,7 +35,7 @@ public class S3UploaderImpl implements S3Uploader {
 
     @Transactional
     @Override
-    public Image uploadImage( MultipartFile image) throws IOException {
+    public Image uploadImage(MultipartFile image) throws IOException {
 
         // 이미지 확장자 확인
         isValidExtension(image);
