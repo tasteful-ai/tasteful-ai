@@ -7,15 +7,12 @@ public enum MemberRole {
 
     /**
      * ADMIN : 관리자,
-     * USER : 일반 회원,
-     * OWNER : 사업자
+     * USER : 일반 회원
      */
     ADMIN,
-    USER,
-    OWNER;
+    USER;
 
     public Collection<String> getAuthorities() {
         return List.of("ROLE_" + this.name());
     }
-
 }

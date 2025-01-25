@@ -13,7 +13,7 @@ public interface MemberService {
 
     Member findById(Long memberId);
 
-    MemberResponseDto signup(String email, String password, String nickname, Integer age, GenderRole genderRole, MemberRole memberRole);
+    MemberResponseDto signup(MemberRole memberRole, String email, String password, String nickname, Integer age, GenderRole genderRole);
 
     JwtAuthResponse login(String email, String password);
 

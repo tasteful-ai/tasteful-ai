@@ -57,14 +57,14 @@ public class Member extends BaseEntity {
     private List<Taste> tastes = new ArrayList<>();
 
     // 생성자
-    public Member(String email, String password, String nickname, Integer age,
-                  GenderRole genderRole, MemberRole memberRole, LocalDateTime deletedAt) {
+    public Member(MemberRole memberRole, String email, String password, String nickname, Integer age,
+                  GenderRole genderRole, LocalDateTime deletedAt) {
+        this.memberRole = memberRole;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.age = age;
         this.genderRole = genderRole;
-        this.memberRole = memberRole;
         this.deletedAt = deletedAt;
     }
 
