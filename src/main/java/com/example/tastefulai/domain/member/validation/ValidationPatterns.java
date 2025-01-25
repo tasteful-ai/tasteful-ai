@@ -1,4 +1,4 @@
-package com.example.tastefulai.global.config;
+package com.example.tastefulai.domain.member.validation;
 
 import java.util.regex.Pattern;
 
