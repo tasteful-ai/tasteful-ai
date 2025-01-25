@@ -2,7 +2,6 @@ package com.example.tastefulai.domain.image.controller;
 
 import com.example.tastefulai.domain.image.dto.ProfileRequestDto;
 import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
-import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
@@ -36,7 +35,7 @@ public class MemberProfileController {
     }
 
     @GetMapping
-    public ResponseEntity<CommonResponseDto<ProfileResponseDto>> getProfile(@AuthenticationPrincipal MemberDetailsImpl  memberDetailsImpl) {
+    public ResponseEntity<CommonResponseDto<ProfileResponseDto>> getProfile(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
         Long memberId = memberDetailsImpl.getId();
 
