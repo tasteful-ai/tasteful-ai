@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +49,10 @@ public class MemberController {
     // 3. 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<CommonResponseDto<String>> logout(@RequestHeader("Authorization") String token) {
-        String jwtToken = token.replace("Bearer ", "");
+       if (!token.startsWith("Bearer ")) {
+           throw new CustomException(ErrorCode.INVALID_TOKEN_FORMAT);
+       }
+        String jwtToken = token.substring(7);
         memberService.logout(jwtToken);
 
         return new ResponseEntity<>(new CommonResponseDto<>("로그아웃 완료", null), HttpStatus.OK);
@@ -59,27 +61,27 @@ public class MemberController {
 
     // 4. 비밀번호 변경
     @PatchMapping("/passwords")
-    public ResponseEntity<CommonResponseDto<Void>> updatePassword(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
-                                                                  @RequestHeader("Authorization") String authorizationHeader,
-                                                                  @Valid @RequestBody PasswordUpdateRequestDto passwordUpdateRequestDto) {
-
+    public ResponseEntity<CommonResponseDto<Void>> updatePassword(@Valid @RequestBody PasswordUpdateRequestDto passwordUpdateRequestDto,
+                                                                  @AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
+                                                                  @RequestHeader("Authorization") String authorizationHeader) {
         String email = memberDetailsImpl.getUsername();
-        String currentPassword = passwordUpdateRequestDto.getCurrentPassword();
-        String newPassword = passwordUpdateRequestDto.getNewPassword();
-        String currentAccessToken = authorizationHeader.replace("Bearer ", "");
-
-        memberService.updatePassword(email, currentPassword, newPassword, currentAccessToken);
+        String currentAccessToken = authorizationHeader.substring(7);
+        memberService.updatePassword(
+                email,
+                passwordUpdateRequestDto.getCurrentPassword(),
+                passwordUpdateRequestDto.getNewPassword(),
+                currentAccessToken
+        );
 
         return new ResponseEntity<>(new CommonResponseDto<>("비밀번호 변경 완료", null), HttpStatus.OK);
     }
 
 
     // 5. 비밀번호 검증
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("/members/{memberId}/check")
-    public ResponseEntity<CommonResponseDto<Void>> verifyPassword(@PathVariable Long memberId,
-                                                                  @Valid @RequestBody PasswordVerifyRequestDto passwordVerifyRequestDto,
-                                                                  @AuthenticationPrincipal MemberDetailsImpl currentUser) {
+    public ResponseEntity<CommonResponseDto<Void>> verifyPassword(@Valid @RequestBody PasswordVerifyRequestDto passwordVerifyRequestDto,
+                                                                  @AuthenticationPrincipal MemberDetailsImpl currentUser,
+                                                                  @PathVariable Long memberId) {
         String password = passwordVerifyRequestDto.getPassword();
 
         // 현재 로그인된 사용자와 사용자 ID 비교
@@ -94,12 +96,11 @@ public class MemberController {
 
 
     // 6. 계정 삭제
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DeleteMapping("/members/{memberId}")
     public ResponseEntity<CommonResponseDto<Void>> deleteOwnAccount(@PathVariable Long memberId) {
 
-        memberService.deleteMember(memberId);
+       memberService.deleteMember(memberId);
 
-        return new ResponseEntity<>(new CommonResponseDto<>("회원 탈퇴 완료", null), HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 }

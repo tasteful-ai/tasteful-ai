@@ -1,6 +1,5 @@
 package com.example.tastefulai.global.config.auth;
 
-import com.example.tastefulai.domain.member.dto.MemberRequestDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
@@ -22,13 +21,13 @@ public class MemberDetailsServiceImpl implements UserDetailsService {
     private final JwtProvider jwtProvider;
 
     // 로그인 요청 처리
-    public String login(MemberRequestDto loginRequest) {
+    public String login(String email, String password) {
         // 이메일로 사용자 조회
-        Member member = memberRepository.findByEmail(loginRequest.getEmail())
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 비밀번호 검증
-        if (!passwordEncoder.matches(loginRequest.getPassword(), member.getPassword())) {
+        if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 
