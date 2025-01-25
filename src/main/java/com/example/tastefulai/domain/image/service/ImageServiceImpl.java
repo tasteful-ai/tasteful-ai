@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class ImageServiceImpl implements ImageService{
+public class ImageServiceImpl implements ImageService {
 
     private final ImageRepository imageRepository;
     private final S3Uploader s3Uploader;
@@ -38,7 +38,7 @@ public class ImageServiceImpl implements ImageService{
     @Override
     public void deleteImage(Member member) {
         Image existImage = imageRepository.findByMemberId(member.getId());
-        if (existImage != null){
+        if (existImage != null) {
             s3Uploader.deleteS3Image(existImage.getFileName());
             imageRepository.delete(existImage);
         }
