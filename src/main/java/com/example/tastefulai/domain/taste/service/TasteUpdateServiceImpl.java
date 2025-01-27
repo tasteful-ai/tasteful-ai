@@ -56,23 +56,6 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
 
         Member member = memberService.findById(memberId);
 
-//        // null 이거나 건너뛰기면 전부 삭제
-//        if (genresRequest == null || genresRequest.isEmpty()) {
-//            tasteGenresRepository.deleteByMember(member);
-//            return new TasteResponseDto(Collections.emptyList(), null, null, null, null);
-//        }
-//
-//        // 5개 초과 시 예외 처리 -> 수정
-//        if (genresRequest.size() > 5) {
-//            throw new CustomException(ErrorCode.INVALID_INPUT_DATA);
-//        }
-//
-//        // 중복 제거 (중복 입력 시 예외)
-//        Set<String> distinctGenres = new HashSet<>(genresRequest);
-//        if (distinctGenres.size() < genresRequest.size()) {
-//            throw new CustomException(ErrorCode.DUPLICATE_DATA);
-//        }
-
         // 기존 데이터 삭제
         tasteGenresRepository.deleteByMember(member);
 
