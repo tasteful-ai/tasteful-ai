@@ -29,10 +29,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -56,26 +56,15 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
 
         Member member = memberService.findById(memberId);
 
-        // 기존 데이터 삭제
-        tasteGenresRepository.deleteByMember(member);
-
-        // 새 데이터 저장
-        List<Genres> genresList = genresRequest.stream()
-                .distinct() // 중복 제거 (이미 Controller에서 검증되었지만 추가 안전망)
-                .map(genreName -> genresRepository.findByGenreName(genreName)
-                        .orElseGet(() -> genresRepository.save(new Genres(genreName))))
-                .toList();
-
-        genresList.forEach(genres -> tasteGenresRepository.save(new TasteGenres(member, genres)));
-
-        // 저장된 장르 이름 반환
-        List<String> updateGenres = genresList.stream()
-                .map(Genres::getGenreName)
-                .toList();
-
+        List<String> updateGenres = updateTaste(
+                member,
+                genresRequest,
+                genresRepository::findByGenreName,
+                Genres::new,
+                genres -> tasteGenresRepository.save(new TasteGenres(member, genres))
+        );
         return new TasteResponseDto(updateGenres, null, null, null, null);
     }
-
 
     @Override
     @Transactional
@@ -83,23 +72,13 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
 
         Member member = memberService.findById(memberId);
 
-        // 기존 데이터 삭제
-        tasteLikeFoodsRepository.deleteByMember(member);
-
-        // 새 데이터 저장
-        List<LikeFoods> likeFoodsList = likeFoodsRequest.stream()
-                .distinct()
-                .map(likeName -> likeFoodsRepository.findByLikeName(likeName)
-                        .orElseGet(() -> likeFoodsRepository.save(new LikeFoods(likeName))))
-                .toList();
-
-        likeFoodsList.forEach(likeFoods -> tasteLikeFoodsRepository.save(new TasteLikeFoods(member, likeFoods)));
-
-        // 저장된 선호 음식 이름 반환
-        List<String> updateLikeFoods = likeFoodsList.stream()
-                .map(LikeFoods::getLikeName)
-                .toList();
-
+        List<String> updateLikeFoods = updateTaste(
+                member,
+                likeFoodsRequest,
+                likeFoodsRepository::findByLikeName,
+                LikeFoods::new,
+                likeFoods -> tasteLikeFoodsRepository.save(new TasteLikeFoods(member, likeFoods))
+        );
         return new TasteResponseDto(null, updateLikeFoods, null, null, null);
     }
 
@@ -109,20 +88,13 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
 
         Member member = memberService.findById(memberId);
 
-        tasteDislikeFoodsRepository.deleteByMember(member);
-
-        List<DislikeFoods> dislikeFoodsList = dislikeFoodsRequest.stream()
-                .distinct()
-                .map(dislikeName -> dislikeFoodsRepository.findByDislikeName(dislikeName)
-                        .orElseGet(() -> dislikeFoodsRepository.save(new DislikeFoods(dislikeName))))
-                .toList();
-
-        dislikeFoodsList.forEach(dislikeFoods -> tasteDislikeFoodsRepository.save(new TasteDislikeFoods(member, dislikeFoods)));
-
-        List<String> updateDislikeFoods = dislikeFoodsList.stream()
-                .map(DislikeFoods::getDislikeName)
-                .toList();
-
+        List<String> updateDislikeFoods = updateTaste(
+                member,
+                dislikeFoodsRequest,
+                dislikeFoodsRepository::findByDislikeName,
+                DislikeFoods::new,
+                dislikeFoods -> tasteDislikeFoodsRepository.save(new TasteDislikeFoods(member, dislikeFoods))
+        );
         return new TasteResponseDto(null, null, updateDislikeFoods, null, null);
     }
 
@@ -132,20 +104,13 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
 
         Member member = memberService.findById(memberId);
 
-        tasteDietaryPreferencesRepository.deleteByMember(member);
-
-        List<DietaryPreferences> dietaryPreferencesList = dietaryPreferencesRequest.stream()
-                .distinct()
-                .map(preferenceName -> dietaryPreferencesRepository.findByPreferenceName(preferenceName)
-                        .orElseGet(() -> dietaryPreferencesRepository.save(new DietaryPreferences(preferenceName))))
-                .toList();
-
-        dietaryPreferencesList.forEach(dietaryPreferences -> tasteDietaryPreferencesRepository.save(new TasteDietaryPreferences(member, dietaryPreferences)));
-
-        List<String> updateDietaryPreferences = dietaryPreferencesList.stream()
-                .map(DietaryPreferences::getPreferenceName)
-                .toList();
-
+        List<String> updateDietaryPreferences = updateTaste(
+                member,
+                dietaryPreferencesRequest,
+                dietaryPreferencesRepository::findByPreferenceName,
+                DietaryPreferences::new,
+                dietaryPreferences -> tasteDietaryPreferencesRepository.save(new TasteDietaryPreferences(member, dietaryPreferences))
+        );
         return new TasteResponseDto(null, null, null, updateDietaryPreferences, null);
     }
 
@@ -164,5 +129,24 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
         tasteSpicyLevelRepository.save(tasteSpicyLevel);
 
         return new TasteResponseDto(null, null, null, null, spicyLevelRequest);
+    }
+
+    private <T> List<String> updateTaste(
+            Member member,
+            List<String> requestList,
+            Function<String, Optional<T>> findEntityFunction,
+            Function<String, T> createEntityFunction,
+            Consumer<T> saveFuntion
+    ) {
+        if (requestList == null || requestList.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST);
+        }
+
+        return requestList.stream()
+                .distinct()
+                .map(name -> findEntityFunction.apply(name).orElseGet(() -> createEntityFunction.apply(name)))
+                .peek(saveFuntion)
+                .map(Object::toString)
+                .toList();
     }
 }
