@@ -2,6 +2,7 @@ package com.example.tastefulai.domain.chatting.controller;
 
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageRequestDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
+import com.example.tastefulai.domain.chatting.dto.ChattingroomRequestDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingroomResponseDto;
 import com.example.tastefulai.domain.chatting.service.ChattingService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -28,26 +28,27 @@ public class ChattingContoller {
 
     private final ChattingService chattingService;
 
-    @PostMapping("/room")
+    @PostMapping("/rooms")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommonResponseDto<ChattingroomResponseDto>> createChattingroom(@RequestParam String roomName,
+    public ResponseEntity<CommonResponseDto<ChattingroomResponseDto>> createChattingroom(@RequestBody ChattingroomRequestDto chattingroomRequestDto,
                                                                                          @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         String adminEmail = memberDetails.getUsername();
-        ChattingroomResponseDto chattingroomResponseDto = chattingService.createChattingroom(roomName, adminEmail);
+
+        ChattingroomResponseDto chattingroomResponseDto = chattingService.createChattingroom(chattingroomRequestDto.getRoomName(), adminEmail);
 
         return new ResponseEntity<>(new CommonResponseDto<>("채팅방 생성 성공", chattingroomResponseDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/room/{id}")
-    public ResponseEntity<CommonResponseDto<ChattingroomResponseDto>> getChattingroom(@PathVariable Long id) {
+    @GetMapping("/rooms")
+    public ResponseEntity<CommonResponseDto<List<ChattingroomResponseDto>>> getAllChattingrooms() {
 
-        ChattingroomResponseDto chattingroomResponseDto = chattingService.getChattingroom(id);
+        List<ChattingroomResponseDto> chattingrooms = chattingService.getAllChattingrooms();
 
-        return new ResponseEntity<>(new CommonResponseDto<>("채팅방 조회 성공", chattingroomResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("채팅방 목록 조회 성공", chattingrooms), HttpStatus.OK);
     }
 
-    @PostMapping("/room/{id}/messages")
+    @PostMapping("/rooms/{id}/messages")
     public ResponseEntity<CommonResponseDto<ChattingMessageResponseDto>> sendMessage(@RequestBody ChattingMessageRequestDto chattingMessageRequestDto,
                                                                                      @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
@@ -57,8 +58,8 @@ public class ChattingContoller {
         return new ResponseEntity<>(new CommonResponseDto<>("메시지 전송 성공", chattingMessageResponseDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/room/{id}/messages")
-    public ResponseEntity<CommonResponseDto<List<ChattingMessageResponseDto>>> getMessage(@PathVariable Long id) {
+    @GetMapping("/rooms/{id}/messages")
+    public ResponseEntity<CommonResponseDto<List<ChattingMessageResponseDto>>> getMessages(@PathVariable Long id) {
 
         List<ChattingMessageResponseDto> messages = chattingService.getMessages(id);
 

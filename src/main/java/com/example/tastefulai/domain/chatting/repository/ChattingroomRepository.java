@@ -10,4 +10,6 @@ public interface ChattingroomRepository extends JpaRepository<Chattingroom, Long
     default Chattingroom findChattingroomByIdOrThrow(Long id) {
         return findById(id).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
     }
+
+    boolean existsByRoomName(String roomName);
 }
