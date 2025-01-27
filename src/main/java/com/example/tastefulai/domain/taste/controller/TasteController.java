@@ -2,7 +2,8 @@ package com.example.tastefulai.domain.taste.controller;
 
 import com.example.tastefulai.domain.taste.dto.TasteRequestDto;
 import com.example.tastefulai.domain.taste.dto.TasteResponseDto;
-import com.example.tastefulai.domain.taste.service.TasteService;
+import com.example.tastefulai.domain.taste.service.TasteGetService;
+import com.example.tastefulai.domain.taste.service.TasteUpdateService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,95 +16,105 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users/members/{memberId}/tastes")
 public class TasteController {
 
-    private final TasteService tasteService;
+    private final TasteUpdateService tasteUpdateService;
+    private final TasteGetService tasteGetService;
 
     @PatchMapping("/genres")
-    public ResponseEntity<CommonResponseDto<String>> updateGenres(@PathVariable Long memberId,
-                                                         @RequestBody @Valid TasteRequestDto tasteRequestDto) {
+    public ResponseEntity<CommonResponseDto<List<String>>> updateGenres(@PathVariable Long memberId,
+                                                                        @RequestBody @Valid TasteRequestDto tasteRequestDto) {
 
-        TasteResponseDto tasteResponseDto = tasteService.updateGenres(memberId, tasteRequestDto.getGenres());
+        TasteResponseDto tasteResponseDto = tasteUpdateService.updateGenres(memberId, tasteRequestDto.getGenres());
 
         return new ResponseEntity<>(new CommonResponseDto<>("선호 음식 장르 수정 완료", tasteResponseDto.getGenres()), HttpStatus.OK);
     }
 
     @PatchMapping("/likeFoods")
-    public ResponseEntity<CommonResponseDto<String>> updateLikeFoods(@PathVariable Long memberId,
-                                                            @RequestBody @Valid TasteRequestDto tasteRequestDto) {
+    public ResponseEntity<CommonResponseDto<List<String>>> updateLikeFoods(@PathVariable Long memberId,
+                                                                           @RequestBody @Valid TasteRequestDto tasteRequestDto) {
 
-        TasteResponseDto tasteResponseDto = tasteService.updateLikeFoods(memberId, tasteRequestDto.getLikeFoods());
+        TasteResponseDto tasteResponseDto = tasteUpdateService.updateLikeFoods(memberId, tasteRequestDto.getLikeFoods());
 
         return new ResponseEntity<>(new CommonResponseDto<>("좋아하는 음식 수정 완료", tasteResponseDto.getLikeFoods()), HttpStatus.OK);
     }
 
     @PatchMapping("/dislikeFoods")
-    public ResponseEntity<CommonResponseDto<String>> updateDislikeFoods(@PathVariable Long memberId,
-                                                               @RequestBody @Valid TasteRequestDto tasteRequestDto) {
+    public ResponseEntity<CommonResponseDto<List<String>>> updateDislikeFoods(@PathVariable Long memberId,
+                                                                              @RequestBody @Valid TasteRequestDto tasteRequestDto) {
 
-        TasteResponseDto tasteResponseDto = tasteService.updateDislikeFoods(memberId, tasteRequestDto.getDislikeFoods());
+        TasteResponseDto tasteResponseDto = tasteUpdateService.updateDislikeFoods(memberId, tasteRequestDto.getDislikeFoods());
 
         return new ResponseEntity<>(new CommonResponseDto<>("비선호 음식 수정 완료", tasteResponseDto.getDislikeFoods()), HttpStatus.OK);
     }
 
     @PatchMapping("/dietaryPreferences")
-    public ResponseEntity<CommonResponseDto<TasteResponseDto>> updateDietaryPreferences(@PathVariable Long memberId,
-                                                                     @RequestBody @Valid TasteRequestDto tasteRequestDto) {
+    public ResponseEntity<CommonResponseDto<List<String>>> updateDietaryPreferences(@PathVariable Long memberId,
+                                                                                    @RequestBody @Valid TasteRequestDto tasteRequestDto) {
 
-        TasteResponseDto tasteResponseDto = tasteService.updateDietaryPreferences(memberId, tasteRequestDto.getDietaryPreferences());
+        TasteResponseDto tasteResponseDto = tasteUpdateService.updateDietaryPreferences(memberId, tasteRequestDto.getDietaryPreferences());
 
-        return new ResponseEntity<>(new CommonResponseDto<>("식단 성향 수정 완료", tasteResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("식단 성향 수정 완료", tasteResponseDto.getDietaryPreferences()), HttpStatus.OK);
     }
 
     @PatchMapping("/spicyLevels")
-    public ResponseEntity<CommonResponseDto<TasteResponseDto>> updateSpicyLevel(@PathVariable Long memberId,
-                                                              @RequestBody @Valid TasteRequestDto tasteRequestDto) {
+    public ResponseEntity<CommonResponseDto<Integer>> updateSpicyLevel(@PathVariable Long memberId,
+                                                                       @RequestBody @Valid TasteRequestDto tasteRequestDto) {
 
-        TasteResponseDto tasteResponseDto = tasteService.updateSpicyLevel(memberId, tasteRequestDto.getSpicyLevel());
+        TasteResponseDto tasteResponseDto = tasteUpdateService.updateSpicyLevel(memberId, tasteRequestDto.getSpicyLevel());
 
-        return new ResponseEntity<>(new CommonResponseDto<>("매운 정도 수정 완료", tasteResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("매운 정도 수정 완료", tasteResponseDto.getSpicyLevel()), HttpStatus.OK);
     }
 
     @GetMapping("/genres")
-    public ResponseEntity<CommonResponseDto<String>> getGenres(@PathVariable Long memberId) {
+    public ResponseEntity<CommonResponseDto<List<String>>> getGenres(@PathVariable Long memberId) {
 
-        TasteResponseDto tasteResponseDto = tasteService.getGenres(memberId);
+        TasteResponseDto tasteResponseDto = tasteGetService.getGenres(memberId);
 
-        return new ResponseEntity<>(new CommonResponseDto<>("선호 음식 장르 조회 완료", tasteResponseDto.getGenres()), HttpStatus.OK);
+        return ResponseEntity.ok(
+                new CommonResponseDto<>("선호 음식 장르 조회 완료", tasteResponseDto.getGenres())
+        );
     }
 
     @GetMapping("/likeFoods")
-    public ResponseEntity<CommonResponseDto<String>> getLikeFoods(@PathVariable Long memberId) {
+    public ResponseEntity<CommonResponseDto<List<String>>> getLikeFoods(@PathVariable Long memberId) {
 
-        TasteResponseDto tasteResponseDto = tasteService.getLikeFoods(memberId);
+        TasteResponseDto tasteResponseDto = tasteGetService.getLikeFoods(memberId);
 
-        return new ResponseEntity<>(new CommonResponseDto<>("좋아하는 음식 조회 완료", tasteResponseDto.getLikeFoods()), HttpStatus.OK);
+        return ResponseEntity.ok(
+                new CommonResponseDto<>("좋아하는 음식 조회 완료", tasteResponseDto.getLikeFoods())
+        );
     }
 
     @GetMapping("/dislikeFoods")
-    public ResponseEntity<CommonResponseDto<String>> getDislikeFoods(@PathVariable Long memberId) {
+    public ResponseEntity<CommonResponseDto<List<String>>> getDislikeFoods(@PathVariable Long memberId) {
 
-        TasteResponseDto tasteResponseDto = tasteService.getDislikeFoods(memberId);
-
-        return new ResponseEntity<>(new CommonResponseDto<>("비선호 음식 조회 완료", tasteResponseDto.getDislikeFoods()), HttpStatus.OK);
+        TasteResponseDto tasteResponseDto = tasteGetService.getDislikeFoods(memberId);
+        return ResponseEntity.ok(
+                new CommonResponseDto<>("비선호 음식 조회 완료", tasteResponseDto.getDislikeFoods())
+        );
     }
 
     @GetMapping("/dietaryPreferences")
-    public ResponseEntity<CommonResponseDto<String>> getDietaryPreferences(@PathVariable Long memberId) {
+    public ResponseEntity<CommonResponseDto<List<String>>> getDietaryPreferences(@PathVariable Long memberId) {
 
-        TasteResponseDto tasteResponseDto = tasteService.getDietaryPreferences(memberId);
-
-        return new ResponseEntity<>(new CommonResponseDto<>("식단 성향 조회 완료", tasteResponseDto.getDietaryPreferences()), HttpStatus.OK);
+        TasteResponseDto tasteResponseDto = tasteGetService.getDietaryPreferences(memberId);
+        return ResponseEntity.ok(
+                new CommonResponseDto<>("식단 성향 조회 완료", tasteResponseDto.getDietaryPreferences())
+        );
     }
 
     @GetMapping("/spicyLevels")
     public ResponseEntity<CommonResponseDto<Integer>> getSpicyLevel(@PathVariable Long memberId) {
 
-        TasteResponseDto tasteResponseDto = tasteService.getSpicyLevel(memberId);
-
-        return new ResponseEntity<>(new CommonResponseDto<>("매운 정도 조회 완료", tasteResponseDto.getSpicyLevel()), HttpStatus.OK);
+        TasteResponseDto tasteResponseDto = tasteGetService.getSpicyLevel(memberId);
+        return ResponseEntity.ok(
+                new CommonResponseDto<>("매운 정도 조회 완료", tasteResponseDto.getSpicyLevel())
+        );
     }
 }
