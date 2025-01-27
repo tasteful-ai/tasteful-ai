@@ -2,6 +2,7 @@ package com.example.tastefulai.global.config.filter;
 
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
+import com.example.tastefulai.domain.member.service.BlacklistService;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;

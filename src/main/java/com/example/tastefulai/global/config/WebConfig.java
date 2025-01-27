@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000") // React 개발 서버용
                 .allowedOrigins("https://localhost:8080")
 //                .allowedOrigins("http://localhost:8080", "http://your-production-domain.com") // 허용할 도메인 명시
-                .allowedOrigins("*")
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowCredentials(true)
                 .maxAge(3600);
