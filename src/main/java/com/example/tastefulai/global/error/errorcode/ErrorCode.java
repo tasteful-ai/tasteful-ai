@@ -16,14 +16,16 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "잘못된 인증 정보 입니다."),
     PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "새 비밀번호는 기존 비밀번호와 다르게 설정해야 합니다."),
     VERIFY_PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "비밀번호 검증이 필요합니다."),
-    INVALID_SPICY_LEVEL (HttpStatus.BAD_REQUEST, "유효하지 않은 매운 정도 값입니다."),
-    NO_IMAGE_TO_DELETE (HttpStatus.BAD_REQUEST, "삭제할 파일이 존재하지 않습니다."),
+    INVALID_SPICY_LEVEL(HttpStatus.BAD_REQUEST, "유효하지 않은 매운 정도 값입니다."),
+    NO_IMAGE_TO_DELETE(HttpStatus.BAD_REQUEST, "삭제할 파일이 존재하지 않습니다."),
     INVALID_JSON(HttpStatus.BAD_REQUEST, "JSON 데이터 형식이 올바르지 않습니다."),
     CANNOT_MODIFY_DEACTIVATED_MEMBER(HttpStatus.BAD_REQUEST, "탈퇴한 사용자는 권한을 변경할 수 없습니다."),
     CANNOT_CHANGE_TO_SAME_ROLE(HttpStatus.BAD_REQUEST, "이미 동일한 권한입니다."),
     PASSWORD_CANNOT_BE_EMPTY(HttpStatus.BAD_REQUEST, "비밀번호는 필수 입력 값입니다. "),
     INVALID_TOKEN_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 토큰 형식입니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청 정보입니다."),
+    DUPLICATE_CHATROOM_NAME(HttpStatus.BAD_REQUEST, "이미 사용 중인 채팅방 이름입니다."),
+
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED_PASSWORD(HttpStatus.UNAUTHORIZED, "잘못된 비밀번호 입니다."),

@@ -26,15 +26,15 @@ public class Chattingroom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
     @Column(nullable = false, unique = true)
     private String roomName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
     private Member creator;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @PrePersist
     public void prePersist() {
@@ -44,5 +44,9 @@ public class Chattingroom {
     public Chattingroom(String roomName, Member creator) {
         this.roomName = roomName;
         this.creator = creator;
+    }
+
+    public String getCreator() {
+        return creator.getNickname();
     }
 }

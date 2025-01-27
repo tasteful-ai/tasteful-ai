@@ -4,13 +4,14 @@ import com.example.tastefulai.domain.chatting.dto.ChattingMessageRequestDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingroomResponseDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ChattingService {
 
     ChattingroomResponseDto createChattingroom(String roomName, String adminEmail);
 
-    ChattingroomResponseDto getChattingroom(Long id);
+    List<ChattingroomResponseDto> getAllChattingrooms();
 
     ChattingMessageResponseDto createMessage(String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto);
 

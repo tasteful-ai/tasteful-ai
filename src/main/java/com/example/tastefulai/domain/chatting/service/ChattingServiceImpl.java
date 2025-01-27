@@ -12,6 +12,7 @@ import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
+import com.example.tastefulai.global.error.exception.CustomException;
 import com.example.tastefulai.global.error.exception.NotFoundException;
 import com.example.tastefulai.global.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -37,17 +38,26 @@ public class ChattingServiceImpl implements ChattingService {
 
         validateAdminRole(admin);
 
+        if (chattingroomRepository.existsByRoomName(roomName)) {
+            throw new CustomException(ErrorCode.DUPLICATE_CHATROOM_NAME);
+        }
+
         Chattingroom chattingroom = new Chattingroom(roomName, admin);
         chattingroomRepository.save(chattingroom);
 
-        return new ChattingroomResponseDto(chattingroom.getId(), chattingroom.getCreatedAt(), admin.getNickname());
+        return new ChattingroomResponseDto(chattingroom.getId(), chattingroom.getRoomName(), admin.getNickname(), chattingroom.getCreatedAt());
     }
 
     @Override
-    public ChattingroomResponseDto getChattingroom(Long id) {
-        Chattingroom chattingroom = chattingroomRepository.findChattingroomByIdOrThrow(id);
+    public List<ChattingroomResponseDto> getAllChattingrooms() {
 
-        return new ChattingroomResponseDto(chattingroom.getId(), chattingroom.getCreatedAt(), chattingroom.getCreator().getNickname());
+        return chattingroomRepository.findAll().stream()
+                .map(chattingroom -> new ChattingroomResponseDto(
+                        chattingroom.getId(),
+                        chattingroom.getRoomName(),
+                        chattingroom.getCreator(),
+                        chattingroom.getCreatedAt()))
+                .collect(Collectors.toList());
     }
 
     @Override
