@@ -47,7 +47,7 @@ public class ChattingContoller {
         return new ResponseEntity<>(new CommonResponseDto<>("채팅방 조회 성공", chattingroomResponseDto), HttpStatus.OK);
     }
 
-    @PostMapping("/messages")
+    @PostMapping("/room/{id}/messages")
     public ResponseEntity<CommonResponseDto<ChattingMessageResponseDto>> sendMessage(@RequestBody ChattingMessageRequestDto chattingMessageRequestDto,
                                                                                      @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
