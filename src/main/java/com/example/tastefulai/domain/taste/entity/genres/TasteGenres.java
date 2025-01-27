@@ -31,7 +31,8 @@ public class TasteGenres extends BaseEntity {
     @JoinColumn(name = "genre_id")
     private Genres genres;
 
-    public TasteGenres(Member member) {
+    public TasteGenres(Member member, Genres genres) {
         this.member = member;
+        this.genres = genres;
     }
 }

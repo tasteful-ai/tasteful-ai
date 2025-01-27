@@ -1,6 +1,7 @@
 package com.example.tastefulai.domain.taste.entity.dietarypreferences;
 
 import com.example.tastefulai.domain.member.entity.Member;
+import com.example.tastefulai.domain.taste.entity.dislikefoods.DislikeFoods;
 import com.example.tastefulai.global.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,10 +30,11 @@ public class TasteDietaryPreferences extends BaseEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dietary_pref_id")
+    @JoinColumn(name = "dietary_preferences_id")
     private DietaryPreferences dietaryPreferences;
 
-    public TasteDietaryPreferences(Member member) {
+    public TasteDietaryPreferences(Member member, DietaryPreferences dietaryPreferences) {
         this.member = member;
+        this.dietaryPreferences = dietaryPreferences;
     }
 }

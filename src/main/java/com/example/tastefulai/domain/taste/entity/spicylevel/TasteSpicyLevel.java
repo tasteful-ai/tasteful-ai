@@ -31,7 +31,8 @@ public class TasteSpicyLevel extends BaseEntity {
     @JoinColumn(name = "spicy_level")
     private SpicyLevel spicyLevel;
 
-    public TasteSpicyLevel(Member member) {
+    public TasteSpicyLevel(Member member, SpicyLevel spicyLevel) {
         this.member = member;
+        this.spicyLevel = spicyLevel;
     }
 }

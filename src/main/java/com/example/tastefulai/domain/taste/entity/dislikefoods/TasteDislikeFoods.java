@@ -31,7 +31,8 @@ public class TasteDislikeFoods extends BaseEntity {
     @JoinColumn(name = "dislike_food_id")
     private DislikeFoods dislikeFoods;
 
-    public TasteDislikeFoods(Member member) {
+    public TasteDislikeFoods(Member member, DislikeFoods dislikeFoods) {
         this.member = member;
+        this.dislikeFoods = dislikeFoods;
     }
 }
