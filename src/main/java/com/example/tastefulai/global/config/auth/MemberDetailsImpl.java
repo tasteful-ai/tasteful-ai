@@ -1,7 +1,6 @@
 package com.example.tastefulai.global.config.auth;
 
 import com.example.tastefulai.domain.member.entity.Member;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

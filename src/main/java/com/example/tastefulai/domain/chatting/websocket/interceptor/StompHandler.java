@@ -48,11 +48,9 @@ public class StompHandler implements ChannelInterceptor {
                     .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(new MemberDetailsImpl(member), null, member.getAuthorities());
-            log.info(member.getEmail());
             log.info("Authentication before setting SecurityContext: {}", authentication);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            stompHeaderAccessor.setUser(authentication);
         }
 
         return message;
