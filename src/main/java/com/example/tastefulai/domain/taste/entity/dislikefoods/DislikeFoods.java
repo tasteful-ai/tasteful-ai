@@ -25,8 +25,12 @@ public class DislikeFoods extends BaseEntity {
     private Long id;
 
     @Column(name = "dislike_name", nullable = true)
-    private String dislike_name;
+    private String dislikeName;
 
-    @OneToMany(mappedBy = "dislike_foods")
+    @OneToMany(mappedBy = "dislikeFoods")
     private List<TasteDislikeFoods> tasteDislikeFoods = new ArrayList<>();
+
+    public DislikeFoods(String dislikeName) {
+        this.dislikeName = dislikeName;
+    }
 }

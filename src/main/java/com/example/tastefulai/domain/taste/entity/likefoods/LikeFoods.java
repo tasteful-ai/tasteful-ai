@@ -27,6 +27,10 @@ public class LikeFoods extends BaseEntity {
     @Column(name = "like_name", nullable = true)
     private String likeName;
 
-    @OneToMany(mappedBy = "like_foods")
+    @OneToMany(mappedBy = "likeFoods")
     private List<TasteLikeFoods> tasteLikeFoods = new ArrayList<>();
+
+    public LikeFoods(String likeName) {
+        this.likeName = likeName;
+    }
 }
