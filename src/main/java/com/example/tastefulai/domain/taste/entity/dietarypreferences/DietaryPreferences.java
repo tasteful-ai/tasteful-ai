@@ -27,7 +27,7 @@ public class DietaryPreferences extends BaseEntity {
     @Column(name = "preference_name", nullable = true)
     private String preferenceName;
 
-    @OneToMany(mappedBy = "dietary_preferences")
+    @OneToMany(mappedBy = "dietaryPreferences")
     private List<TasteDietaryPreferences> tasteDietaryPreferences = new ArrayList<>();
 
     public DietaryPreferences(String preferenceName) {
