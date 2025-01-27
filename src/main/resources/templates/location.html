@@ -79,8 +79,8 @@
 </head>
 <body>
 <header>
-  <h1>사용자 위치 기반 맛집 검색</h1>
-  <input type="text" id="keyword" placeholder="검색어를 입력하세요" value="맛집">
+  <h1>맛집 레이더 작동 중… 배가 고프다면 검색하세요!</h1>
+  <input type="text" id="keyword" placeholder="검색어를 입력하세요" value="">
   <button onclick="searchPlaces()">검색</button>
 </header>
 <div id="container">
@@ -101,13 +101,15 @@
   var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 }); // 인포윈도우 생성
   var currentPosition = null;
 
+  // 현재 위치 가져오기 및 지도 중심 설정
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
-            function(position) {
+            function (position) {
               currentPosition = new kakao.maps.LatLng(position.coords.latitude, position.coords.longitude);
-              map.setCenter(currentPosition);
+              map.setCenter(currentPosition); // 지도 중심을 현재 위치로 설정
+              displayCurrentLocationMarker(); // 현재 위치 마커 표시
             },
-            function(error) {
+            function (error) {
               alert("위치 정보를 가져올 수 없어 기본 위치를 사용합니다.");
             }
     );
@@ -115,6 +117,20 @@
     alert("위치 정보 기능을 지원하지 않는 브라우저입니다.");
   }
 
+  function displayCurrentLocationMarker() {
+    var marker = new kakao.maps.Marker({
+      map: map,
+      position: currentPosition, // 현재 위치 좌표
+      title: "현위치", // 마우스 오버 시 표시되는 텍스트
+    });
+
+    // 마커를 클릭했을 때 간단한 알림창 (필요하지 않으면 제거 가능)
+    kakao.maps.event.addListener(marker, 'click', function () {
+      alert('현재 위치입니다😁');
+    });
+  }
+
+  // 장소 검색 실행
   function searchPlaces() {
     var keyword = document.getElementById('keyword').value.trim();
 
@@ -124,27 +140,29 @@
     }
 
     ps.keywordSearch(keyword, placesSearchCB, {
-      location: currentPosition || map.getCenter(), // 사용자 위치 기반 검색
-      radius: 5000 // 5km 반경
+      location: currentPosition || map.getCenter(), // 현재 위치 기준 검색
+      radius: 5000, // 5km 반경
+      size: 10 // 최대 10개 결과
     });
   }
 
-  function placesSearchCB(data, status, pagination) {
+  // 검색 결과 처리
+  function placesSearchCB(data, status) {
     if (status === kakao.maps.services.Status.OK) {
-      displayPlaces(data); // 검색 결과 목록 표시
-      displayPagination(pagination); // 페이지 네비게이션 표시
+      displayPlaces(data); // 검색 결과 지도와 목록에 표시
     } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
       alert('검색 결과가 없습니다.');
-    } else if (status === kakao.maps.services.Status.ERROR) {
+    } else {
       alert('검색 중 오류가 발생했습니다.');
     }
   }
 
+  // 검색 결과 표시
   function displayPlaces(places) {
     var listEl = document.getElementById('placesList');
     var bounds = new kakao.maps.LatLngBounds();
 
-    listEl.innerHTML = '';
+    listEl.innerHTML = ''; // 기존 리스트 초기화
 
     for (var i = 0; i < places.length; i++) {
       var place = places[i];
@@ -158,22 +176,22 @@
       `;
 
       listEl.appendChild(itemEl);
-      (function(marker, title) {
-        kakao.maps.event.addListener(marker, 'mouseover', function() {
+      (function (marker, title) {
+        kakao.maps.event.addListener(marker, 'mouseover', function () {
           infowindow.setContent(`<div style="padding:5px;">${title}</div>`);
           infowindow.open(map, marker);
         });
 
-        kakao.maps.event.addListener(marker, 'mouseout', function() {
+        kakao.maps.event.addListener(marker, 'mouseout', function () {
           infowindow.close();
         });
 
-        itemEl.onmouseover = function() {
+        itemEl.onmouseover = function () {
           infowindow.setContent(`<div style="padding:5px;">${title}</div>`);
           infowindow.open(map, marker);
         };
 
-        itemEl.onmouseout = function() {
+        itemEl.onmouseout = function () {
           infowindow.close();
         };
       })(displayMarker(place), place.place_name);
@@ -181,9 +199,10 @@
       bounds.extend(new kakao.maps.LatLng(place.y, place.x));
     }
 
-    map.setBounds(bounds);
+    map.setBounds(bounds); // 검색 결과에 맞게 지도 범위 설정
   }
 
+  // 장소 마커 표시
   function displayMarker(place) {
     var marker = new kakao.maps.Marker({
       map: map,
@@ -191,29 +210,4 @@
     });
     return marker;
   }
-
-  function displayPagination(pagination) {
-    var paginationEl = document.getElementById('pagination');
-    paginationEl.innerHTML = '';
-
-    for (var i = 1; i <= pagination.last; i++) {
-      var a = document.createElement('a');
-      a.href = '#';
-      a.innerHTML = i;
-
-      if (i === pagination.current) {
-        a.style.fontWeight = 'bold';
-      } else {
-        a.onclick = (function(i) {
-          return function() {
-            pagination.gotoPage(i);
-          };
-        })(i);
-      }
-
-      paginationEl.appendChild(a);
-    }
-  }
 </script>
-</body>
-</html>

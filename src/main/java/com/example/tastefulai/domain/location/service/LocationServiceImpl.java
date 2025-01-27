@@ -4,6 +4,7 @@ import com.example.tastefulai.domain.location.dto.LocationResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,6 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,39 +24,55 @@ import java.util.Map;
 @Slf4j
 public class LocationServiceImpl implements LocationService {
 
+    private final RedisTemplate<String, Object> locationRedisTemplate;
+
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
 
-    /**
-     * 키워드로 장소를 검색하는 메서드
-     * @param keyword 검색할 키워드
-     * @return LocationResponseDto 리스트 (검색 결과)
-     */
     @Override
     public List<LocationResponseDto> findByKeyword(String keyword) {
-        // Kakao API의 키워드 검색 URL
-        String url = "https://dapi.kakao.com/v2/local/search/keyword.json";
+        // Redis 키 설정
+        String cacheKey = "search:" + keyword;
 
+        // Redis에서 캐시 확인
+        List<LocationResponseDto> cachedResults = (List<LocationResponseDto>) locationRedisTemplate.opsForValue().get(cacheKey);
+        if (cachedResults != null) {
+            log.info("Redis 캐시에서 검색 결과를 가져옴: {}", cacheKey);
+            return cachedResults;
+        }
+
+        // 캐시에 없을 경우 Kakao API 호출
+        List<LocationResponseDto> results = fetchFromKakaoApi(keyword);
+
+        // Redis에 검색 결과 저장
+        if (!results.isEmpty()) {
+            locationRedisTemplate.opsForValue().set(cacheKey, results, Duration.ofMinutes(5));  // 캐시 TTL 설정 (5분)
+            log.info("Redis 캐시에 검색 결과 저장: {}", cacheKey);
+        }
+
+        return results;
+    }
+
+    private List<LocationResponseDto> fetchFromKakaoApi(String keyword) {
+        String url = "https://dapi.kakao.com/v2/local/search/keyword.json";
         String requestUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("query", keyword)   // 검색 키워드
                 .queryParam("radius", 5000) // 5km 반경
                 .queryParam("size", 10) // 최대 10개 결과
                 .toUriString();
 
-        // HTTP 요청 헤더 설정: Kakao API 키 포함
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + kakaoApiKey);
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
-
         RestTemplate restTemplate = new RestTemplate();
 
         try {
             ResponseEntity<Map> response = restTemplate.exchange(requestUrl, HttpMethod.GET, entity, Map.class);
             log.info("카카오 API 응답: {}", response.getBody());
             return parseResponse(response.getBody());
-        } catch (HttpClientErrorException e) {
-            log.error("API 호출 실패: {}", e.getMessage());
+        } catch (HttpClientErrorException exception) {
+            log.error("API 호출 실패: {}", exception.getMessage());
             return new ArrayList<>();
         }
     }
