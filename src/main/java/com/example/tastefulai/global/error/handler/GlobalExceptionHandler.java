@@ -106,6 +106,6 @@ public class GlobalExceptionHandler {
     // 데이터베이스 제약 조건 위반 시 발생 예외 처리
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException customException) {
-        return ErrorResponse.toResponseEntity(ErrorCode.DUPLICATE_RESOURCE);
+        return ErrorResponse.toResponseEntity(ErrorCode.INVALID_REQUEST);
     }
 }
