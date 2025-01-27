@@ -3,22 +3,13 @@ package com.example.tastefulai.domain.chatting.websocket.controller;
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 import com.example.tastefulai.domain.chatting.redis.RedisPublisher;
 import com.example.tastefulai.domain.chatting.websocket.dto.ChatMessageDto;
-import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
+import com.example.tastefulai.global.util.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.socket.messaging.SessionConnectEvent;
-
-import java.util.Objects;
 
 @Slf4j
 @Controller
@@ -26,24 +17,27 @@ import java.util.Objects;
 public class WebSocketChatController {
 
     private final RedisPublisher redisPublisher;
+    private final JwtProvider jwtProvider;
 
     // WebSocket을 통해 클라이언트로부터 메시지 수신
     @MessageMapping("/chat")
-    public void publishMessage(@AuthenticationPrincipal MemberDetailsImpl memberDetails, ChatMessageDto chatMessageDto, SessionConnectEvent event) {
+    public void publishMessage(ChatMessageDto chatMessageDto) {
 
-        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);
-
-        Authentication authentication = (Authentication) Objects.requireNonNull(accessor.getUser());
-        String username = authentication.getName();
-
-        if (memberDetails == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_MEMBER);
+        String token = chatMessageDto.getToken();
+        if (token == null || !jwtProvider.validateToken(token)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
-        String sender = memberDetails.getUsername();
-        log.info("메시지 발신자: {}", sender);
+        String email = jwtProvider.getEmailFromToken(token);
+        log.info("토큰에서 추출된 이메일: {}", email);
 
-        ChattingMessageResponseDto chattingMessageResponseDto = new ChattingMessageResponseDto(sender, chatMessageDto.getMessage(), chatMessageDto.getChattingroomId());
+        if (!email.equals(chatMessageDto.getSender())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MEMBER);
+        }
+        log.info("메시지 발신자: {}", chatMessageDto.getSender());
+
+        ChattingMessageResponseDto chattingMessageResponseDto = new ChattingMessageResponseDto(chatMessageDto.getSender(), chatMessageDto.getMessage(), chatMessageDto.getChattingroomId());
+
         redisPublisher.publishMessage(chatMessageDto.getChattingroomId(), chattingMessageResponseDto);
         log.info("Redis 메시지 전송 완료");
     }

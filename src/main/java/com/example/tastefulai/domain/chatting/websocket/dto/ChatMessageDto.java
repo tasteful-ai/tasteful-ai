@@ -12,15 +12,18 @@ public class ChatMessageDto {
     private final String sender;
     private final String message;
     private final Long chattingroomId;
+    private final String token;
 
     @JsonCreator
     public ChatMessageDto(@JsonProperty("type") MessageType type,
                           @JsonProperty("sender") String sender,
                           @JsonProperty("message") String message,
-                          @JsonProperty("chattingroomId") Long chattingroomId) {
+                          @JsonProperty("chattingroomId") Long chattingroomId,
+                          @JsonProperty("token") String token) {
         this.type = type;
         this.sender = sender;
         this.message = message;
         this.chattingroomId = chattingroomId;
+        this.token = token;
     }
 }
