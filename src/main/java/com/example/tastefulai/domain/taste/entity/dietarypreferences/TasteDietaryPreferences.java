@@ -1,7 +1,6 @@
 package com.example.tastefulai.domain.taste.entity.dietarypreferences;
 
 import com.example.tastefulai.domain.member.entity.Member;
-import com.example.tastefulai.domain.taste.entity.dislikefoods.DislikeFoods;
 import com.example.tastefulai.global.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
