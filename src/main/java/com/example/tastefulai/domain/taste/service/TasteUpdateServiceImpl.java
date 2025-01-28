@@ -54,8 +54,7 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
     @Transactional
     public TasteResponseDto updateGenres(Long memberId, List<String> genresRequest) {
 
-        Member member = memberService.findById(memberId);
-
+        Member member = findMember(memberId);
         List<String> updateGenres = updateTaste(
                 member,
                 genresRequest,
@@ -70,8 +69,7 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
     @Transactional
     public TasteResponseDto updateLikeFoods(Long memberId, List<String> likeFoodsRequest) {
 
-        Member member = memberService.findById(memberId);
-
+        Member member = findMember(memberId);
         List<String> updateLikeFoods = updateTaste(
                 member,
                 likeFoodsRequest,
@@ -86,8 +84,7 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
     @Transactional
     public TasteResponseDto updateDislikeFoods(Long memberId, List<String> dislikeFoodsRequest) {
 
-        Member member = memberService.findById(memberId);
-
+        Member member = findMember(memberId);
         List<String> updateDislikeFoods = updateTaste(
                 member,
                 dislikeFoodsRequest,
@@ -102,7 +99,7 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
     @Transactional
     public TasteResponseDto updateDietaryPreferences(Long memberId, List<String> dietaryPreferencesRequest) {
 
-        Member member = memberService.findById(memberId);
+        Member member = findMember(memberId);
 
         List<String> updateDietaryPreferences = updateTaste(
                 member,
@@ -118,8 +115,7 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
     @Transactional
     public TasteResponseDto updateSpicyLevel(Long memberId, Integer spicyLevelRequest) {
 
-        Member member = memberService.findById(memberId);
-
+        Member member = findMember(memberId);
         tasteSpicyLevelRepository.deleteByMember(member);
 
         SpicyLevel spicyLevel = spicyLevelRepository.findBySpicyLevel(spicyLevelRequest)
@@ -148,5 +144,9 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
                 .peek(saveFuntion)
                 .map(Object::toString)
                 .toList();
+    }
+
+    private Member findMember(Long memberId) {
+        return memberService.findById(memberId);
     }
 }
