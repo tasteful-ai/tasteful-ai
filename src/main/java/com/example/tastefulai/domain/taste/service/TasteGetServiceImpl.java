@@ -33,7 +33,7 @@ public class TasteGetServiceImpl implements TasteGetService {
     @Transactional(readOnly = true)
     public TasteResponseDto getGenres(Long memberId) {
 
-        Member member = findMember(memberId);
+        Member member = memberService.findById(memberId);
         List<String> genres = tasteGenresRepository.findByMember(member).stream()
                 .map(tg -> tg.getGenres().getGenreName())
                 .collect(Collectors.toList());
@@ -45,7 +45,7 @@ public class TasteGetServiceImpl implements TasteGetService {
     @Transactional(readOnly = true)
     public TasteResponseDto getLikeFoods(Long memberId) {
 
-        Member member = findMember(memberId);
+        Member member = memberService.findById(memberId);
         List<String> likeFoods = tasteLikeFoodsRepository.findByMember(member).stream()
                 .map(tg -> tg.getLikeFoods().getLikeName())
                 .collect(Collectors.toList());
@@ -57,7 +57,7 @@ public class TasteGetServiceImpl implements TasteGetService {
     @Transactional(readOnly = true)
     public TasteResponseDto getDislikeFoods(Long memberId) {
 
-        Member member = findMember(memberId);
+        Member member = memberService.findById(memberId);
         List<String> dislikeFoods = tasteDislikeFoodsRepository.findByMember(member).stream()
                 .map(tg -> tg.getDislikeFoods().getDislikeName())
                 .collect(Collectors.toList());
@@ -69,7 +69,7 @@ public class TasteGetServiceImpl implements TasteGetService {
     @Transactional(readOnly = true)
     public TasteResponseDto getDietaryPreferences(Long memberId) {
 
-        Member member = findMember(memberId);
+        Member member = memberService.findById(memberId);
         List<String> dietaryPreferences = tasteDietaryPreferencesRepository.findByMember(member).stream()
                 .map(tg -> tg.getDietaryPreferences().getPreferenceName())
                 .collect(Collectors.toList());
@@ -81,16 +81,12 @@ public class TasteGetServiceImpl implements TasteGetService {
     @Transactional(readOnly = true)
     public TasteResponseDto getSpicyLevel(Long memberId) {
 
-        Member member = findMember(memberId);
+        Member member = memberService.findById(memberId);
         TasteSpicyLevel tasteSpicyLevel = tasteSpicyLevelRepository.findByMember(member)
                 .orElseThrow(() -> new CustomException(ErrorCode.DATA_NOT_FOUND));
 
         Integer spicyLevel = tasteSpicyLevel.getSpicyLevel().getSpicyLevel();
 
         return new TasteResponseDto(null, null, null,null, spicyLevel);
-    }
-
-    private Member findMember(Long memberId) {
-        return memberService.findById(memberId);
     }
 }
