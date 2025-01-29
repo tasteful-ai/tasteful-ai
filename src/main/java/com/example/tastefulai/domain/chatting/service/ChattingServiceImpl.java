@@ -36,6 +36,10 @@ public class ChattingServiceImpl implements ChattingService {
     public ChattingroomResponseDto createChattingroom(String roomName, String adminEmail) {
         Member admin = memberService.findByEmail(adminEmail);
 
+        if (admin == null) {
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        
         validateAdminRole(admin);
 
         if (chattingroomRepository.existsByRoomName(roomName)) {
