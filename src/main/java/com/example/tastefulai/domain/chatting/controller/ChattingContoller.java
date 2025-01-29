@@ -10,6 +10,7 @@ import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class ChattingContoller {
 
     @PostMapping("/rooms")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommonResponseDto<ChattingroomResponseDto>> createChattingroom(@RequestBody ChattingroomRequestDto chattingroomRequestDto,
+    public ResponseEntity<CommonResponseDto<ChattingroomResponseDto>> createChattingroom(@Valid @RequestBody ChattingroomRequestDto chattingroomRequestDto,
                                                                                          @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         String adminEmail = memberDetails.getUsername();
@@ -53,7 +54,7 @@ public class ChattingContoller {
     }
 
     @PostMapping("/rooms/{roomId}/messages")
-    public ResponseEntity<CommonResponseDto<ChattingMessageResponseDto>> sendMessage(@RequestBody ChattingMessageRequestDto chattingMessageRequestDto,
+    public ResponseEntity<CommonResponseDto<ChattingMessageResponseDto>> sendMessage(@Valid @RequestBody ChattingMessageRequestDto chattingMessageRequestDto,
                                                                                      @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         if (chattingMessageRequestDto.getChattingroomId() == null) {
