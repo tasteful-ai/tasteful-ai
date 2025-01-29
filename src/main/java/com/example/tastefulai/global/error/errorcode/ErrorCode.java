@@ -45,6 +45,9 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "멤버 정보를 찾을 수 없습니다."),
     NOT_FOUND_CHATTINGROOM(HttpStatus.NOT_FOUND, "채팅방이 존재하지 않습니다."),
 
+    //500
+    REDIS_SERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Redis 메시지 직렬화 오류입니다."),
+
     // 503 SERVICE_UNAVAILABLE
     TOO_MANY_REQUESTS(HttpStatus.SERVICE_UNAVAILABLE, "오늘의 메뉴 추천 요청 횟수를 초과했습니다.");
 
