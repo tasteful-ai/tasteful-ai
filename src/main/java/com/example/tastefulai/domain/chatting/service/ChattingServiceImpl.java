@@ -63,8 +63,18 @@ public class ChattingServiceImpl implements ChattingService {
     @Override
     @Transactional
     public ChattingMessageResponseDto createMessage(String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto) {
+
         Member member = memberService.findByEmail(memberEmail);
+
+        if (member == null) {
+            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
         Chattingroom chattingroom = chattingroomRepository.findChattingroomByIdOrThrow(chattingMessageRequestDto.getChattingroomId());
+
+        if (chattingMessageRequestDto.getMessage() == null || chattingMessageRequestDto.getMessage().trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
 
         ChattingMessage chattingMessage = new ChattingMessage(chattingroom, member, chattingMessageRequestDto.getMessage());
         chattingMessageRepository.save(chattingMessage);
@@ -100,6 +110,14 @@ public class ChattingServiceImpl implements ChattingService {
     public void processReceivedMessage(ChattingMessageResponseDto chattingMessageResponseDto) {
         Chattingroom chattingroom = chattingroomRepository.findChattingroomByIdOrThrow(chattingMessageResponseDto.getChattingroomId());
         Member sender = memberService.findByEmail(chattingMessageResponseDto.getSenderNickname());
+
+        if (sender == null) {
+            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
+        if (chattingMessageResponseDto.getMessage() == null || chattingMessageResponseDto.getMessage().trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
 
         ChattingMessage chattingMessage = new ChattingMessage(chattingroom, sender, chattingMessageResponseDto.getMessage());
         chattingMessageRepository.save(chattingMessage);

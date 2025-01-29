@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class ChattingroomResponseDto {
 
     private final Long id;
-    private String roomName;
+    private final String roomName;
     private final String creatorNickname;
     private final LocalDateTime createdAt;
 

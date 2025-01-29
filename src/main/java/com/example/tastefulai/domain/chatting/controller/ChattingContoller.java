@@ -4,9 +4,12 @@ import com.example.tastefulai.domain.chatting.dto.ChattingMessageRequestDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingroomRequestDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingroomResponseDto;
+import com.example.tastefulai.domain.chatting.repository.ChattingroomRepository;
 import com.example.tastefulai.domain.chatting.service.ChattingService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
+import com.example.tastefulai.global.error.errorcode.ErrorCode;
+import com.example.tastefulai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,7 @@ import java.util.List;
 public class ChattingContoller {
 
     private final ChattingService chattingService;
+    private final ChattingroomRepository chattingroomRepository;
 
     @PostMapping("/rooms")
     @PreAuthorize("hasRole('ADMIN')")
@@ -48,9 +52,13 @@ public class ChattingContoller {
         return new ResponseEntity<>(new CommonResponseDto<>("채팅방 목록 조회 성공", chattingrooms), HttpStatus.OK);
     }
 
-    @PostMapping("/rooms/{id}/messages")
+    @PostMapping("/rooms/{roomId}/messages")
     public ResponseEntity<CommonResponseDto<ChattingMessageResponseDto>> sendMessage(@RequestBody ChattingMessageRequestDto chattingMessageRequestDto,
                                                                                      @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+
+        if (chattingMessageRequestDto.getChattingroomId() == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND_CHATTINGROOM);
+        }
 
         String memberEmail = memberDetails.getUsername();
         ChattingMessageResponseDto chattingMessageResponseDto = chattingService.createMessage(memberEmail, chattingMessageRequestDto);
@@ -58,8 +66,12 @@ public class ChattingContoller {
         return new ResponseEntity<>(new CommonResponseDto<>("메시지 전송 성공", chattingMessageResponseDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/rooms/{id}/messages")
+    @GetMapping("/rooms/{roomId}/messages")
     public ResponseEntity<CommonResponseDto<List<ChattingMessageResponseDto>>> getMessages(@PathVariable Long id) {
+
+        if (!chattingroomRepository.existsById(id)) {
+            throw new CustomException(ErrorCode.NOT_FOUND_CHATTINGROOM);
+        }
 
         List<ChattingMessageResponseDto> messages = chattingService.getMessages(id);
 
