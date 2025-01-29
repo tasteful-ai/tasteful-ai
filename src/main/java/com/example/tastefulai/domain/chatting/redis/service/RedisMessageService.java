@@ -24,7 +24,9 @@ public class RedisMessageService {
     public void saveMessage(Long chattingroomId, ChattingMessageResponseDto chattingMessageResponseDto) {
         try {
             String key = getRedisKey(chattingroomId);
+
             String serializedMessage = objectMapper.writeValueAsString(chattingMessageResponseDto);
+            messageCacheRedisTemplate.opsForList().rightPush(key, serializedMessage);
 
             if (messageCacheRedisTemplate.opsForList().size(key) > MAX_MESSAGE_COUNT) {
                 messageCacheRedisTemplate.opsForList().leftPop(key);
