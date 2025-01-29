@@ -34,7 +34,7 @@ public class Chattingroom {
     private Member creator;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
