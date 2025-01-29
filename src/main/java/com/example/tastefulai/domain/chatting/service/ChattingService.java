@@ -13,7 +13,7 @@ public interface ChattingService {
 
     List<ChattingroomResponseDto> getAllChattingrooms();
 
-    ChattingMessageResponseDto createMessage(String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto);
+    ChattingMessageResponseDto createMessage(Long chattingroomId, String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto);
 
     List<ChattingMessageResponseDto> getMessages(Long chattingroomId);
 

@@ -62,7 +62,7 @@ public class ChattingServiceImpl implements ChattingService {
 
     @Override
     @Transactional
-    public ChattingMessageResponseDto createMessage(String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto) {
+    public ChattingMessageResponseDto createMessage(Long chattingroomId, String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto) {
 
         Member member = memberService.findByEmail(memberEmail);
 
@@ -70,7 +70,7 @@ public class ChattingServiceImpl implements ChattingService {
             throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
         }
 
-        Chattingroom chattingroom = chattingroomRepository.findChattingroomByIdOrThrow(chattingMessageRequestDto.getChattingroomId());
+        Chattingroom chattingroom = chattingroomRepository.findChattingroomByIdOrThrow(chattingroomId);
 
         if (chattingMessageRequestDto.getMessage() == null || chattingMessageRequestDto.getMessage().trim().isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_INPUT);

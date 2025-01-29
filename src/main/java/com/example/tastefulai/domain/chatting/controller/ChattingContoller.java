@@ -55,26 +55,19 @@ public class ChattingContoller {
 
     @PostMapping("/rooms/{roomId}/messages")
     public ResponseEntity<CommonResponseDto<ChattingMessageResponseDto>> sendMessage(@Valid @RequestBody ChattingMessageRequestDto chattingMessageRequestDto,
-                                                                                     @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-
-        if (chattingMessageRequestDto.getChattingroomId() == null) {
-            throw new CustomException(ErrorCode.NOT_FOUND_CHATTINGROOM);
-        }
+                                                                                     @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+                                                                                     @PathVariable Long roomId) {
 
         String memberEmail = memberDetails.getUsername();
-        ChattingMessageResponseDto chattingMessageResponseDto = chattingService.createMessage(memberEmail, chattingMessageRequestDto);
+        ChattingMessageResponseDto chattingMessageResponseDto = chattingService.createMessage(roomId, memberEmail, chattingMessageRequestDto);
 
         return new ResponseEntity<>(new CommonResponseDto<>("메시지 전송 성공", chattingMessageResponseDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/rooms/{roomId}/messages")
-    public ResponseEntity<CommonResponseDto<List<ChattingMessageResponseDto>>> getMessages(@PathVariable Long id) {
+    public ResponseEntity<CommonResponseDto<List<ChattingMessageResponseDto>>> getMessages(@PathVariable Long roomId) {
 
-        if (!chattingroomRepository.existsById(id)) {
-            throw new CustomException(ErrorCode.NOT_FOUND_CHATTINGROOM);
-        }
-
-        List<ChattingMessageResponseDto> messages = chattingService.getMessages(id);
+        List<ChattingMessageResponseDto> messages = chattingService.getMessages(roomId);
 
         return new ResponseEntity<>(new CommonResponseDto<>("메시지 조회 성공", messages), HttpStatus.OK);
     }
