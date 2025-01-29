@@ -29,7 +29,7 @@ public class TasteController {
 
     @PatchMapping("/genres")
     public ResponseEntity<CommonResponseDto<List<String>>> updateGenres(@AuthenticationPrincipal MemberDetailsImpl memberDetails,
-                                                                        @RequestBody @Valid TasteRequestDto tasteRequestDto) {
+                                                                        @Valid @RequestBody TasteRequestDto tasteRequestDto) {
 
         Long memberId = memberDetails.getId();
 
@@ -40,7 +40,7 @@ public class TasteController {
 
     @PatchMapping("/likeFoods")
     public ResponseEntity<CommonResponseDto<List<String>>> updateLikeFoods(@AuthenticationPrincipal MemberDetailsImpl memberDetails,
-                                                                           @RequestBody @Valid TasteRequestDto tasteRequestDto) {
+                                                                           @Valid @RequestBody TasteRequestDto tasteRequestDto) {
 
         Long memberId = memberDetails.getId();
 
@@ -51,7 +51,7 @@ public class TasteController {
 
     @PatchMapping("/dislikeFoods")
     public ResponseEntity<CommonResponseDto<List<String>>> updateDislikeFoods(@AuthenticationPrincipal MemberDetailsImpl memberDetails,
-                                                                              @RequestBody @Valid TasteRequestDto tasteRequestDto) {
+                                                                              @Valid @RequestBody TasteRequestDto tasteRequestDto) {
 
         Long memberId = memberDetails.getId();
 
@@ -62,7 +62,7 @@ public class TasteController {
 
     @PatchMapping("/dietaryPreferences")
     public ResponseEntity<CommonResponseDto<List<String>>> updateDietaryPreferences(@AuthenticationPrincipal MemberDetailsImpl memberDetails,
-                                                                                    @RequestBody @Valid TasteRequestDto tasteRequestDto) {
+                                                                                    @Valid @RequestBody TasteRequestDto tasteRequestDto) {
         Long memberId = memberDetails.getId();
 
         TasteResponseDto tasteResponseDto = tasteUpdateService.updateDietaryPreferences(memberId, tasteRequestDto.getDietaryPreferences());
@@ -72,7 +72,7 @@ public class TasteController {
 
     @PatchMapping("/spicyLevels")
     public ResponseEntity<CommonResponseDto<Integer>> updateSpicyLevel(@AuthenticationPrincipal MemberDetailsImpl memberDetails,
-                                                                       @RequestBody @Valid TasteRequestDto tasteRequestDto) {
+                                                                       @Valid @RequestBody TasteRequestDto tasteRequestDto) {
         Long memberId = memberDetails.getId();
 
         TasteResponseDto tasteResponseDto = tasteUpdateService.updateSpicyLevel(memberId, tasteRequestDto.getSpicyLevel());
