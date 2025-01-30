@@ -19,8 +19,9 @@ public class RedisPublisher {
     private final ObjectMapper objectMapper;
 
     public void publishMessage(Long chattingroomId, ChattingMessageResponseDto chattingMessageResponseDto) {
+        String channel = getChannelName(chattingroomId);
+
         try {
-            String channel = getChannelName(chattingroomId);
             String serializedMessage = objectMapper.writeValueAsString(chattingMessageResponseDto);
 
             pubSubRedisTemplate.convertAndSend(channel, serializedMessage);
@@ -30,7 +31,7 @@ public class RedisPublisher {
             log.error("Redis 메시지 직렬화 오류: {}", jsonProcessingException.getMessage());
 
             String fallbackMessage = "{\"message\": \"메시지 전송에 실패하였습니다. 잠시 후 다시 시도해주세요.\", \"senderNickname\": \"System\"}";
-            pubSubRedisTemplate.convertAndSend(getChannelName(chattingroomId), fallbackMessage);
+            pubSubRedisTemplate.convertAndSend(channel, fallbackMessage);
             log.warn("Redis Fallback 메시지를 전송했습니다.");
 
             throw new CustomException(ErrorCode.REDIS_SERIALIZATION_ERROR);
