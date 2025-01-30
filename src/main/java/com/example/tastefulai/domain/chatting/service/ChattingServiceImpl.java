@@ -39,7 +39,7 @@ public class ChattingServiceImpl implements ChattingService {
         if (admin == null) {
             throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
         }
-        
+
         validateAdminRole(admin);
 
         if (chattingroomRepository.existsByRoomName(roomName)) {
@@ -84,6 +84,7 @@ public class ChattingServiceImpl implements ChattingService {
         chattingMessageRepository.save(chattingMessage);
 
         ChattingMessageResponseDto chattingMessageResponseDto = new ChattingMessageResponseDto(
+                member.getEmail(),
                 member.getNickname(),
                 chattingMessage.getMessage(),
                 chattingroom.getId());
@@ -101,6 +102,7 @@ public class ChattingServiceImpl implements ChattingService {
 
             return messages.stream()
                     .map(message -> new ChattingMessageResponseDto(
+                            message.getMember().getEmail(),
                             message.getSenderNickname(),
                             message.getMessage(),
                             chattingroomId
@@ -113,7 +115,7 @@ public class ChattingServiceImpl implements ChattingService {
     @Transactional
     public void processReceivedMessage(ChattingMessageResponseDto chattingMessageResponseDto) {
         Chattingroom chattingroom = chattingroomRepository.findChattingroomByIdOrThrow(chattingMessageResponseDto.getChattingroomId());
-        Member sender = memberService.findByEmail(chattingMessageResponseDto.getSenderNickname());
+        Member sender = memberService.findByEmail(chattingMessageResponseDto.getSenderEmail());
 
         if (sender == null) {
             throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
