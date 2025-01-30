@@ -24,6 +24,8 @@ public enum ErrorCode {
     PASSWORD_CANNOT_BE_EMPTY(HttpStatus.BAD_REQUEST, "비밀번호는 필수 입력 값입니다. "),
     INVALID_TOKEN_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 토큰 형식입니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청 정보입니다."),
+    INVALID_INPUT_DATA(HttpStatus.BAD_REQUEST, "카테고리별 데이터는 최대 5개까지만 입력할 수 있습니다."),
+    DUPLICATE_DATA(HttpStatus.BAD_REQUEST, "중복된 데이터가 포함되어 있습니다."),
 
     // 401 UNAUTHORIZED
     UNAUTHORIZED_PASSWORD(HttpStatus.UNAUTHORIZED, "잘못된 비밀번호입니다."),
@@ -39,6 +41,7 @@ public enum ErrorCode {
     // 404 NOT_FOUND
     NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 페이지를 찾을 수 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "멤버 정보를 찾을 수 없습니다."),
+    DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 데이터를 찾을 수 없습니다."),
 
     // 503 SERVICE_UNAVAILABLE
     TOO_MANY_REQUESTS(HttpStatus.SERVICE_UNAVAILABLE, "오늘의 메뉴 추천 요청 횟수를 초과했습니다.");
