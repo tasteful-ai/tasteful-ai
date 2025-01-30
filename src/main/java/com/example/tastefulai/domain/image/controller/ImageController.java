@@ -30,9 +30,9 @@ public class ImageController {
     public ResponseEntity<CommonResponseDto<ImageResponseDto>> updateImage(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
                                                                            @RequestParam(required = false) MultipartFile image) throws IOException {
 
-        Member member = memberDetailsImpl.getMember();
+        Long memberId = memberDetailsImpl.getId();
 
-        ImageResponseDto imageResponseDto = imageService.uploadImage(member, image);
+        ImageResponseDto imageResponseDto = imageService.uploadImage(memberId, image);
 
         return new ResponseEntity<>(new CommonResponseDto<>("프로필 이미지 업데이트 성공", imageResponseDto), HttpStatus.OK);
     }
@@ -41,9 +41,9 @@ public class ImageController {
     @DeleteMapping
     public ResponseEntity<CommonResponseDto<ImageResponseDto>> deleteImage(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
-        Member member = memberDetailsImpl.getMember();
+        Long memberId = memberDetailsImpl.getId();
 
-        imageService.deleteImage(member);
+        imageService.deleteImage(memberId);
 
         ImageResponseDto imageResponseDto = new ImageResponseDto(
                 "https://tasteful-ai-image-bucket.s3.ap-northeast-2.amazonaws.com/%E1%84%80%E1%85%B5%E1%84%87%E1%85%A9%E1%86%AB+%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%84%8C%E1%85%B5.png"
