@@ -2,17 +2,22 @@ package com.example.tastefulai.domain.taste.dto;
 
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class TasteResponseDto {
 
-    private String genres;
-    private String likeFoods;
-    private String dislikeFoods;
-    private String dietaryPreferences;
+    private List<String> genres;
+    private List<String> likeFoods;
+    private List<String> dislikeFoods;
+    private List<String> dietaryPreferences;
     private Integer spicyLevel;
 
-    public TasteResponseDto(String genres, String likeFoods,
-                            String dislikeFoods, String dietaryPreferences, Integer spicyLevel) {
+    public TasteResponseDto(List<String> genres,
+                            List<String> likeFoods,
+                            List<String> dislikeFoods,
+                            List<String> dietaryPreferences,
+                            Integer spicyLevel) {
         this.genres = genres;
         this.likeFoods = likeFoods;
         this.dislikeFoods = dislikeFoods;
