@@ -46,7 +46,7 @@ public class ImageController {
         imageService.deleteImage(memberId);
 
         ImageResponseDto imageResponseDto = new ImageResponseDto(
-                "https://tasteful-ai-image-bucket.s3.ap-northeast-2.amazonaws.com/%E1%84%80%E1%85%B5%E1%84%87%E1%85%A9%E1%86%AB+%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%84%8C%E1%85%B5.png"
+                "https://tasteful-ai-image-bucket.s3.ap-northeast-2.amazonaws.com/Default-Image.png"
         );
 
         return new ResponseEntity<>(new CommonResponseDto<>("프로필 이미지 삭제 성공", imageResponseDto), HttpStatus.OK);
