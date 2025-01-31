@@ -79,7 +79,7 @@ public class MemberServiceImpl implements MemberService {
         // RefreshToken 을 Redis 에 저장
         storeRefreshToken(email, refreshToken);
 
-        return new JwtAuthResponse(accessToken, refreshToken);
+        return new JwtAuthResponse(member.getId(), member.getMemberRole(), accessToken, refreshToken);
     }
 
 
