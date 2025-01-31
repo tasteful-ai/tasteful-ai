@@ -28,7 +28,7 @@ public class RedisConfig {
         return lettuceConnectionFactory;
     }
 
-    @Bean(name = "redisTemplate") // 현재는 채팅과 AI가 redisTemplate 공유. 추후 수정
+    @Bean(name = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
@@ -75,6 +75,27 @@ public class RedisConfig {
 
     public ZSetOperations<String, String> zSetOperations(RedisTemplate<String, String> redisTemplate) {
         return redisTemplate.opsForZSet();
+    }
+
+    // 오픈채팅용 설정
+    @Bean(name = "pubSubRedisTemplate")
+    public RedisTemplate<String, String> pubSubRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+
+        return redisTemplate;
+    }
+
+    @Bean(name = "messageCacheRedisTemplate")
+    public RedisTemplate<String, Object> messageCacheRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+
+        return redisTemplate;
     }
 
     // Redis Pub/Sub 메시지 리스너 : 수신한 메시지를 처리

@@ -207,7 +207,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member findById(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+        return memberRepository.findById(memberId).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     private void savePasswordVerification(Long memberId) {
