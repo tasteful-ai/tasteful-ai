@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,7 @@ public class MemberDetailsImpl implements UserDetails {
     /**
      * Member entity.
      */
-    private final Member member;
+    private Member member;
 
     /**
      * 계정의 권한 리스트를 리턴.
@@ -103,5 +104,9 @@ public class MemberDetailsImpl implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public MemberDetailsImpl(Member member) {
+        this.member = member;
     }
 }

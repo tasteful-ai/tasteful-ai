@@ -3,72 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Test</title>
+    <title>Chat Test</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        .button-group {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-<h1>WebSocket, STOMP, Redis Test</h1>
+<h1>Chat Room Test</h1>
 <div>
-    <label for="message">Enter Message:</label>
-    <input type="text" id="message" placeholder="Type your message here">
-    <button onclick="sendMessage()">Send Message</button>
+    <label for="room-id">Chat Room ID:</label>
+    <input type="text" id="room-id" placeholder="Enter Chat Room ID">
 </div>
 <div>
-    <h2>Console Output</h2>
-    <textarea id="consoleOutput" cols="80" rows="20" readonly></textarea>
+    <label for="token">JWT Token:</label>
+    <input type="text" id="token" placeholder="Enter JWT Token">
 </div>
+<div class="button-group">
+    <button id="connect-btn">Connect</button>
+    <button id="disconnect-btn" disabled>Disconnect</button>
+</div>
+<div>
+    <textarea id="chat-box" rows="10" cols="50" readonly placeholder="Chat messages will appear here..."></textarea>
+</div>
+<div class="button-group">
+    <input type="text" id="message" placeholder="Enter your message">
+    <button id="send-btn" disabled>Send Message</button>
+</div>
+
 <script>
-    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VydGVzdEBnbWFpbC5jb20iLCJpYXQiOjE3MzY3NjcwMTgsImV4cCI6MTczNjc3MDYxOH0.AeLXgepQClgoohoZgkjAl7KfwpsxjN0EZ0FX_nMHHHY";
-    const endpoint = "http://localhost:8080/ws-chat";
+    let stompClient = null;
 
-    // Set up SockJS and STOMP client
-    const socket = new SockJS(endpoint);
-    const stompClient = Stomp.over(socket);
+    document.getElementById('connect-btn').addEventListener('click', () => {
+        const roomId = document.getElementById('room-id').value.trim();
+        const token = document.getElementById('token').value.trim();
 
-    // Disable debug logs in the console
-    stompClient.debug = (msg) => console.log(msg);
-
-    // Connect to WebSocket with Authorization header
-    stompClient.connect(
-        {Authorization: `Bearer ${token}`},
-        (frame) => {
-            logMessage(`Connected: ${frame}`);
-            subscribeToTopic();
-        },
-        (error) => logMessage(`Connection error: ${error}`)
-    );
-
-    // Subscribe to the topic
-    function subscribeToTopic() {
-        stompClient.subscribe('/sub/chat', (message) => {
-            logMessage(`Received message: ${message.body}`);
-        });
-    }
-
-    // Send a message to the server
-    function sendMessage() {
-        const messageInput = document.getElementById("message");
-        const message = messageInput.value;
-        if (!message) {
-            logMessage("Message cannot be empty!");
+        if (!roomId || !token) {
+            alert('Room ID and Token are required!');
             return;
         }
-        const payload = JSON.stringify({
-            sender: "testUser",
-            message: message
-        });
-        stompClient.send('/pub/chat', {Authorization: `Bearer ${token}`}, payload);
-        logMessage(`Message sent: ${message}`);
-        messageInput.value = "";
-    }
 
-    // Log messages to the output textarea
-    function logMessage(message) {
-        const output = document.getElementById("consoleOutput");
-        output.value += `[${new Date().toISOString()}] ${message}\n`;
-        output.scrollTop = output.scrollHeight;
-    }
+        const socket = new SockJS('/ws-chat');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({Authorization: token}, () => {
+            stompClient.subscribe(`/sub/chatroom/${roomId}`, (message) => {
+                const chatBox = document.getElementById('chat-box');
+                const data = JSON.parse(message.body);
+                chatBox.value += `[${data.senderNickname}] ${data.message}\n`;
+                chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+            });
+
+            document.getElementById('connect-btn').disabled = true;
+            document.getElementById('disconnect-btn').disabled = false;
+            document.getElementById('send-btn').disabled = false;
+
+            alert('Connected to WebSocket!');
+        }, (error) => {
+            console.error('Error connecting to WebSocket:', error);
+            alert('Failed to connect to WebSocket. Please check your token and try again.');
+        });
+    });
+
+    document.getElementById('disconnect-btn').addEventListener('click', () => {
+        if (stompClient) {
+            stompClient.disconnect(() => {
+                document.getElementById('connect-btn').disabled = false;
+                document.getElementById('disconnect-btn').disabled = true;
+                document.getElementById('send-btn').disabled = true;
+
+                alert('Disconnected from WebSocket!');
+            });
+        }
+    });
+
+    document.getElementById('send-btn').addEventListener('click', () => {
+        const roomId = document.getElementById('room-id').value.trim();
+        const message = document.getElementById('message').value.trim();
+
+        if (!roomId || !message) {
+            alert('Room ID and message are required!');
+            return;
+        }
+
+        stompClient.send('/pub/chat', {}, JSON.stringify({
+            chattingroomId: roomId,
+            sender: 'usertest123@gmail.com',
+            //sender:localStorage.getItem("email")
+            message: message,
+            token: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VydGVzdDEyM0BnbWFpbC5jb20iLCJpYXQiOjE3Mzc5NTY3ODQsImV4cCI6MTczNzk2MDM4NH0.igP47fOjde5xWZggIPyjbOU-1_ORlZ6S-UE81D4Yl5U',
+            // token: localStorage.getItem("accessToken"),
+            type: 'TALK'
+        }));
+
+        document.getElementById('message').value = ''; // Clear the input field
+    });
 </script>
 </body>
 </html>

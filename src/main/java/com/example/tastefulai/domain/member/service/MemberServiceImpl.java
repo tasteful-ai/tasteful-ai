@@ -79,7 +79,7 @@ public class MemberServiceImpl implements MemberService {
         // RefreshToken 을 Redis 에 저장
         storeRefreshToken(email, refreshToken);
 
-        return new JwtAuthResponse(accessToken, refreshToken);
+        return new JwtAuthResponse(member.getId(), member.getMemberRole(), accessToken, refreshToken);
     }
 
 
@@ -207,7 +207,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member findById(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+        return memberRepository.findById(memberId).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     private void savePasswordVerification(Long memberId) {

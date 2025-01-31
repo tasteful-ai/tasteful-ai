@@ -36,6 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final MemberRepository memberRepository;
     private final BlacklistService blacklistService;
 
+    // 요청시 실행하는 메서드
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
                                     HttpServletResponse httpServletResponse,
@@ -55,7 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
     }
 
-    
+
     /**
      * **** 공통 메서드 ***
      */
