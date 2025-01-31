@@ -1,6 +1,5 @@
 package com.example.tastefulai.domain.taste.service;
 
-import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.taste.dto.TasteResponseDto;
 
 public interface TasteGetService {
