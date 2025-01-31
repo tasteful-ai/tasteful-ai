@@ -1,5 +1,6 @@
 package com.example.tastefulai.domain.chatting.dto;
 
+import com.example.tastefulai.domain.chatting.entity.ChattingMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
@@ -24,5 +25,14 @@ public class ChattingMessageResponseDto {
         this.senderNickname = senderNickname;
         this.message = message;
         this.chattingroomId = chattingroomId;
+    }
+
+    public static ChattingMessageResponseDto fromEntity(ChattingMessage chattingMessage) {
+        return new ChattingMessageResponseDto(
+                chattingMessage.getMember().getId(),
+                chattingMessage.getSenderNickname(),
+                chattingMessage.getMessage(),
+                chattingMessage.getChattingroom().getId()
+        );
     }
 }

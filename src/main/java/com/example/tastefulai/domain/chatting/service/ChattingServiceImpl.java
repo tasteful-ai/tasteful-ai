@@ -71,11 +71,7 @@ public class ChattingServiceImpl implements ChattingService {
         ChattingMessage chattingMessage = new ChattingMessage(chattingroom, member, chattingMessageRequestDto.getMessage());
         chattingMessageRepository.save(chattingMessage);
 
-        ChattingMessageResponseDto chattingMessageResponseDto = new ChattingMessageResponseDto(
-                member.getId(),
-                member.getNickname(),
-                chattingMessage.getMessage(),
-                chattingroom.getId());
+        ChattingMessageResponseDto chattingMessageResponseDto = ChattingMessageResponseDto.fromEntity(chattingMessage);
 
         redisMessageService.saveMessage(chattingroom.getId(), chattingMessageResponseDto);
         return chattingMessageResponseDto;
