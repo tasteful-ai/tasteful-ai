@@ -38,9 +38,9 @@ public class ChattingContoller {
     public ResponseEntity<CommonResponseDto<ChattingroomResponseDto>> createChattingroom(@Valid @RequestBody ChattingroomRequestDto chattingroomRequestDto,
                                                                                          @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
-        String adminEmail = memberDetails.getUsername();
+        Long adminId = memberDetails.getId();
 
-        ChattingroomResponseDto chattingroomResponseDto = chattingService.createChattingroom(chattingroomRequestDto.getRoomName(), adminEmail);
+        ChattingroomResponseDto chattingroomResponseDto = chattingService.createChattingroom(chattingroomRequestDto.getRoomName(), adminId);
 
         return new ResponseEntity<>(new CommonResponseDto<>("채팅방 생성 성공", chattingroomResponseDto), HttpStatus.CREATED);
     }

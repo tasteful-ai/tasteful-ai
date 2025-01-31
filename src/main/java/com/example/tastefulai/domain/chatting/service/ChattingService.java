@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface ChattingService {
 
-    ChattingroomResponseDto createChattingroom(String roomName, String adminEmail);
+    ChattingroomResponseDto createChattingroom(String roomName, Long adminId);
 
     List<ChattingroomResponseDto> getAllChattingrooms();
 
-    ChattingMessageResponseDto createMessage(Long chattingroomId, String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto);
+    ChattingMessageResponseDto createMessage(Long chattingroomId, Long memberId, ChattingMessageRequestDto chattingMessageRequestDto);
 
     List<ChattingMessageResponseDto> getMessages(Long chattingroomId);
 

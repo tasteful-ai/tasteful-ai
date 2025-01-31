@@ -9,18 +9,18 @@ import lombok.Getter;
 @EqualsAndHashCode
 public class ChattingMessageResponseDto {
 
-    private final String senderEmail;
+    private final Long senderId;
     private final String senderNickname;
     private final String message;
     private final Long chattingroomId;
 
     @JsonCreator
     public ChattingMessageResponseDto(
-            @JsonProperty("senderEmail") String senderEmail,
+            @JsonProperty("senderId") Long senderId,
             @JsonProperty("senderNickname") String senderNickname,
             @JsonProperty("message") String message,
             @JsonProperty("chattingroomId") Long chattingroomId) {
-        this.senderEmail = senderEmail;
+        this.senderId = senderId;
         this.senderNickname = senderNickname;
         this.message = message;
         this.chattingroomId = chattingroomId;

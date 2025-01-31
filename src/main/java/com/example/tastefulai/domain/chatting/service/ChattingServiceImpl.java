@@ -33,12 +33,8 @@ public class ChattingServiceImpl implements ChattingService {
 
     @Override
     @Transactional
-    public ChattingroomResponseDto createChattingroom(String roomName, String adminEmail) {
-        Member admin = memberService.findByEmail(adminEmail);
-
-        if (admin == null) {
-            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+    public ChattingroomResponseDto createChattingroom(String roomName, Long adminId) {
+        Member admin = memberService.findById(adminId);
 
         validateAdminRole(admin);
 
@@ -66,13 +62,9 @@ public class ChattingServiceImpl implements ChattingService {
 
     @Override
     @Transactional
-    public ChattingMessageResponseDto createMessage(Long chattingroomId, String memberEmail, ChattingMessageRequestDto chattingMessageRequestDto) {
+    public ChattingMessageResponseDto createMessage(Long chattingroomId, Long memberId, ChattingMessageRequestDto chattingMessageRequestDto) {
 
-        Member member = memberService.findByEmail(memberEmail);
-
-        if (member == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+        Member member = memberService.findById(memberId);
 
         Chattingroom chattingroom = chattingroomRepository.findChattingroomByIdOrThrow(chattingroomId);
 
@@ -84,7 +76,7 @@ public class ChattingServiceImpl implements ChattingService {
         chattingMessageRepository.save(chattingMessage);
 
         ChattingMessageResponseDto chattingMessageResponseDto = new ChattingMessageResponseDto(
-                member.getEmail(),
+                member.getId(),
                 member.getNickname(),
                 chattingMessage.getMessage(),
                 chattingroom.getId());
@@ -102,7 +94,7 @@ public class ChattingServiceImpl implements ChattingService {
 
             return messages.stream()
                     .map(message -> new ChattingMessageResponseDto(
-                            message.getMember().getEmail(),
+                            message.getMember().getId(),
                             message.getSenderNickname(),
                             message.getMessage(),
                             chattingroomId
@@ -115,11 +107,7 @@ public class ChattingServiceImpl implements ChattingService {
     @Transactional
     public void processReceivedMessage(ChattingMessageResponseDto chattingMessageResponseDto) {
         Chattingroom chattingroom = chattingroomRepository.findChattingroomByIdOrThrow(chattingMessageResponseDto.getChattingroomId());
-        Member sender = memberService.findByEmail(chattingMessageResponseDto.getSenderEmail());
-
-        if (sender == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+        Member sender = memberService.findById(chattingMessageResponseDto.getSenderId());
 
         if (chattingMessageResponseDto.getMessage() == null || chattingMessageResponseDto.getMessage().trim().isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_INPUT);
