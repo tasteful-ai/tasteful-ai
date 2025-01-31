@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChattingroomRepository extends JpaRepository<Chattingroom, Long> {
 
-    default Chattingroom getSingleChattingroom() {
-        return findById(1L).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+    default Chattingroom findChattingroomByIdOrThrow(Long id) {
+        return findById(id).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
     }
+
+    boolean existsByRoomName(String roomName);
 }
