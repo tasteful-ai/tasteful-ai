@@ -52,11 +52,7 @@ public class ChattingServiceImpl implements ChattingService {
     public List<ChattingroomResponseDto> getAllChattingrooms() {
 
         return chattingroomRepository.findAll().stream()
-                .map(chattingroom -> new ChattingroomResponseDto(
-                        chattingroom.getId(),
-                        chattingroom.getRoomName(),
-                        chattingroom.getCreator(),
-                        chattingroom.getCreatedAt()))
+                .map(ChattingroomResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
 

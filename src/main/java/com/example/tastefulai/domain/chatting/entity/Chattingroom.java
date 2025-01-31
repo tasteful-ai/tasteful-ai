@@ -45,8 +45,4 @@ public class Chattingroom {
         this.roomName = roomName;
         this.creator = creator;
     }
-
-    public String getCreator() {
-        return creator.getNickname();
-    }
 }

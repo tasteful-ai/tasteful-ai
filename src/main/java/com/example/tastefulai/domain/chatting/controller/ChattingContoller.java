@@ -58,8 +58,8 @@ public class ChattingContoller {
                                                                                      @AuthenticationPrincipal MemberDetailsImpl memberDetails,
                                                                                      @PathVariable Long roomId) {
 
-        String memberEmail = memberDetails.getUsername();
-        ChattingMessageResponseDto chattingMessageResponseDto = chattingService.createMessage(roomId, memberEmail, chattingMessageRequestDto);
+        Long memberId = memberDetails.getId();
+        ChattingMessageResponseDto chattingMessageResponseDto = chattingService.createMessage(roomId, memberId, chattingMessageRequestDto);
 
         return new ResponseEntity<>(new CommonResponseDto<>("메시지 전송 성공", chattingMessageResponseDto), HttpStatus.CREATED);
     }
