@@ -23,7 +23,7 @@ public class AiChatController {
     private final AiChatService aiChatService;
 
     @PostMapping
-//    @PreAuthorize("hasRole('USER')") // USER 권한을 가진 사용자만 접근 가능
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CommonResponseDto<AiChatResponseDto>> createMenuRecommendation(@RequestBody AiChatRequestDto aiChatRequestDto,
                                                                                          @AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
