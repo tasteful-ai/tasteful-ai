@@ -39,16 +39,12 @@ public class ImageController {
 
     // 프로필 사진 삭제
     @DeleteMapping
-    public ResponseEntity<CommonResponseDto<ImageResponseDto>> deleteImage(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
+    public ResponseEntity<CommonResponseDto<Void>> deleteImage(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
         Long memberId = memberDetailsImpl.getId();
 
         imageService.deleteImage(memberId);
 
-        ImageResponseDto imageResponseDto = new ImageResponseDto(
-                "https://tasteful-ai-image-bucket.s3.ap-northeast-2.amazonaws.com/Default-Image.png"
-        );
-
-        return new ResponseEntity<>(new CommonResponseDto<>("프로필 이미지 삭제 성공", imageResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("프로필 이미지 삭제 성공", null), HttpStatus.OK);
     }
 }
