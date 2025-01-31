@@ -76,14 +76,7 @@ public class AiChatServiceImpl implements AiChatService {
         String recommendation;
         try {
             Map<String, String> responseMap = objectMapper.readValue(response, Map.class);
-            recommendation = responseMap.get("recommendation");
-
-            if (recommendation == null || recommendation.isEmpty()) {
-                recommendation = "추천할 메뉴가 없습니다.";
-
-            } else {
-                recommendation = recommendation.trim();
-            }
+            recommendation = responseMap.getOrDefault("recommendation", "추천할 메뉴가 없습니다.").trim();
         } catch (Exception exception) {
             recommendation = "추천할 메뉴를 파싱하는 데 실패했습니다.";
         }
