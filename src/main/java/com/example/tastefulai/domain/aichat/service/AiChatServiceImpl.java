@@ -13,6 +13,8 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -20,22 +22,33 @@ import java.util.concurrent.TimeUnit;
 public class AiChatServiceImpl implements AiChatService {
 
     private final ChatClient chatClient;
-    private final RedisTemplate<String, Integer> aiRedisTemplate;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Integer> aiCountRedisTemplate;
+    private final RedisTemplate<String, Object> aiChatRedisTemplate;
     private final ObjectMapper objectMapper;
 
     private static final String REQUEST_COUNT_KEY_PREFIX = "ai:chat:request:count:";
     private static final String RECOMMENDATION_LIST_KEY_PREFIX = "ai:chat:recommendations:";
+    private static final String SESSION_KEY_PREFIX = "ai:chat:session:";
 
     @Override
     public AiChatResponseDto createMenuRecommendation(AiChatRequestDto aiChatRequestDto, Long memberId) {
+
+        // 세션 Id 생성
+        String sessionKey = SESSION_KEY_PREFIX + memberId;
+        ValueOperations<String, Object> sessionOps = aiChatRedisTemplate.opsForValue();
+        String sessionId = Optional.ofNullable((String) sessionOps.get(sessionKey))
+                .orElseGet(() -> {
+                    String newSessionId = UUID.randomUUID().toString();
+                    sessionOps.set(sessionKey, newSessionId);
+                    return newSessionId;
+                });
 
         //  tasteRepository.findByMemberId(memberId);
         //  이 taste 정보 prompt로 넘겨주기
 
         // 요청 횟수 제한 확인
         String redisKey = REQUEST_COUNT_KEY_PREFIX + memberId;
-        ValueOperations<String, Integer> ops = aiRedisTemplate.opsForValue();
+        ValueOperations<String, Integer> ops = aiCountRedisTemplate.opsForValue();
         Integer count = ops.get(redisKey);
 
         if (count == null) {
@@ -56,6 +69,7 @@ public class AiChatServiceImpl implements AiChatService {
 //                .call()
 //                .content();
 
+        // AI 요청 (임시 Mock 데이터 사용)
         String response = "{\"recommendation\": \"김치찌개\"}";   // TODO: 나중에 ai 요청 로직으로 변경
 
         // JSON 응답 파싱
@@ -74,11 +88,24 @@ public class AiChatServiceImpl implements AiChatService {
             recommendation = "추천할 메뉴를 파싱하는 데 실패했습니다.";
         }
 
-        // 추천 메뉴 저장
-        String recommendationKey = RECOMMENDATION_LIST_KEY_PREFIX + memberId;
-        ListOperations<String, Object> listOps = redisTemplate.opsForList();
-        listOps.rightPush(recommendationKey, recommendation);
+        // AI 채팅 히스토리를 Redis에 저장 (세션 ID 기반)
+        String historyKey = RECOMMENDATION_LIST_KEY_PREFIX + sessionId;
+        ListOperations<String, Object> listOps = aiChatRedisTemplate.opsForList();
+        listOps.rightPush(historyKey, recommendation);
 
         return new AiChatResponseDto(recommendation);
+    }
+
+    @Override
+    public void clearChatHistory(Long memberId) {
+        String sessionKey = SESSION_KEY_PREFIX + memberId;
+        ValueOperations<String, Object> sessionOps = aiChatRedisTemplate.opsForValue();
+        String sessionId = (String) sessionOps.get(sessionKey);
+
+        if (sessionId != null) {
+            String historyKey = RECOMMENDATION_LIST_KEY_PREFIX + sessionId;
+            aiChatRedisTemplate.delete(historyKey);
+            aiChatRedisTemplate.delete(sessionKey);
+        }
     }
 }
