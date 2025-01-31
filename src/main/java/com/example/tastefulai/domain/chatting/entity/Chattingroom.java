@@ -13,6 +13,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.time.LocalDateTime;
 
@@ -42,6 +43,13 @@ public class Chattingroom {
     }
 
     public Chattingroom(String roomName, Member creator) {
+        this.roomName = roomName;
+        this.creator = creator;
+    }
+
+    @VisibleForTesting
+    public Chattingroom(Long id, String roomName, Member creator) {
+        this.id = id;
         this.roomName = roomName;
         this.creator = creator;
     }
