@@ -12,6 +12,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,21 +48,26 @@ public class AiChatServiceImpl implements AiChatService {
         //  tasteRepository.findByMemberId(memberId);
         //  이 taste 정보 prompt로 넘겨주기
 
-        // 요청 횟수 제한 확인
+        // 요청 횟수 제한 확인 (매일 자정 기준 초기화)
         String redisKey = REQUEST_COUNT_KEY_PREFIX + memberId;
         ValueOperations<String, Integer> ops = aiCountRedisTemplate.opsForValue();
-        Integer count = ops.get(redisKey);
+        Integer count = Optional.ofNullable(ops.get(redisKey)).orElse(0);
 
-        if (count == null) {
-            ops.set(redisKey, 1, 1, TimeUnit.DAYS);
-        } else if (count >= 10) {
+        if (count >= 10) {
             throw new CustomException(ErrorCode.TOO_MANY_REQUESTS);
-
-        } else {
-            ops.increment(redisKey);
         }
 
-        // 프롬프트 사용
+        // 자정까지 남은 시간 계산하여 TTL 설정
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime midnight = now.toLocalDate().plusDays(1).atStartOfDay();
+        long secondsUntilMidnight = Duration.between(now, midnight).getSeconds();
+
+        ops.increment(redisKey);
+        if (count == 0) {
+            ops.set(redisKey, 1, secondsUntilMidnight, TimeUnit.SECONDS); // 자정 기준으로 초기화
+        }
+
+        // AI 프롬프트 사용
         String prompt = "오늘 점심메뉴를 하나만 추천해. 응답은 반드시 JSON 형식으로, {\"recommendation\": \"메뉴 이름\"}";
 
         // ChatClient를 사용해 AI에게 메시지 전달 및 응답 받음
