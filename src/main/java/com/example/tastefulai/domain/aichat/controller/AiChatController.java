@@ -6,6 +6,7 @@ import com.example.tastefulai.domain.aichat.service.AiChatService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,7 +39,7 @@ public class AiChatController {
         String recommendation = aiChatResponseDto.recommendation();
         AiChatResponseDto responseDto = new AiChatResponseDto(recommendation);
 
-        return ResponseEntity.ok(new CommonResponseDto<>("AI 메뉴 추천 완료", responseDto));
+        return new ResponseEntity<>(new CommonResponseDto<>("AI 메뉴 추천 완료", responseDto), HttpStatus.OK);
     }
 
     @DeleteMapping("/clear")
@@ -47,6 +48,6 @@ public class AiChatController {
         Long memberId = memberDetailsImpl.getId();
         aiChatService.clearChatHistory(memberId);
 
-        return ResponseEntity.ok(new CommonResponseDto<>("AI 채팅 히스토리 삭제 완료", null));
+        return new ResponseEntity<>(new CommonResponseDto<>("AI 채팅 히스토리 삭제 완료", null), HttpStatus.NO_CONTENT);
     }
 }
