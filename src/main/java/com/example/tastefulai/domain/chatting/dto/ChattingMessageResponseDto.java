@@ -30,7 +30,7 @@ public class ChattingMessageResponseDto {
     public static ChattingMessageResponseDto fromEntity(ChattingMessage chattingMessage) {
         return new ChattingMessageResponseDto(
                 chattingMessage.getMember().getId(),
-                chattingMessage.getSenderNickname(),
+                chattingMessage.getMember().getNickname(),
                 chattingMessage.getMessage(),
                 chattingMessage.getChattingroom().getId()
         );
