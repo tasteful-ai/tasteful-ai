@@ -47,6 +47,10 @@ public class Chattingroom {
         this.creator = creator;
     }
 
+    public void updateRoomName(String newRoomName) {
+        this.roomName = newRoomName;
+    }
+
     @VisibleForTesting
     public Chattingroom(Long id, String roomName, Member creator) {
         this.id = id;
