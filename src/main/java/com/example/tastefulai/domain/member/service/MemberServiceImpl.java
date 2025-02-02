@@ -168,7 +168,7 @@ public class MemberServiceImpl implements MemberService {
 
         Member member = findById(memberId);
 
-        return Member.toProfileDto(member);
+        return ProfileResponseDto.fromMember(member);
     }
 
     // 9. 회원 전체 조회 ------> 추후 작업 예정

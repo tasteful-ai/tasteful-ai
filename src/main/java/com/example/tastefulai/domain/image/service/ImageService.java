@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public interface ImageService {
 
-    ImageResponseDto uploadImage(Member member, MultipartFile image) throws IOException;
+    ImageResponseDto uploadImage(Long memberId, MultipartFile image) throws IOException;
 
-    void deleteImage(Member member);
+    void deleteImage(Long memberId);
 }
