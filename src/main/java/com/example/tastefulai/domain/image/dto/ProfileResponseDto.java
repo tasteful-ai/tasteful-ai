@@ -47,7 +47,7 @@ public class ProfileResponseDto {
         this.tasteSpicyLevels = tasteSpicyLevels;
     }
 
-    public static ProfileResponseDto from(Member member) {
+    public static ProfileResponseDto fromMember(Member member) {
         return new ProfileResponseDto(
                 member.getNickname(),
                 (member.getImages().isEmpty()) ? null : member.getImages().getFirst().getImageUrl(),
