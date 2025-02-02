@@ -49,6 +49,7 @@ public enum ErrorCode {
 
     //500
     REDIS_SERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Redis 메시지 직렬화 오류입니다."),
+    S3CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 업데이트에 실패하였습니다. 다시 시도해주세요."),
 
     // 503 SERVICE_UNAVAILABLE
     TOO_MANY_REQUESTS(HttpStatus.SERVICE_UNAVAILABLE, "오늘의 메뉴 추천 요청 횟수를 초과했습니다.");
