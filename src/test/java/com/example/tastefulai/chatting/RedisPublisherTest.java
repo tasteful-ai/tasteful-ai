@@ -23,7 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class RedisPublisherTest {
+class RedisPublisherTest {
 
     @InjectMocks
     private RedisPublisher redisPublisher;
