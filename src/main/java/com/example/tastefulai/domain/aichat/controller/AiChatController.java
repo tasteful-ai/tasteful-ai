@@ -7,7 +7,6 @@ import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,13 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users/aiChats")
+@RequestMapping("/api/aiChats")
 public class AiChatController {
 
     private final AiChatService aiChatService;
 
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CommonResponseDto<AiChatResponseDto>> createMenuRecommendation(@RequestBody AiChatRequestDto aiChatRequestDto,
                                                                                          @AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
@@ -43,7 +41,6 @@ public class AiChatController {
     }
 
     @DeleteMapping("/clear")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CommonResponseDto<Void>> clearChatHistory(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
         Long memberId = memberDetailsImpl.getId();
         aiChatService.clearChatHistory(memberId);
