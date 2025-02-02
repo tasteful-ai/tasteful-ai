@@ -50,11 +50,12 @@ public class AiChatRedisRepositoryImpl implements aiChatRedisRepository {
         ValueOperations<String, Object> sessionOps = aiChatRedisTemplate.opsForValue();
 
         // 기존 sessionId 조회 및 삭제를 한 번의 Redis 호출로 처리
-        String sessionId = (String) sessionOps.getAndDelete(sessionKey);
+        String sessionId = (String) sessionOps.get(sessionKey);
 
         if (sessionId != null) {
             String historyKey = RECOMMENDATION_LIST_KEY_PREFIX + sessionId;
             aiChatRedisTemplate.delete(historyKey);
+            aiChatRedisTemplate.delete(sessionKey);
         }
     }
 }
