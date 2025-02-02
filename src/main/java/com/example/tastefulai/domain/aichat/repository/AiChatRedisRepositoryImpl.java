@@ -6,6 +6,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @Repository
 @RequiredArgsConstructor
 public class AiChatRedisRepositoryImpl implements aiChatRedisRepository {
@@ -19,7 +21,13 @@ public class AiChatRedisRepositoryImpl implements aiChatRedisRepository {
         String sessionKey = SESSION_KEY_PREFIX + memberId;
         ValueOperations<String, Object> sessionOps = aiChatRedisTemplate.opsForValue();
 
-        return (String) sessionOps.get(sessionKey);
+        // 새로운 세션 Id 생성
+        String sessionId = UUID.randomUUID().toString();
+
+        // sessionKey가 없을 경우 새로운 sessionId를 저장 (한 번의 Redis 요청)
+        String existingSessionId = (String) sessionOps.getAndSet(sessionKey, sessionId);
+
+        return existingSessionId != null ? existingSessionId : sessionId;
     }
 
     @Override
@@ -40,12 +48,13 @@ public class AiChatRedisRepositoryImpl implements aiChatRedisRepository {
     public void deleteChatHistory(Long memberId) {
         String sessionKey = SESSION_KEY_PREFIX + memberId;
         ValueOperations<String, Object> sessionOps = aiChatRedisTemplate.opsForValue();
-        String sessionId = (String) sessionOps.get(sessionKey);
+
+        // 기존 sessionId 조회 및 삭제를 한 번의 Redis 호출로 처리
+        String sessionId = (String) sessionOps.getAndDelete(sessionKey);
 
         if (sessionId != null) {
             String historyKey = RECOMMENDATION_LIST_KEY_PREFIX + sessionId;
             aiChatRedisTemplate.delete(historyKey);
-            aiChatRedisTemplate.delete(sessionKey);
         }
     }
 }
