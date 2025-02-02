@@ -48,6 +48,6 @@ public class AiChatController {
         Long memberId = memberDetailsImpl.getId();
         aiChatService.clearChatHistory(memberId);
 
-        return new ResponseEntity<>(new CommonResponseDto<>("AI 채팅 히스토리 삭제 완료", null), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(new CommonResponseDto<>("AI 채팅 히스토리 삭제 완료", null), HttpStatus.OK);
     }
 }
