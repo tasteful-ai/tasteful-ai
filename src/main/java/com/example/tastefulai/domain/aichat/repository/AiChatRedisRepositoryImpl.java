@@ -6,7 +6,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
+
+import static org.hibernate.internal.util.collections.CollectionHelper.listOf;
 
 @Repository
 @RequiredArgsConstructor
@@ -54,8 +57,7 @@ public class AiChatRedisRepositoryImpl implements aiChatRedisRepository {
 
         if (sessionId != null) {
             String historyKey = RECOMMENDATION_LIST_KEY_PREFIX + sessionId;
-            aiChatRedisTemplate.delete(historyKey);
-            aiChatRedisTemplate.delete(sessionKey);
+            aiChatRedisTemplate.delete(List.of(sessionKey, historyKey));
         }
     }
 }
