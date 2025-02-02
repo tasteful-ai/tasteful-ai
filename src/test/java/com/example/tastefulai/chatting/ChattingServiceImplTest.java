@@ -191,4 +191,50 @@ class ChattingServiceImplTest {
         assertEquals("Hello", messages.get(0).getMessage());
     }
 
+    @Test
+    @DisplayName("채팅방 삭제")
+    void deleteChattingroom_Success() {
+        Long roomId = 1L;
+        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId)).thenReturn(chattingroom);
+
+        chattingService.deleteChattingroom(roomId);
+
+        verify(chattingroomRepository, times(1)).delete(chattingroom);
+    }
+
+    @Test
+    @DisplayName("예외 - 존재하지 않는 채팅방")
+    void deleteChattingroom_NotFound() {
+        Long roomId = 99L;
+        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId))
+                .thenThrow(new NotFoundException(ErrorCode.NOT_FOUND_CHATTINGROOM));
+
+        assertThrows(NotFoundException.class, () -> chattingService.deleteChattingroom(roomId));
+    }
+
+    @Test
+    @DisplayName("채팅방 이름 변경")
+    void updateChattingroom_Success() {
+        Long roomId = 1L;
+        String newRoomName = "Updated Room";
+
+        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId)).thenReturn(chattingroom);
+
+        ChattingroomResponseDto responseDto = chattingService.updateChattingroom(roomId, newRoomName);
+
+        assertEquals(newRoomName, responseDto.getRoomName());
+    }
+
+    @Test
+    @DisplayName("예외 - 존재하지 않는 채팅방)")
+    void updateChattingroom_NotFound() {
+        Long roomId = 99L;
+        String newRoomName = "New Room Name";
+
+        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId))
+                .thenThrow(new NotFoundException(ErrorCode.NOT_FOUND_CHATTINGROOM));
+
+        assertThrows(NotFoundException.class, () -> chattingService.updateChattingroom(roomId, newRoomName));
+    }
+
 }
