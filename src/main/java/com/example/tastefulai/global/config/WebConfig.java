@@ -21,6 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("https://localhost:8080")
 //                .allowedOrigins("http://localhost:8080", "http://your-production-domain.com") // 허용할 도메인 명시
                 .allowedOriginPatterns("*")
+                .allowedHeaders("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowCredentials(true)
                 .maxAge(3600);
