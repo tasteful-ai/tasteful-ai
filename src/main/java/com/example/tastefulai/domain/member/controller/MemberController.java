@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -102,5 +104,13 @@ public class MemberController {
        memberService.deleteMember(memberId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    // 7. 회원 전체 조회
+    @GetMapping("/members")
+    public ResponseEntity<CommonResponseDto<List<MemberListResponseDto>>> getAllMembers() {
+        List<MemberListResponseDto> members = memberService.getAllMembers();
+
+        return new ResponseEntity<>(new CommonResponseDto<>("회원 목록 조회 완료", members), HttpStatus.OK);
     }
 }

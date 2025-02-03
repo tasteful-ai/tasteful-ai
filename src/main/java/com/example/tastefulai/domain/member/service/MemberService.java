@@ -1,11 +1,14 @@
 package com.example.tastefulai.domain.member.service;
 
 import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
+import com.example.tastefulai.domain.member.dto.MemberListResponseDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.global.common.dto.JwtAuthResponse;
+
+import java.util.List;
 
 public interface MemberService {
 
@@ -28,4 +31,6 @@ public interface MemberService {
     void updateNickname(Long memberId, String nickname);
 
     ProfileResponseDto getMemberProfile(Long memberId);
+
+    List<MemberListResponseDto> getAllMembers();
 }
