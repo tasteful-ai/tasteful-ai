@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RedisMessageService {
 
+    @Qualifier("messageCacheRedisTemplate")
     private final RedisTemplate<String, Object> messageCacheRedisTemplate;
     private final ObjectMapper objectMapper;
     private static final int MAX_MESSAGE_COUNT = 50;
@@ -28,7 +30,7 @@ public class RedisMessageService {
 
             messageCacheRedisTemplate.opsForList().rightPush(key, serializedMessage);
             messageCacheRedisTemplate.opsForList().trim(key, -MAX_MESSAGE_COUNT, -1);
-            
+
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("Redis 메시지 저장 오류: {}", jsonProcessingException.getMessage());
         }
