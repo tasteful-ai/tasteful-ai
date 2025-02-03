@@ -22,17 +22,17 @@ public class TasteRequestDto {
     private List<String> dietaryPreferences;
 
     @Max(value = 5)
-    private Integer spicyLevel;
+    private List<Integer> spicyLevel;
 
     public TasteRequestDto(List<String> genres,
                            List<String> likeFoods,
                            List<String> dislikeFoods,
                            List<String> dietaryPreferences,
-                           Integer spicyLevel) {
+                           List<Integer> spicyLevels) {
         this.genres = genres;
         this.likeFoods = likeFoods;
         this.dislikeFoods = dislikeFoods;
         this.dietaryPreferences = dietaryPreferences;
-        this.spicyLevel = spicyLevel;
+        this.spicyLevel = spicyLevels;
     }
 }

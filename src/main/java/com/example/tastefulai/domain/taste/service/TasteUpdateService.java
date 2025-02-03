@@ -10,5 +10,5 @@ public interface TasteUpdateService {
     TasteResponseDto updateLikeFoods(Long memberId, List<String> likeFoodsRequest);
     TasteResponseDto updateDislikeFoods(Long memberId, List<String> dislikeFoodsRequest);
     TasteResponseDto updateDietaryPreferences(Long memberId, List<String> dietaryPreferencesRequest);
-    TasteResponseDto updateSpicyLevel(Long memberId, Integer spicyLevel);
+    TasteResponseDto updateSpicyLevel(Long memberId, List<Integer> spicyLevel);
 }

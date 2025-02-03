@@ -82,10 +82,14 @@ public class TasteGetServiceImpl implements TasteGetService {
     public TasteResponseDto getSpicyLevel(Long memberId) {
 
         Member member = memberService.findById(memberId);
-        TasteSpicyLevel tasteSpicyLevel = tasteSpicyLevelRepository.findByMember(member)
-                .orElseThrow(() -> new CustomException(ErrorCode.DATA_NOT_FOUND));
 
-        Integer spicyLevel = tasteSpicyLevel.getSpicyLevel().getSpicyLevel();
+        List<TasteSpicyLevel> tasteSpicyLevel = tasteSpicyLevelRepository.findByMember(member);
+
+        if (tasteSpicyLevel.isEmpty()) {
+            throw new CustomException(ErrorCode.DATA_NOT_FOUND);
+        }
+
+        List<Integer> spicyLevel = List.of(tasteSpicyLevel.get(0).getSpicyLevel().getSpicyLevel());
 
         return new TasteResponseDto(null, null, null,null, spicyLevel);
     }
@@ -106,10 +110,10 @@ public class TasteGetServiceImpl implements TasteGetService {
         List<String> dietaryPreferences = tasteDietaryPreferencesRepository.findByMember(member).stream()
                 .map(tp -> tp.getDietaryPreferences().getPreferenceName())
                 .collect(Collectors.toList());
-        Integer spicyLevel = tasteSpicyLevelRepository.findByMember(member)
+        List<Integer> spicyLevels = tasteSpicyLevelRepository.findByMember(member).stream()
                 .map(ts -> ts.getSpicyLevel().getSpicyLevel())
-                .orElse(null);
+                .collect(Collectors.toList());
 
-        return new TasteResponseDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevel);
+        return new TasteResponseDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevels);
     }
 }
