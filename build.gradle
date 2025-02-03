@@ -93,7 +93,6 @@ dependencies {
     // kakao api
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
-
     // OpenAI API 연동을 위한 WebClient
     implementation "org.springframework.ai:spring-ai-openai-spring-boot-starter"
     implementation 'org.springframework.ai:spring-ai-openai'

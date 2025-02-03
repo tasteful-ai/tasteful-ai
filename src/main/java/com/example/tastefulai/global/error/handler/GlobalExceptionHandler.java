@@ -6,7 +6,7 @@ import com.example.tastefulai.global.error.exception.BadRequestException;
 import com.example.tastefulai.global.error.exception.CustomException;
 import com.example.tastefulai.global.error.exception.ForbiddenException;
 import com.example.tastefulai.global.error.exception.NotFoundException;
-import com.example.tastefulai.global.error.exception.ServiceUnavailableException;
+import com.example.tastefulai.global.error.exception.TooManyRequestsException;
 import com.example.tastefulai.global.error.exception.UnAuthorizedException;
 import com.example.tastefulai.global.error.response.ErrorResponse;
 import io.jsonwebtoken.JwtException;
@@ -78,9 +78,9 @@ public class GlobalExceptionHandler {
     }
 
     // 메뉴 추천 요청 횟수 초과 예외 처리
-    @ExceptionHandler(ServiceUnavailableException.class)
-    public ResponseEntity<String> handleRequestLimitExceededException(ServiceUnavailableException customException) {
-        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(customException.getMessage());
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ErrorResponse> handleRequestLimitExceededException(TooManyRequestsException customException) {
+        return ErrorResponse.toResponseEntity(ErrorCode.TOO_MANY_REQUESTS);
     }
 
     // 잘못된 JSON 데이터 요청 예외 처리
