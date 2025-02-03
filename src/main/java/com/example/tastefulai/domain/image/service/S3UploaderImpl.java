@@ -89,10 +89,6 @@ public class S3UploaderImpl implements S3Uploader {
     @Override
     @Transactional
     public void deleteS3Image(String imageName) {
-        try {
             s3Client.deleteObject(builder -> builder.bucket(bucket).key(imageName).build());
-        } catch (CustomException customException) {
-            throw new CustomException(ErrorCode.BAD_REQUEST);
-        }
     }
 }
