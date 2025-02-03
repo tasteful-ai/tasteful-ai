@@ -1,7 +1,7 @@
-package com.example.tastefulai.domain.image.controller;
+package com.example.tastefulai.domain.member.controller;
 
-import com.example.tastefulai.domain.image.dto.ProfileRequestDto;
-import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
+import com.example.tastefulai.domain.member.dto.ProfileRequestDto;
+import com.example.tastefulai.domain.member.dto.ProfileResponseDto;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;

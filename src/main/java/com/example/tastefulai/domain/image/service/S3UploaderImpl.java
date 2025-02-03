@@ -35,7 +35,7 @@ public class S3UploaderImpl implements S3Uploader {
 
     @Transactional
     @Override
-    public Image uploadImage(MultipartFile image) throws IOException {
+    public Image uploadImage(MultipartFile image) {
 
         // 이미지 확장자 확인
         isValidExtension(image);
@@ -56,7 +56,7 @@ public class S3UploaderImpl implements S3Uploader {
                     RequestBody.fromInputStream(image.getInputStream(), image.getSize())
             );
         } catch (IOException ioException) {
-            throw new CustomException(ErrorCode.BAD_REQUEST);
+            throw new CustomException(ErrorCode.S3CLIENT_ERROR);
         }
 
         String imageUrl = String.format("https://%s.s3.amazonaws.com/%s", bucket, uniqueName);
@@ -66,19 +66,23 @@ public class S3UploaderImpl implements S3Uploader {
 
     // 파일의 확장자를 검증 (png, jpeg, jpg)
     @Override
-    public void isValidExtension(MultipartFile image) throws IOException {
+    public void isValidExtension(MultipartFile image) {
 
-        // 파일 이름의 확장자를 검사
-        String extension = StringUtils.getFilenameExtension(image.getOriginalFilename());
-        if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            throw new BadRequestException(ErrorCode.INVALID_FILE);
-        }
+        try {
+            // 파일 이름의 확장자를 검사
+            String extension = StringUtils.getFilenameExtension(image.getOriginalFilename());
+            if (!ALLOWED_EXTENSIONS.contains(extension)) {
+                throw new BadRequestException(ErrorCode.INVALID_FILE);
+            }
 
-        // 파일의 MIME 타입을 검사
-        Tika tika = new Tika();
-        String mimeType = tika.detect(image.getInputStream());
-        if (!ALLOWED_MIMETYPE.contains(mimeType)) {
-            throw new BadRequestException(ErrorCode.INVALID_FILE);
+            // 파일의 MIME 타입을 검사
+            Tika tika = new Tika();
+            String mimeType = tika.detect(image.getInputStream());
+            if (!ALLOWED_MIMETYPE.contains(mimeType)) {
+                throw new BadRequestException(ErrorCode.INVALID_FILE);
+            }
+        } catch (IOException ioException) {
+            throw new CustomException(ErrorCode.FILE_ACCESS_DENIED);
         }
     }
 

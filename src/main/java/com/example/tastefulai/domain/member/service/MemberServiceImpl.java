@@ -1,8 +1,11 @@
 package com.example.tastefulai.domain.member.service;
 
-import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
-import com.example.tastefulai.domain.member.dto.MemberListResponseDto;
+import com.example.tastefulai.domain.member.dto.ProfileResponseDto;
+import com.example.tastefulai.domain.member.dto.LoginRequestDto;
+//import com.example.tastefulai.domain.member.dto.MemberListResponseDto;
+import com.example.tastefulai.domain.member.dto.MemberRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
+import com.example.tastefulai.domain.member.dto.PasswordUpdateRequestDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;

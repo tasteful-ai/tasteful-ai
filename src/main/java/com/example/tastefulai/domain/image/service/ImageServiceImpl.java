@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @Service
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
@@ -20,22 +18,22 @@ public class ImageServiceImpl implements ImageService {
     private final MemberService memberService;
 
     @Override
-    public ImageResponseDto uploadImage(Long memberId, MultipartFile image) throws IOException {
+    public ImageResponseDto uploadImage(Long memberId, MultipartFile image) {
 
-        // S3 업로드  -> member 저장을 안한 Image 반환
-        Image uploadImage = s3Uploader.uploadImage(image);
+            // S3 업로드  -> member 저장을 안한 Image 반환
+            Image uploadImage = s3Uploader.uploadImage(image);
 
-        // Member 정보 세팅
-        Member member = memberService.findById(memberId);
-        uploadImage.updateMember(member);
+            // Member 정보 세팅
+            Member member = memberService.findById(memberId);
+            uploadImage.updateMember(member);
 
-        // 기존에 저장된 사진을 db와 S3에서 삭제
-        deleteImage(memberId);
+            // 기존에 저장된 사진을 db와 S3에서 삭제
+            deleteImage(memberId);
 
-        // db에 새로운 사진 저장
-        Image savedImage = imageRepository.save(uploadImage);
+            // db에 새로운 사진 저장
+            Image savedImage = imageRepository.save(uploadImage);
 
-        return new ImageResponseDto(savedImage.getImageUrl());
+            return new ImageResponseDto(savedImage.getImageUrl());
     }
 
     @Override
