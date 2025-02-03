@@ -1,6 +1,7 @@
 package com.example.tastefulai.domain.aichat.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -22,13 +23,17 @@ public class AiChatRedisRepositoryImpl implements AiChatRedisRepository {
         String sessionKey = SESSION_KEY_PREFIX + memberId;
         ValueOperations<String, Object> sessionOps = aiChatRedisTemplate.opsForValue();
 
-        // 새로운 세션 Id 생성
-        String sessionId = UUID.randomUUID().toString();
+        // 기존 세션 아이디 조회
+        String existingSessionId = (String) sessionOps.get(sessionKey);
+        if (existingSessionId != null) {
+            return existingSessionId;
+        }
 
-        // sessionKey가 없을 경우 새로운 sessionId를 저장 (한 번의 Redis 요청)
-        String existingSessionId = (String) sessionOps.getAndSet(sessionKey, sessionId);
+        // 없으면 새 세션 아이디 생성 후 저장
+        String newSessionId = UUID.randomUUID().toString();
+        sessionOps.set(sessionKey, newSessionId);
 
-        return existingSessionId != null ? existingSessionId : sessionId;
+        return newSessionId;
     }
 
     @Override
