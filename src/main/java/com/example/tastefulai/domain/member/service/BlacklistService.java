@@ -1,6 +1,7 @@
 package com.example.tastefulai.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class BlacklistService {
 
+    @Qualifier("blacklistTemplate")
     private final RedisTemplate<String, String> blacklistTemplate;
 
     // Access Token 블랙리스트 등록
