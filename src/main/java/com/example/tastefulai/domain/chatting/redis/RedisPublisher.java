@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class RedisPublisher {
 
+    @Qualifier("pubSubRedisTemplate")
     private final RedisTemplate<String, String> pubSubRedisTemplate;
     private final ObjectMapper objectMapper;
 

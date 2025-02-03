@@ -107,13 +107,14 @@ public class RedisConfig {
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisConnectionFactory chatRedisConnectionFactory,
-            MessageListenerAdapter messageListener
-    ) {
+            MessageListenerAdapter messageListener,
+            RedisSubscriber redisSubscriber) {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
 
         // 특정 채널 "chatroom"을 구독
         redisMessageListenerContainer.setConnectionFactory(chatRedisConnectionFactory);
-        redisMessageListenerContainer.addMessageListener(messageListener, new PatternTopic("chatroom:*"));
+        redisMessageListenerContainer.addMessageListener(new MessageListenerAdapter(redisSubscriber, "handleMessage"),
+                new PatternTopic("chatroom:*"));
 
         return redisMessageListenerContainer;
     }

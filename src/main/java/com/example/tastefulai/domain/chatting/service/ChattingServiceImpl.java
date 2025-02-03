@@ -57,6 +57,23 @@ public class ChattingServiceImpl implements ChattingService {
     }
 
     @Override
+    public void deleteChattingroom(Long roomId) {
+
+        Chattingroom chattingroom = findChattingroomById(roomId);
+        chattingroomRepository.delete(chattingroom);
+    }
+
+    @Override
+    @Transactional
+    public ChattingroomResponseDto updateChattingroom(Long roomId, String newRoomName) {
+
+        Chattingroom chattingroom = findChattingroomById(roomId);
+        chattingroom.updateRoomName(newRoomName);
+
+        return new ChattingroomResponseDto(chattingroom.getId(), chattingroom.getRoomName(), chattingroom.getCreator().getNickname(), chattingroom.getCreatedAt());
+    }
+
+    @Override
     @Transactional
     public ChattingMessageResponseDto createMessage(Long chattingroomId, Long memberId, ChattingMessageRequestDto chattingMessageRequestDto) {
 
@@ -113,5 +130,10 @@ public class ChattingServiceImpl implements ChattingService {
         if (!admin.getMemberRole().equals(MemberRole.ADMIN)) {
             throw new UnAuthorizedException(ErrorCode.FORBIDDEN_ADMIN_ONLY);
         }
+    }
+
+    @Override
+    public Chattingroom findChattingroomById(Long roomId) {
+        return chattingroomRepository.findChattingroomByIdOrThrow(roomId);
     }
 }
