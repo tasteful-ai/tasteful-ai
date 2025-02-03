@@ -70,7 +70,7 @@ public class TasteController {
         return new ResponseEntity<>(new CommonResponseDto<>("식단 성향 수정 완료", tasteResponseDto.getDietaryPreferences()), HttpStatus.OK);
     }
 
-    @PatchMapping("/spicyLevels")
+    @PatchMapping("/spicyLevel")
     public ResponseEntity<CommonResponseDto<Integer>> updateSpicyLevel(@AuthenticationPrincipal MemberDetailsImpl memberDetails,
                                                                        @Valid @RequestBody TasteRequestDto tasteRequestDto) {
         Long memberId = memberDetails.getId();
@@ -126,7 +126,7 @@ public class TasteController {
         );
     }
 
-    @GetMapping("/spicyLevels")
+    @GetMapping("/spicyLevel")
     public ResponseEntity<CommonResponseDto<Integer>> getSpicyLevel(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         Long memberId = memberDetails.getId();
