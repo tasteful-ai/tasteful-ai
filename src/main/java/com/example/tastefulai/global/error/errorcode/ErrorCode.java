@@ -48,12 +48,12 @@ public enum ErrorCode {
     NOT_FOUND_CHATTINGROOM(HttpStatus.NOT_FOUND, "채팅방이 존재하지 않습니다."),
     DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 데이터를 찾을 수 없습니다."),
 
-    //500
-    REDIS_SERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Redis 메시지 직렬화 오류입니다."),
-    S3CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 업데이트에 실패하였습니다. 다시 시도해주세요."),
+    // 429 TOO_MANY_REQUESTS
+    TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "오늘의 메뉴 추천 요청 횟수를 초과했습니다."),
 
-    // 503 SERVICE_UNAVAILABLE
-    TOO_MANY_REQUESTS(HttpStatus.SERVICE_UNAVAILABLE, "오늘의 메뉴 추천 요청 횟수를 초과했습니다.");
+    //500 INTERNAL_SERVER_ERROR
+    REDIS_SERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Redis 메시지 직렬화 오류입니다."),
+    S3CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 업데이트에 실패하였습니다. 다시 시도해주세요.");
 
     private final HttpStatus httpStatus;
     private final String message;
