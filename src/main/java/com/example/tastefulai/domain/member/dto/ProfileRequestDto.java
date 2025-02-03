@@ -1,4 +1,4 @@
-package com.example.tastefulai.domain.image.dto;
+package com.example.tastefulai.domain.member.dto;
 
 import lombok.Getter;
 
