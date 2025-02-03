@@ -18,31 +18,31 @@ class BlacklistServiceTest {
     private BlacklistService blacklistService;
 
     @Mock
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, String> blacklistRedisTemplate;
 
     @Mock
-    private ValueOperations<String, Object> valueOperations;
+    private ValueOperations<String, String> valueOperations;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        blacklistService = new BlacklistService(redisTemplate);
+        when(blacklistRedisTemplate.opsForValue()).thenReturn(valueOperations); // Mock 초기화
+        blacklistService = new BlacklistService(blacklistRedisTemplate);
     }
 
     @Test
     @DisplayName("토큰이 Redis에 블랙리스트로 저장되는지 확인")
     void addToBlacklist_ShouldStoreTokenInRedis() {
-        // Arrange
+        // Given
         String token = "test-token";
         long ttlMillis = 60000; // 1 minute
+        when(blacklistRedisTemplate.opsForValue()).thenReturn(valueOperations);
 
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-
-        // Act
+        // When
         blacklistService.addToBlacklist(token, ttlMillis);
 
-        // Assert
-        verify(redisTemplate.opsForValue(), times(1))
+        // Then
+        verify(blacklistRedisTemplate.opsForValue(), times(1))
                 .set("blacklist:" + token, "invalid", ttlMillis, TimeUnit.MILLISECONDS);
     }
 }
