@@ -1,6 +1,6 @@
 package com.example.tastefulai.domain.aichat.service;
 
-import com.example.tastefulai.domain.aichat.repository.aiChatRedisRepository;
+import com.example.tastefulai.domain.aichat.repository.AiChatRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AiChatSessionService {
 
-    private final aiChatRedisRepository aiChatRedisRepository;
+    private final AiChatRedisRepository aiChatRedisRepository;
 
     // 세션 Id 가져오기 (없으면 생성)
     public String getSessionId(Long memberId) {

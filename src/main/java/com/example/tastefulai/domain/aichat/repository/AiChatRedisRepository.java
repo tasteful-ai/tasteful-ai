@@ -1,6 +1,6 @@
 package com.example.tastefulai.domain.aichat.repository;
 
-public interface aiChatRedisRepository {
+public interface AiChatRedisRepository {
 
     String getSessionId(Long memberId);
     void saveSessionId(Long memberId, String sessionId);
