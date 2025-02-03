@@ -1,6 +1,5 @@
 package com.example.tastefulai.domain.member.entity;
 
-import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
 import com.example.tastefulai.domain.image.entity.Image;
 import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
