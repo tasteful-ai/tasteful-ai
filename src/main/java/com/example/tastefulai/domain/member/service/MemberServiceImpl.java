@@ -100,8 +100,7 @@ public class MemberServiceImpl implements MemberService {
     public void updatePassword(String email, String currentPassword, String newPassword, String currentAccessToken) {
 
         // 유효성 검사
-        PasswordUpdateRequestDto passwordUpdateRequestDto = new PasswordUpdateRequestDto(currentPassword, newPassword);
-        memberValidation.validatePasswordUpdate(passwordUpdateRequestDto);
+        memberValidation.validatePasswordUpdate(currentPassword, newPassword);
 
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
