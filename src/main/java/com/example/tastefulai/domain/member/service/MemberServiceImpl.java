@@ -1,6 +1,7 @@
 package com.example.tastefulai.domain.member.service;
 
 import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
+import com.example.tastefulai.domain.member.dto.MemberListResponseDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.GenderRole;
@@ -61,8 +62,7 @@ public class MemberServiceImpl implements MemberService {
         memberValidation.validateLogin(email, password);
 
         // 사용자 확인
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = findByEmail(email);
 
         // 비밀번호 확인
         if (!passwordEncoder.matches(password, member.getPassword())) {
@@ -97,8 +97,8 @@ public class MemberServiceImpl implements MemberService {
         // 유효성 검사
         memberValidation.validatePasswordUpdate(currentPassword, newPassword);
 
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        // 사용자 확인
+        Member member = findByEmail(email);
 
         // 현재 비밀번호 검증
         validatePassword(currentPassword, member.getPassword());
