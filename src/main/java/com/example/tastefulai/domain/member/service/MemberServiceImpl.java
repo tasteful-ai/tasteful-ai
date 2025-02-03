@@ -48,8 +48,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponseDto signup(MemberRole memberRole, String email, String password, String nickname,
                                     Integer age, GenderRole genderRole) {
         // 유효성 검사
-        MemberRequestDto memberRequestDto = new MemberRequestDto(memberRole, email, password, nickname, age, genderRole);
-        memberValidation.validateSignUp(memberRequestDto);
+        memberValidation.validateSignUp(memberRole, email, password, nickname, age, genderRole);
 
         // 비밀번호 암호화 및 회원 생성
         String encodedPassword = passwordEncoder.encode(password);
