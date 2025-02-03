@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users/members/{memberId}/tastes")
+@RequestMapping("/api/members/{memberId}/tastes")
 public class TasteController {
 
     private final TasteUpdateService tasteUpdateService;
