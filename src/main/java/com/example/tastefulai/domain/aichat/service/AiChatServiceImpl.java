@@ -2,83 +2,75 @@ package com.example.tastefulai.domain.aichat.service;
 
 import com.example.tastefulai.domain.aichat.dto.AiChatRequestDto;
 import com.example.tastefulai.domain.aichat.dto.AiChatResponseDto;
-import com.example.tastefulai.global.error.errorcode.ErrorCode;
-import com.example.tastefulai.global.error.exception.CustomException;
+import com.example.tastefulai.domain.taste.dto.TasteResponseDto;
+import com.example.tastefulai.domain.taste.service.TasteGetService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AiChatServiceImpl implements AiChatService {
 
     private final ChatClient chatClient;
-    private final RedisTemplate<String, Integer> aiRedisTemplate;
-    private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
-
-    private static final String REQUEST_COUNT_KEY_PREFIX = "ai:chat:request:count:";
-    private static final String RECOMMENDATION_LIST_KEY_PREFIX = "ai:chat:recommendations:";
+    private final TasteGetService tasteGetService;
+    private final AiChatCountService aiChatCountService;
+    private final AiChatSessionService aiChatSessionService;
 
     @Override
     public AiChatResponseDto createMenuRecommendation(AiChatRequestDto aiChatRequestDto, Long memberId) {
 
-        //  tasteRepository.findByMemberId(memberId);
-        //  이 taste 정보 prompt로 넘겨주기
+        // 요청 횟수 증가 (제한 초과 시 예외)
+        aiChatCountService.incrementRequestCount(memberId);
 
-        // 요청 횟수 제한 확인
-        String redisKey = REQUEST_COUNT_KEY_PREFIX + memberId;
-        ValueOperations<String, Integer> ops = aiRedisTemplate.opsForValue();
-        Integer count = ops.get(redisKey);
+        // 세션 Id 가져오기
+        String sessionId = aiChatSessionService.getSessionId(memberId);
 
-        if (count == null) {
-            ops.set(redisKey, 1, 1, TimeUnit.DAYS);
-        } else if (count >= 10) {
-            throw new CustomException(ErrorCode.TOO_MANY_REQUESTS);
+        // taste 정보 가져오기
+        TasteResponseDto tasteResponseDto = tasteGetService.getCompleteTaste(memberId);
 
-        } else {
-            ops.increment(redisKey);
-        }
+        // AI 프롬프트 생성 (취향 정보를 포함하여 AI에게 전달)
+        String prompt = String.format(
+                "내 취향은 다음과 같다." +
+                        "장르: %s, 좋아하는 음식: %s, 식단 성향: %s, 매운 정도: %s" +
+                        "이 정보를 고려해서 오늘 점심 메뉴 추천해줘." +
+                        "응답은 반드시 JSON 형식으로, {\"recommendation\": \"메뉴 이름\"} 으로 해줘.",
+                tasteResponseDto.getGenres(),
+                tasteResponseDto.getLikeFoods(),
+                tasteResponseDto.getDislikeFoods(),
+                tasteResponseDto.getDietaryPreferences(),
+                tasteResponseDto.getSpicyLevel()
+        );
 
-        // 프롬프트 사용
-        String prompt = "오늘 점심메뉴를 하나만 추천해. 응답은 반드시 JSON 형식으로, 큰따옴표만 사용해서. {\"recommendation\": \"메뉴 이름\"}";
+        // ChatClient를 사용해 AI에게 요청
+//        String response = chatClient.prompt().user(prompt).call().content();
 
-        // ChatClient를 사용해 AI에게 메시지 전달 및 응답 받음
-//        String response = chatClient.prompt()
-//                .user(prompt)
-//                .call()
-//                .content();
-
-        String response = "{\"recommendation\": \"김치찌개\"}";   // TODO: 나중에 ai 요청 로직으로 변경
+        // AI 요청 (임시 Mock 데이터 사용)
+        String response = "{\"recommendation\": \"김치찌개\"}";   // TODO: chatClient 로직으로 대체
 
         // JSON 응답 파싱
         String recommendation;
         try {
             Map<String, String> responseMap = objectMapper.readValue(response, Map.class);
-            recommendation = responseMap.get("recommendation");
-
-            if (recommendation == null || recommendation.isEmpty()) {
-                recommendation = "추천할 메뉴가 없습니다.";
-
-            } else {
-                recommendation = recommendation.trim();
-            }
+            recommendation = Optional.ofNullable(responseMap.get("recommendation"))
+                    .orElse("추천할 메뉴가 없습니다.").trim();
         } catch (Exception exception) {
             recommendation = "추천할 메뉴를 파싱하는 데 실패했습니다.";
         }
 
-        // 추천 메뉴 저장
-        String recommendationKey = RECOMMENDATION_LIST_KEY_PREFIX + memberId;
-        ListOperations<String, Object> listOps = redisTemplate.opsForList();
-        listOps.rightPush(recommendationKey, recommendation);
+        // AI 추천 히스토리 저장
+        aiChatSessionService.saveRecommendation(sessionId, recommendation);
 
         return new AiChatResponseDto(recommendation);
+    }
+
+    @Override
+    public void clearChatHistory(Long memberId) {
+        aiChatSessionService.clearChatHistory(memberId);
     }
 }

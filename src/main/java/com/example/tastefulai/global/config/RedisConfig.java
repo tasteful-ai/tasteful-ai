@@ -4,7 +4,6 @@ import com.example.tastefulai.domain.chatting.redis.RedisSubscriber;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,7 +27,7 @@ public class RedisConfig {
         return lettuceConnectionFactory;
     }
 
-    @Bean(name = "redisTemplate")
+    @Bean(name = "redisTemplate") // 블랙리스트 redisTemplate
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
@@ -38,12 +37,22 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    @Bean(name = "aiRedisTemplate")
-    public RedisTemplate<String, Integer> aiRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    @Bean(name = "aiCountRedisTemplate")
+    public RedisTemplate<String, Integer> aiCountRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Integer> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Integer.class));
+
+        return redisTemplate;
+    }
+
+        @Bean(name = "aiChatRedisTemplate")
+    public RedisTemplate<String, Object> aiChatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
 
         return redisTemplate;
     }
@@ -57,16 +66,6 @@ public class RedisConfig {
 
         return redisTemplate;
     }
-
-//    @Bean(name = "aiChatRedisTemplate") // 추후 수정
-//    public RedisTemplate<String, Object> aiChatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-//        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-//        redisTemplate.setConnectionFactory(redisConnectionFactory);
-//        redisTemplate.setKeySerializer(new StringRedisSerializer());
-//        redisTemplate.setValueSerializer(new StringRedisSerializer());
-//
-//        return redisTemplate;
-//    }
 
     @Bean
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
