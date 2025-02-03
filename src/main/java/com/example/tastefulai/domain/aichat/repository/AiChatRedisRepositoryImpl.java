@@ -9,11 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hibernate.internal.util.collections.CollectionHelper.listOf;
-
 @Repository
 @RequiredArgsConstructor
-public class AiChatRedisRepositoryImpl implements aiChatRedisRepository {
+public class AiChatRedisRepositoryImpl implements AiChatRedisRepository {
 
     private final RedisTemplate<String, Object> aiChatRedisTemplate;
     private static final String SESSION_KEY_PREFIX = "ai:chat:session:";
