@@ -3,6 +3,7 @@ package com.example.tastefulai.domain.aichat.service;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,9 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class AiChatCountService {
 
+    @Qualifier("aiCountRedisTemplate")
     private final RedisTemplate<String, Integer> aiCountRedisTemplate;
+
     private static final String REQUEST_COUNT_KEY_PREFIX = "ai:chat:request:count:";
 
     // 요청 횟수 증가 및 자정까지 TTL 설정

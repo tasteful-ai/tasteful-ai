@@ -14,7 +14,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AiChatRedisRepositoryImpl implements AiChatRedisRepository {
 
+    @Qualifier("aiChatRedisTemplate")
     private final RedisTemplate<String, Object> aiChatRedisTemplate;
+
     private static final String SESSION_KEY_PREFIX = "ai:chat:session:";
     private static final String RECOMMENDATION_LIST_KEY_PREFIX = "ai:chat:recommendations:";
 
