@@ -57,7 +57,6 @@ public class ChattingServiceImpl implements ChattingService {
     }
 
     @Override
-    @Transactional
     public void deleteChattingroom(Long roomId) {
 
         Chattingroom chattingroom = findChattingroomById(roomId);
