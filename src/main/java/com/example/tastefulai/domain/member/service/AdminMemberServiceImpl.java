@@ -1,5 +1,6 @@
 package com.example.tastefulai.domain.member.service;
 
+import com.example.tastefulai.domain.member.dto.MemberListResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.domain.member.repository.AdminMemberRepository;
@@ -11,13 +12,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class AdminMemberServiceImpl implements AdminMemberService {
 
     private final AdminMemberRepository adminMemberRepository;
 
-    // 회원 탈퇴 - ADMIN 전용
+    // 1. 회원 탈퇴 - ADMIN 전용
     @Override
     @Transactional
     public void deleteMemberByAdmin(Long memberId) {
@@ -33,6 +38,14 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         targetMember.softDelete();
         adminMemberRepository.save(targetMember);
     }
+
+
+    // 2. 회원 전체 조회 - ADMIN 전용
+    @Override
+    public List<MemberListResponseDto> getAllMembers() {
+        return convertToMemberListResponse(adminMemberRepository.findAll());
+    }
+
 
     /**
      * **** 공통 메서드 ****
@@ -61,5 +74,23 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         if (targetMember.getMemberRole() == MemberRole.ADMIN) {
             throw new CustomException(ErrorCode.ADMIN_CANNOT_REMOVE_ADMIN);
         }
+    }
+
+    private List<MemberListResponseDto> convertToMemberListResponse(List<Member> members) {
+        return members.stream()
+                .map(this::convertToMemberListResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    private MemberListResponseDto convertToMemberListResponseDto(Member member) {
+        return new MemberListResponseDto(
+                member.getId(),
+                member.getCreatedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd")),
+                member.getNickname(),
+                member.getEmail(),
+                member.getGenderRole().name(),
+                member.getMemberRole().name(),
+                (member.getDeletedAt() != null) ? member.getDeletedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd")) : null
+        );
     }
 }

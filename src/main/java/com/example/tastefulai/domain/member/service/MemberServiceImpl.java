@@ -1,10 +1,7 @@
 package com.example.tastefulai.domain.member.service;
 
 import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
-import com.example.tastefulai.domain.member.dto.MemberListResponseDto;
-import com.example.tastefulai.domain.member.dto.MemberRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
-import com.example.tastefulai.domain.member.dto.PasswordUpdateRequestDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
@@ -22,10 +19,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -168,12 +163,6 @@ public class MemberServiceImpl implements MemberService {
         return ProfileResponseDto.fromMember(member);
     }
 
-    // 9. 회원 전체 조회
-    @Override
-    public List<MemberListResponseDto> getAllMembers() {
-        return convertToMemberListResponse(memberRepository.findAll());
-    }
-
 
     // **** 공통 메서드 **** //
 
@@ -220,23 +209,5 @@ public class MemberServiceImpl implements MemberService {
 
     private void savePasswordVerification(Long memberId) {
         redisTemplate.opsForValue().set(VERIFY_PASSWORD_KEY + memberId, "true");
-    }
-
-    private List<MemberListResponseDto> convertToMemberListResponse(List<Member> members) {
-        return members.stream()
-                .map(this::convertToMemberListResponseDto)
-                .collect(Collectors.toList());
-    }
-
-    private MemberListResponseDto convertToMemberListResponseDto(Member member) {
-        return new MemberListResponseDto(
-                member.getId(),
-                member.getCreatedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd")),
-                member.getNickname(),
-                member.getEmail(),
-                member.getGenderRole().name(),
-                member.getMemberRole().name(),
-                (member.getDeletedAt() != null) ? member.getDeletedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd")) : null
-        );
     }
 }

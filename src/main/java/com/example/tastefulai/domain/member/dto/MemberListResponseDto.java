@@ -6,12 +6,12 @@ import lombok.Getter;
 public class MemberListResponseDto {
 
     private final Long memberId;
-    private final String createdAt;   // 가입일 (생성 날짜)
-    private final String nickname;    // 닉네임
-    private final String email;       // 이메일
-    private final String gender;      // 성별
-    private final String role;        // 권한
-    private final String deletedAt;   // 탈퇴 날짜 (탈퇴한 경우만 값 있음)
+    private final String createdAt;
+    private final String nickname;
+    private final String email;
+    private final String gender;
+    private final String role;
+    private final String deletedAt;
 
     public MemberListResponseDto (Long memberId, String createdAt, String nickname,
                                   String email, String gender, String role,
