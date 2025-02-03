@@ -79,8 +79,8 @@ public class GlobalExceptionHandler {
 
     // 메뉴 추천 요청 횟수 초과 예외 처리
     @ExceptionHandler(TooManyRequestsException.class)
-    public ResponseEntity<String> handleRequestLimitExceededException(TooManyRequestsException customException) {
-        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(customException.getMessage());
+    public ResponseEntity<ErrorResponse> handleRequestLimitExceededException(TooManyRequestsException customException) {
+        return ErrorResponse.toResponseEntity(ErrorCode.TOO_MANY_REQUESTS);
     }
 
     // 잘못된 JSON 데이터 요청 예외 처리
