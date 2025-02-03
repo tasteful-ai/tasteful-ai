@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface DietaryPreferencesRepository extends JpaRepository<DietaryPreferences, Long> {
 
-    Optional<DietaryPreferences> findByPreferenceName(String genreName);
+    Optional<DietaryPreferences> findByPreferenceName(String preferenceName);
 }

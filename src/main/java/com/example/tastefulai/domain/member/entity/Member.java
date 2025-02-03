@@ -105,13 +105,4 @@ public class Member extends BaseEntity {
     public void updateMemberRole(MemberRole memberRole) {
         this.memberRole = memberRole;
     }
-
-    public static ProfileResponseDto toProfileDto (Member member) {
-
-        return new ProfileResponseDto(
-                member.getNickname(),
-                (member.getImages().isEmpty()) ? null : member.getImages().getFirst().getImageUrl(),
-                member.getCreatedAt().toLocalDate(),
-                "");
-    }
 }
