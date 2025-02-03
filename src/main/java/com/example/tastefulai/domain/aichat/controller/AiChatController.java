@@ -29,15 +29,7 @@ public class AiChatController {
         Long memberId = memberDetailsImpl.getId();
         AiChatResponseDto aiChatResponseDto = aiChatService.createMenuRecommendation(aiChatRequestDto, memberId);
 
-        /*
-         Record의 경우 accessor가 recommendation() 이고,
-         CommonResponseDto의 타입 파라미터는 AiChatResponse 입니다.
-         내부 값을 꺼내서 보여주고 싶은 경우 아래의 방법으로만 가능합니다.. (컨벤션)
-        */
-        String recommendation = aiChatResponseDto.recommendation();
-        AiChatResponseDto responseDto = new AiChatResponseDto(recommendation);
-
-        return new ResponseEntity<>(new CommonResponseDto<>("AI 메뉴 추천 완료", responseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>("AI 메뉴 추천 완료", aiChatResponseDto), HttpStatus.OK);
     }
 
     @DeleteMapping("/clear")
