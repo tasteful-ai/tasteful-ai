@@ -41,9 +41,6 @@ public class MemberValidation {
         if (currentPassword == null || newPassword == null) {
             throw new CustomException(ErrorCode.INVALID_REQUEST);
         }
-        if (currentPassword.trim().isEmpty() || newPassword.trim().isEmpty()) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD);
-        }
         if (currentPassword.equals(newPassword)) {
             throw new CustomException(ErrorCode.PASSWORD_SAME_AS_OLD);
         }
@@ -53,6 +50,9 @@ public class MemberValidation {
 
     // 비밀번호 검증
     public void validatePassword(String password) {
+        if (password == null || password.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST);
+        }
         if (!isValidPassword(password)) {
             throw new CustomException(ErrorCode.PASSWORD_PATTERN_ERROR);
         }
