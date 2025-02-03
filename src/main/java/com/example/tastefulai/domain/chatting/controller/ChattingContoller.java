@@ -34,7 +34,6 @@ import java.util.List;
 public class ChattingContoller {
 
     private final ChattingService chattingService;
-    private final ChattingroomRepository chattingroomRepository;
 
     @PostMapping("/rooms")
     @PreAuthorize("hasRole('ADMIN')")
