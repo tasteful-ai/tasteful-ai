@@ -1,7 +1,6 @@
 package com.example.tastefulai.domain.member.service;
 
 import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
-import com.example.tastefulai.domain.member.dto.LoginRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberListResponseDto;
 import com.example.tastefulai.domain.member.dto.MemberRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
@@ -64,23 +63,23 @@ public class MemberServiceImpl implements MemberService {
     // 2. 로그인
     @Override
     public JwtAuthResponse login(String email, String password) {
-
         // 유효성 검사
-        LoginRequestDto loginRequestDto = new LoginRequestDto(email, password);
-        memberValidation.validateLogin(loginRequestDto);
+        memberValidation.validateLogin(email, password);
 
         // 사용자 확인
-        Member member = this.memberRepository.findActiveByEmail(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 비밀번호 확인
-        validatePassword(password, member.getPassword());
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
+        }
 
         // JWT 토큰 생성
         String accessToken = jwtProvider.generateAccessToken(email);
         String refreshToken = jwtProvider.generateRefreshToken(email);
 
-        // RefreshToken 을 Redis 에 저장
+        // RefreshToken을 Redis에 저장
         storeRefreshToken(email, refreshToken);
 
         return new JwtAuthResponse(member.getId(), member.getNickname(), member.getMemberRole(), accessToken, refreshToken);
