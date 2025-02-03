@@ -37,7 +37,7 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    @Bean(name = "aiRedisTemplate")
+    @Bean(name = "aiCountRedisTemplate")
     public RedisTemplate<String, Integer> aiCountRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Integer> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
