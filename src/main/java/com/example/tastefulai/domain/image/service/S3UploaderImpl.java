@@ -56,7 +56,7 @@ public class S3UploaderImpl implements S3Uploader {
                     RequestBody.fromInputStream(image.getInputStream(), image.getSize())
             );
         } catch (IOException ioException) {
-            throw new CustomException(ErrorCode.BAD_REQUEST);
+            throw new CustomException(ErrorCode.S3CLIENT_ERROR);
         }
 
         String imageUrl = String.format("https://%s.s3.amazonaws.com/%s", bucket, uniqueName);
