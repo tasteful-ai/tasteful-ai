@@ -1,14 +1,6 @@
-package com.example.tastefulai.domain.image.dto;
+package com.example.tastefulai.domain.member.dto;
 
 import com.example.tastefulai.domain.member.entity.Member;
-import com.example.tastefulai.domain.taste.entity.dietarypreferences.DietaryPreferences;
-import com.example.tastefulai.domain.taste.entity.dietarypreferences.TasteDietaryPreferences;
-import com.example.tastefulai.domain.taste.entity.genres.Genres;
-import com.example.tastefulai.domain.taste.entity.genres.TasteGenres;
-import com.example.tastefulai.domain.taste.entity.likefoods.LikeFoods;
-import com.example.tastefulai.domain.taste.entity.likefoods.TasteLikeFoods;
-import com.example.tastefulai.domain.taste.entity.spicylevel.SpicyLevel;
-import com.example.tastefulai.domain.taste.entity.spicylevel.TasteSpicyLevel;
 import lombok.Getter;
 
 import java.time.LocalDate;
