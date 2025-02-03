@@ -1,8 +1,7 @@
 package com.example.tastefulai.domain.member.validation;
 
-import com.example.tastefulai.domain.member.dto.LoginRequestDto;
-import com.example.tastefulai.domain.member.dto.MemberRequestDto;
-import com.example.tastefulai.domain.member.dto.PasswordUpdateRequestDto;
+import com.example.tastefulai.domain.member.enums.GenderRole;
+import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
@@ -19,45 +18,43 @@ public class MemberValidation {
     private final MemberRepository memberRepository;
 
     // 회원가입 유효성 검사
-    public void validateSignUp(MemberRequestDto memberRequestDto) {
-        if (memberRequestDto == null) {
+    public void validateSignUp(MemberRole memberRole, String email, String password,
+                               String nickname, Integer age, GenderRole genderRole) {
+        if (memberRole == null || email == null || password == null ||
+                nickname == null || age == null || genderRole == null) {
             throw new CustomException(ErrorCode.INVALID_REQUEST);
         }
-        validateEmail(memberRequestDto.getEmail());
-        validatePassword(memberRequestDto.getPassword());
-        validateNicknameOrEmail(memberRequestDto.getEmail(), memberRequestDto.getNickname());
+        validateEmail(email);
+        validatePassword(password);
+        validateNicknameOrEmail(email, nickname);
     }
 
     // 로그인 유효성 검사
-    public void validateLogin(LoginRequestDto loginRequestDto) {
-        if (loginRequestDto == null) {
+    public void validateLogin(String email, String password) {
+        if (email == null || password == null) {
             throw new CustomException(ErrorCode.INVALID_REQUEST);
         }
-        validateEmail(loginRequestDto.getEmail());
-        validatePasswordNotEmpty(loginRequestDto.getPassword());
     }
 
     // 비밀번호 변경 유효성 검사
-    public void validatePasswordUpdate(PasswordUpdateRequestDto passwordUpdateRequestDto) {
-        if (passwordUpdateRequestDto == null) {
+    public void validatePasswordUpdate(String currentPassword, String newPassword) {
+        if (currentPassword == null || newPassword == null) {
             throw new CustomException(ErrorCode.INVALID_REQUEST);
         }
-        validatePassword(passwordUpdateRequestDto.getCurrentPassword());
-        validatePassword(passwordUpdateRequestDto.getNewPassword());
-        validateDifferentPasswords(passwordUpdateRequestDto.getCurrentPassword(), passwordUpdateRequestDto.getNewPassword());
+        if (currentPassword.trim().isEmpty() || newPassword.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD);
+        }
+        if (currentPassword.equals(newPassword)) {
+            throw new CustomException(ErrorCode.PASSWORD_SAME_AS_OLD);
+        }
+
+        validatePassword(newPassword);
     }
 
     // 비밀번호 검증
     public void validatePassword(String password) {
         if (!isValidPassword(password)) {
             throw new CustomException(ErrorCode.PASSWORD_PATTERN_ERROR);
-        }
-    }
-
-    // 비밀번호 동일 여부 확인
-    private void validateDifferentPasswords(String currentPassword, String newPassword) {
-        if (currentPassword.equals(newPassword)) {
-            throw new CustomException(ErrorCode.PASSWORD_SAME_AS_OLD);
         }
     }
 
@@ -74,13 +71,6 @@ public class MemberValidation {
             throw new CustomException(ErrorCode.DUPLICATE_RESOURCE);
         }
     }
-
-    // 비밀번호 공백 여부 확인
-     private void validatePasswordNotEmpty(String password) {
-        if (password == null || password.isEmpty()) {
-            throw new CustomException(ErrorCode.PASSWORD_CANNOT_BE_EMPTY);
-        }
-     }
 
     // 유효성 검사 - 비밀번호 패턴
     public boolean isValidPassword(String password) {
