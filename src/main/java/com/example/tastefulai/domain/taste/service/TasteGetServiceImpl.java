@@ -47,7 +47,7 @@ public class TasteGetServiceImpl implements TasteGetService {
 
         Member member = memberService.findById(memberId);
         List<String> likeFoods = tasteLikeFoodsRepository.findByMember(member).stream()
-                .map(tg -> tg.getLikeFoods().getLikeName())
+                .map(tl -> tl.getLikeFoods().getLikeName())
                 .collect(Collectors.toList());
 
         return new TasteResponseDto(null, likeFoods, null,null, null);
@@ -59,7 +59,7 @@ public class TasteGetServiceImpl implements TasteGetService {
 
         Member member = memberService.findById(memberId);
         List<String> dislikeFoods = tasteDislikeFoodsRepository.findByMember(member).stream()
-                .map(tg -> tg.getDislikeFoods().getDislikeName())
+                .map(td -> td.getDislikeFoods().getDislikeName())
                 .collect(Collectors.toList());
 
         return new TasteResponseDto(null, null, dislikeFoods,null, null);
@@ -71,7 +71,7 @@ public class TasteGetServiceImpl implements TasteGetService {
 
         Member member = memberService.findById(memberId);
         List<String> dietaryPreferences = tasteDietaryPreferencesRepository.findByMember(member).stream()
-                .map(tg -> tg.getDietaryPreferences().getPreferenceName())
+                .map(tp -> tp.getDietaryPreferences().getPreferenceName())
                 .collect(Collectors.toList());
 
         return new TasteResponseDto(null, null, null, dietaryPreferences, null);
@@ -88,5 +88,28 @@ public class TasteGetServiceImpl implements TasteGetService {
         Integer spicyLevel = tasteSpicyLevel.getSpicyLevel().getSpicyLevel();
 
         return new TasteResponseDto(null, null, null,null, spicyLevel);
+    }
+
+    @Override
+    public TasteResponseDto getCompleteTaste(Long memberId) {
+
+        Member member = memberService.findById(memberId);
+        List<String> genres = tasteGenresRepository.findByMember(member).stream()
+                .map(tg -> tg.getGenres().getGenreName())
+                .collect(Collectors.toList());
+        List<String> likeFoods = tasteLikeFoodsRepository.findByMember(member).stream()
+                .map(tl -> tl.getLikeFoods().getLikeName())
+                .collect(Collectors.toList());
+        List<String> dislikeFoods = tasteDislikeFoodsRepository.findByMember(member).stream()
+                .map(td -> td.getDislikeFoods().getDislikeName())
+                .collect(Collectors.toList());
+        List<String> dietaryPreferences = tasteDietaryPreferencesRepository.findByMember(member).stream()
+                .map(tp -> tp.getDietaryPreferences().getPreferenceName())
+                .collect(Collectors.toList());
+        Integer spicyLevel = tasteSpicyLevelRepository.findByMember(member)
+                .map(ts -> ts.getSpicyLevel().getSpicyLevel())
+                .orElse(null);
+
+        return new TasteResponseDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevel);
     }
 }
