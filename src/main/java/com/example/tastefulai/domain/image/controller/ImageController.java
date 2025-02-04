@@ -25,10 +25,9 @@ public class ImageController {
 
     private final ImageService imageService;
 
-    // 프로필 사진 업로드
     @PutMapping
     public ResponseEntity<CommonResponseDto<ImageResponseDto>> updateImage(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
-                                                                           @RequestParam(required = false) MultipartFile image) throws IOException {
+                                                                           @RequestParam(required = false) MultipartFile image) {
 
         Long memberId = memberDetailsImpl.getId();
 
@@ -37,7 +36,6 @@ public class ImageController {
         return new ResponseEntity<>(new CommonResponseDto<>("프로필 이미지 업데이트 성공", imageResponseDto), HttpStatus.OK);
     }
 
-    // 프로필 사진 삭제
     @DeleteMapping
     public ResponseEntity<CommonResponseDto<String>> deleteImage(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
