@@ -7,7 +7,5 @@ import java.util.Optional;
 
 public interface ChattingroomRepository extends JpaRepository<Chattingroom, Long> {
 
-    boolean existsByRoomName(String roomName);
-
     Optional<Chattingroom> findByRoomName(String roomName);
 }
