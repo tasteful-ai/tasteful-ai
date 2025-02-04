@@ -7,6 +7,8 @@ import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.global.common.dto.JwtAuthResponse;
 
+import java.util.List;
+
 public interface MemberService {
 
     Member findByEmail(String email);
