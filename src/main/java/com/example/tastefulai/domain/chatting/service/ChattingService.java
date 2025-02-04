@@ -5,7 +5,6 @@ import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingroomResponseDto;
 import com.example.tastefulai.domain.chatting.entity.Chattingroom;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ChattingService {
