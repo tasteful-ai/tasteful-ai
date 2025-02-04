@@ -4,7 +4,6 @@ import com.example.tastefulai.domain.image.entity.Image;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.BadRequestException;
 import com.example.tastefulai.global.error.exception.CustomException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@Slf4j
 @ExtendWith(MockitoExtension.class)
 class S3UploaderImplTest {
 
