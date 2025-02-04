@@ -1,7 +1,7 @@
 package com.example.tastefulai.chatting;
 
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
-import com.example.tastefulai.domain.chatting.redis.service.RedisMessageService;
+import com.example.tastefulai.domain.chatting.service.RedisMessageServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,10 +25,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class RedisMessageServiceTest {
+class RedisMessageServiceImplTest {
 
     @InjectMocks
-    private RedisMessageService redisMessageService;
+    private RedisMessageServiceImpl redisMessageServiceImpl;
 
     @Mock
     private RedisTemplate<String, Object> messageCacheRedisTemplate;
@@ -55,7 +55,7 @@ class RedisMessageServiceTest {
     void saveMessage_Success() throws JsonProcessingException {
         when(objectMapper.writeValueAsString(TEST_MESSAGE)).thenReturn(SERIALIZED_MESSAGE);
 
-        redisMessageService.saveMessage(1L, TEST_MESSAGE);
+        redisMessageServiceImpl.saveMessage(1L, TEST_MESSAGE);
 
         verify(listOperations, times(1)).rightPush(REDIS_KEY, SERIALIZED_MESSAGE);
         verify(listOperations, times(1)).trim(REDIS_KEY, -50, -1);
@@ -67,7 +67,7 @@ class RedisMessageServiceTest {
         when(objectMapper.writeValueAsString(TEST_MESSAGE)).thenThrow(new JsonProcessingException("직렬화 오류") {
         });
 
-        redisMessageService.saveMessage(1L, TEST_MESSAGE);
+        redisMessageServiceImpl.saveMessage(1L, TEST_MESSAGE);
 
         verify(listOperations, never()).rightPush(anyString(), any());
     }
@@ -78,7 +78,7 @@ class RedisMessageServiceTest {
         when(listOperations.range(REDIS_KEY, 0, -1)).thenReturn(List.of(SERIALIZED_MESSAGE));
         when(objectMapper.readValue(SERIALIZED_MESSAGE, ChattingMessageResponseDto.class)).thenReturn(TEST_MESSAGE);
 
-        List<ChattingMessageResponseDto> messages = redisMessageService.getRecentMessages(1L);
+        List<ChattingMessageResponseDto> messages = redisMessageServiceImpl.getRecentMessages(1L);
 
         assertFalse(messages.isEmpty());
         assertEquals(1, messages.size());
@@ -90,7 +90,7 @@ class RedisMessageServiceTest {
     void getRecentMessages_NoCache() {
         when(listOperations.range(REDIS_KEY, 0, -1)).thenReturn(List.of());
 
-        List<ChattingMessageResponseDto> messages = redisMessageService.getRecentMessages(1L);
+        List<ChattingMessageResponseDto> messages = redisMessageServiceImpl.getRecentMessages(1L);
 
         assertTrue(messages.isEmpty());
     }
@@ -102,7 +102,7 @@ class RedisMessageServiceTest {
         when(objectMapper.readValue(SERIALIZED_MESSAGE, ChattingMessageResponseDto.class)).thenThrow(new JsonProcessingException("역직렬화 오류") {
         });
 
-        List<ChattingMessageResponseDto> messages = redisMessageService.getRecentMessages(1L);
+        List<ChattingMessageResponseDto> messages = redisMessageServiceImpl.getRecentMessages(1L);
 
         assertTrue(messages.isEmpty());
     }

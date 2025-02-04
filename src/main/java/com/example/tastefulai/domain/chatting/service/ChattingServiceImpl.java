@@ -5,7 +5,6 @@ import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingroomResponseDto;
 import com.example.tastefulai.domain.chatting.entity.ChattingMessage;
 import com.example.tastefulai.domain.chatting.entity.Chattingroom;
-import com.example.tastefulai.domain.chatting.redis.service.RedisMessageService;
 import com.example.tastefulai.domain.chatting.repository.ChattingMessageRepository;
 import com.example.tastefulai.domain.chatting.repository.ChattingroomRepository;
 import com.example.tastefulai.domain.member.entity.Member;
@@ -13,7 +12,6 @@ import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
-import com.example.tastefulai.global.error.exception.NotFoundException;
 import com.example.tastefulai.global.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,7 @@ public class ChattingServiceImpl implements ChattingService {
     private final ChattingroomRepository chattingroomRepository;
     private final ChattingMessageRepository chattingMessageRepository;
     private final MemberService memberService;
-    private final RedisMessageService redisMessageService;
+    private final RedisMessageServiceImpl redisMessageServiceImpl;
 
     @Override
     @Transactional
@@ -90,13 +88,13 @@ public class ChattingServiceImpl implements ChattingService {
 
         ChattingMessageResponseDto chattingMessageResponseDto = ChattingMessageResponseDto.fromEntity(chattingMessage);
 
-        redisMessageService.saveMessage(chattingroom.getId(), chattingMessageResponseDto);
+        redisMessageServiceImpl.saveMessage(chattingroom.getId(), chattingMessageResponseDto);
         return chattingMessageResponseDto;
     }
 
     @Override
     public List<ChattingMessageResponseDto> getMessages(Long chattingroomId) {
-        List<ChattingMessageResponseDto> cachedMessages = redisMessageService.getRecentMessages(chattingroomId);
+        List<ChattingMessageResponseDto> cachedMessages = redisMessageServiceImpl.getRecentMessages(chattingroomId);
 
         if (cachedMessages.isEmpty()) {
             List<ChattingMessage> messages = chattingMessageRepository.findTop50ByChattingroomIdOrderByCreatedAtDesc(chattingroomId);

@@ -5,7 +5,7 @@ import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingroomResponseDto;
 import com.example.tastefulai.domain.chatting.entity.ChattingMessage;
 import com.example.tastefulai.domain.chatting.entity.Chattingroom;
-import com.example.tastefulai.domain.chatting.redis.service.RedisMessageService;
+import com.example.tastefulai.domain.chatting.service.RedisMessageServiceImpl;
 import com.example.tastefulai.domain.chatting.repository.ChattingMessageRepository;
 import com.example.tastefulai.domain.chatting.repository.ChattingroomRepository;
 import com.example.tastefulai.domain.chatting.service.ChattingServiceImpl;
@@ -53,7 +53,7 @@ class ChattingServiceImplTest {
     private MemberService memberService;
 
     @Mock
-    private RedisMessageService redisMessageService;
+    private RedisMessageServiceImpl redisMessageServiceImpl;
 
     private Member admin;
     private Member user;
@@ -143,7 +143,7 @@ class ChattingServiceImplTest {
         assertEquals("Hello", chattingMessageResponseDto.getMessage());
 
         verify(chattingMessageRepository, times(1)).save(any(ChattingMessage.class));
-        verify(redisMessageService, times(1)).saveMessage(eq(roomId), any(ChattingMessageResponseDto.class));
+        verify(redisMessageServiceImpl, times(1)).saveMessage(eq(roomId), any(ChattingMessageResponseDto.class));
     }
 
     @Test
@@ -182,7 +182,7 @@ class ChattingServiceImplTest {
         Long roomId = 1L;
         ChattingMessageResponseDto chattingMessageResponseDto = new ChattingMessageResponseDto(2L, "User", "Hello", roomId);
 
-        when(redisMessageService.getRecentMessages(roomId)).thenReturn(List.of(chattingMessageResponseDto));
+        when(redisMessageServiceImpl.getRecentMessages(roomId)).thenReturn(List.of(chattingMessageResponseDto));
 
         List<ChattingMessageResponseDto> messages = chattingService.getMessages(roomId);
 
