@@ -3,7 +3,6 @@ package com.example.tastefulai.domain.image.service;
 import com.example.tastefulai.domain.image.entity.Image;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.BadRequestException;
-import com.example.tastefulai.global.error.exception.CustomException;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,10 +79,11 @@ class S3UploaderImplTest {
             // Given
             String originalName = "typeTest.jpg";
             String contentType = "image/jpg";
+
             String filePath = "src/test/resources/typeTest.jpg";    // 이름 확장자는 jpg 이지만 MIME Type 은 png
             File file = new File(filePath);
-
             FileInputStream fileInputStream = new FileInputStream(file);
+
             MultipartFile image = new MockMultipartFile(originalName, originalName, contentType, fileInputStream);
 
             // when & then
@@ -104,9 +104,8 @@ class S3UploaderImplTest {
 
     @Test
     @DisplayName("이미지 확장자 검사 실패 - 잘못된 MIME 타입 예외처리")
-    void isValidExtension_invalidMIMEType() {
+    void isValidExtension_invalidMIMEType() throws IOException {
 
-        try {
             // Given
             String originalName = "MIMETypeTest.jpeg";
             String contentType = "image/jpeg";
@@ -121,10 +120,6 @@ class S3UploaderImplTest {
             BadRequestException badRequestException = assertThrows(BadRequestException.class, () -> s3Uploader.isValidExtension(image));
             assertEquals("image/webp", tika.detect(image.getInputStream()));
             assertEquals(ErrorCode.INVALID_FILE, badRequestException.getErrorCode());
-
-        } catch (IOException ioException) {
-            throw new CustomException(ErrorCode.DATA_NOT_FOUND);
-        }
     }
 
     @Test
@@ -134,7 +129,6 @@ class S3UploaderImplTest {
 
         assertDoesNotThrow(() -> s3Uploader.deleteS3Image("imageName"));
 
-        // deleteObject가 정확히 한 번 호출되었는지 검증
         verify(s3Client, times(1)).deleteObject((DeleteObjectRequest) any());
     }
 }
