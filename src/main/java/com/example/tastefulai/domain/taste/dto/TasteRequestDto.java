@@ -28,11 +28,11 @@ public class TasteRequestDto {
                            List<String> likeFoods,
                            List<String> dislikeFoods,
                            List<String> dietaryPreferences,
-                           List<Integer> spicyLevels) {
+                           List<Integer> spicyLevel) {
         this.genres = genres;
         this.likeFoods = likeFoods;
         this.dislikeFoods = dislikeFoods;
         this.dietaryPreferences = dietaryPreferences;
-        this.spicyLevel = spicyLevels;
+        this.spicyLevel = spicyLevel;
     }
 }

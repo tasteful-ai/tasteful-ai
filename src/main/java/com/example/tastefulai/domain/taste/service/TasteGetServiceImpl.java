@@ -110,10 +110,10 @@ public class TasteGetServiceImpl implements TasteGetService {
         List<String> dietaryPreferences = tasteDietaryPreferencesRepository.findByMember(member).stream()
                 .map(tp -> tp.getDietaryPreferences().getPreferenceName())
                 .collect(Collectors.toList());
-        List<Integer> spicyLevels = tasteSpicyLevelRepository.findByMember(member).stream()
+        List<Integer> spicyLevel = tasteSpicyLevelRepository.findByMember(member).stream()
                 .map(ts -> ts.getSpicyLevel().getSpicyLevel())
                 .collect(Collectors.toList());
 
-        return new TasteResponseDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevels);
+        return new TasteResponseDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevel);
     }
 }
