@@ -77,6 +77,12 @@ public class GlobalExceptionHandler {
         return ErrorResponse.toResponseEntity(ErrorCode.LARGE_FILE);
     }
 
+    // S3 Client 예외처리
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public ResponseEntity<ErrorResponse> handleUnsupportedOperationException (UnsupportedOperationException unsupportedOperationException) {
+        return ErrorResponse.toResponseEntity(ErrorCode.S3CLIENT_ERROR);
+    }
+
     // 메뉴 추천 요청 횟수 초과 예외 처리
     @ExceptionHandler(TooManyRequestsException.class)
     public ResponseEntity<ErrorResponse> handleRequestLimitExceededException(TooManyRequestsException customException) {

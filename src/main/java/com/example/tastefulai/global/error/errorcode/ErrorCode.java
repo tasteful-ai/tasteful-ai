@@ -13,6 +13,7 @@ public enum ErrorCode {
     PASSWORD_PATTERN_ERROR(HttpStatus.BAD_REQUEST, "비밀번호는 최소 8자 이상이어야 하며, 숫자, 특수문자, 대문자를 포함해야 합니다."),
     INVALID_FILE(HttpStatus.BAD_REQUEST, "지원하지 않는 형식의 파일입니다."),
     LARGE_FILE(HttpStatus.BAD_REQUEST, "파일 용량 크기를 초과하였습니다."),
+    FILE_ACCESS_DENIED(HttpStatus.BAD_REQUEST, "파일에 접근할 수 없습니다."),
     INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "잘못된 인증 정보 입니다."),
     PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "새 비밀번호는 기존 비밀번호와 다르게 설정해야 합니다."),
     VERIFY_PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "비밀번호 검증이 필요합니다."),
@@ -51,7 +52,8 @@ public enum ErrorCode {
     TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "오늘의 메뉴 추천 요청 횟수를 초과했습니다."),
 
     //500 INTERNAL_SERVER_ERROR
-    REDIS_SERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Redis 메시지 직렬화 오류입니다.");
+    REDIS_SERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Redis 메시지 직렬화 오류입니다."),
+    S3CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 업데이트에 실패하였습니다. 다시 시도해주세요.");
 
     private final HttpStatus httpStatus;
     private final String message;

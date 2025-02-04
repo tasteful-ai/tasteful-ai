@@ -1,6 +1,7 @@
 package com.example.tastefulai.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -10,12 +11,13 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class BlacklistService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    @Qualifier("blacklistTemplate")
+    private final RedisTemplate<String, String> blacklistTemplate;
 
     // Access Token 블랙리스트 등록
     public void addToBlacklist(String token, long expiryMillis) {
         // Redis에 토큰을 블랙리스트로 저장
-        redisTemplate.opsForValue().set(
+        blacklistTemplate.opsForValue().set(
                 "blacklist:" + token, // Key: 토큰
                 "logout", // Value: 로그아웃 표시
                 expiryMillis, // TTL: 만료 시간
@@ -26,6 +28,6 @@ public class BlacklistService {
     // 블랙리스트 확인
     public boolean isBlacklisted(String token) {
         // Redis에서 토큰 검증
-        return redisTemplate.hasKey("blacklist:" + token);
+        return blacklistTemplate.hasKey("blacklist:" + token);
     }
 }

@@ -53,12 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/map", "location", EndpointConstants.AUTH_SIGNUP, EndpointConstants.AUTH_LOGIN).permitAll() // 회원가입과 로그인 요청 허용
                         .requestMatchers("/api/location/**").authenticated() // 인증이 필요!
-                        .requestMatchers(
-                                "/api/admins/**"
-
-
-
-                        ).hasRole("ADMIN")
+                        .requestMatchers("/api/admins/**").hasRole("ADMIN")
                         .requestMatchers("/ws-chat/**").permitAll()
                         .requestMatchers("/test").permitAll()
                         .anyRequest().authenticated() // 그 외 요청 인증 필요

@@ -1,6 +1,6 @@
 package com.example.tastefulai.domain.member.service;
 
-import com.example.tastefulai.domain.image.dto.ProfileResponseDto;
+import com.example.tastefulai.domain.member.dto.ProfileResponseDto;
 import com.example.tastefulai.domain.member.dto.LoginRequestDto;
 //import com.example.tastefulai.domain.member.dto.MemberListResponseDto;
 import com.example.tastefulai.domain.member.dto.MemberRequestDto;
@@ -23,10 +23,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,8 +47,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponseDto signup(MemberRole memberRole, String email, String password, String nickname,
                                     Integer age, GenderRole genderRole) {
         // 유효성 검사
-        MemberRequestDto memberRequestDto = new MemberRequestDto(memberRole, email, password, nickname, age, genderRole);
-        memberValidation.validateSignUp(memberRequestDto);
+        memberValidation.validateSignUp(memberRole, email, password, nickname, age, genderRole);
 
         // 비밀번호 암호화 및 회원 생성
         String encodedPassword = passwordEncoder.encode(password);
@@ -64,23 +61,22 @@ public class MemberServiceImpl implements MemberService {
     // 2. 로그인
     @Override
     public JwtAuthResponse login(String email, String password) {
-
         // 유효성 검사
-        LoginRequestDto loginRequestDto = new LoginRequestDto(email, password);
-        memberValidation.validateLogin(loginRequestDto);
+        memberValidation.validateLogin(email, password);
 
         // 사용자 확인
-        Member member = this.memberRepository.findActiveByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = findByEmail(email);
 
         // 비밀번호 확인
-        validatePassword(password, member.getPassword());
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
+        }
 
         // JWT 토큰 생성
         String accessToken = jwtProvider.generateAccessToken(email);
         String refreshToken = jwtProvider.generateRefreshToken(email);
 
-        // RefreshToken 을 Redis 에 저장
+        // RefreshToken을 Redis에 저장
         storeRefreshToken(email, refreshToken);
 
         return new JwtAuthResponse(member.getId(), member.getNickname(), member.getMemberRole(), accessToken, refreshToken);
@@ -102,11 +98,10 @@ public class MemberServiceImpl implements MemberService {
     public void updatePassword(String email, String currentPassword, String newPassword, String currentAccessToken) {
 
         // 유효성 검사
-        PasswordUpdateRequestDto passwordUpdateRequestDto = new PasswordUpdateRequestDto(currentPassword, newPassword);
-        memberValidation.validatePasswordUpdate(passwordUpdateRequestDto);
+        memberValidation.validatePasswordUpdate(currentPassword, newPassword);
 
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        // 사용자 확인
+        Member member = findByEmail(email);
 
         // 현재 비밀번호 검증
         validatePassword(currentPassword, member.getPassword());
@@ -171,12 +166,6 @@ public class MemberServiceImpl implements MemberService {
         return ProfileResponseDto.fromMember(member);
     }
 
-    // 9. 회원 전체 조회 ------> 추후 작업 예정
-//    @Override
-//    public List<MemberListResponseDto> getAllMembers() {
-//        return convertToMemberListResponse(memberRepository.findAll());
-//    }
-
 
     // **** 공통 메서드 **** //
 
@@ -224,21 +213,4 @@ public class MemberServiceImpl implements MemberService {
     private void savePasswordVerification(Long memberId) {
         redisTemplate.opsForValue().set(VERIFY_PASSWORD_KEY + memberId, "true");
     }
-
-//    private List<MemberListResponseDto> convertToMemberListResponse(List<Member> members) {
-//        return members.stream()
-//                .map(this::convertToMemberListResponseDto)
-//                .collect(Collectors.toList());
-//    }
-//
-//    private MemberListResponseDto convertToMemberListResponseDto(Member member) {
-//        return new MemberListResponseDto(
-//                member.getCreatedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd")),
-//                member.getNickname(),
-//                member.getEmail(),
-//                member.getGenderRole().name(),
-//                member.getMemberRole().name(),
-//                (member.getDeletedAt() != null) ? member.getDeletedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd")) : null
-//        );
-//    }
 }
