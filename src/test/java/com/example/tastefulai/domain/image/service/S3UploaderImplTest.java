@@ -4,8 +4,8 @@ import com.example.tastefulai.domain.image.entity.Image;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.BadRequestException;
 import com.example.tastefulai.global.error.exception.CustomException;
+import groovy.util.logging.Slf4j;
 import org.apache.tika.Tika;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,11 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -29,7 +25,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,8 +36,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class S3UploaderImplTest {
 
@@ -52,9 +47,6 @@ class S3UploaderImplTest {
 
     @Mock
     private S3Client s3Client;
-
-    private static final Set<String> ALLOWED_EXTENSIONS = Set.of("png", "jpeg", "jpg");
-    private static final Set<String> ALLOWED_MIMETYPE = Set.of("image/png", "image/jpeg", "image/jpg");
 
     @Test
     @DisplayName("이미지 업로드 성공")
@@ -68,7 +60,7 @@ class S3UploaderImplTest {
         MultipartFile image = new MockMultipartFile("image", originalName, "image/png", new byte[10]);
 
         // stubbing
-        try{
+        try {
             doNothing().when(spyUploader).isValidExtension(any());
         } catch (IOException ioException) {
             log.error("isValidation()에서 확장자에 접근하지 못하는 IOException 발생");
