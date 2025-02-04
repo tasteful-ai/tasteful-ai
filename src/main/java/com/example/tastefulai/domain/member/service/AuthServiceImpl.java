@@ -1,9 +1,8 @@
 package com.example.tastefulai.domain.member.service;
 
+import com.example.tastefulai.domain.member.dto.MemberRequestDto;
 import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
-import com.example.tastefulai.domain.member.enums.GenderRole;
-import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
 import com.example.tastefulai.domain.member.validation.MemberValidation;
 import com.example.tastefulai.global.common.dto.JwtAuthResponse;
@@ -46,12 +45,19 @@ public class AuthServiceImpl implements AuthService {
     // 회원가입
     @Override
     @Transactional
-    public MemberResponseDto signup(MemberRole memberRole, String email, String password, String nickname,
-                                    Integer age, GenderRole genderRole) {
-        memberValidation.validateSignUp(memberRole, email, password, nickname, age, genderRole);
+    public MemberResponseDto signup(MemberRequestDto memberRequestDto) {
+        memberValidation.validateSignUp(memberRequestDto);
 
-        String encodedPassword = passwordEncoder.encode(password);
-        Member member = new Member(memberRole, email, encodedPassword, nickname, age, genderRole, null);
+        String encodedPassword = passwordEncoder.encode(memberRequestDto.getPassword());
+        Member member = new Member(
+                memberRequestDto.getMemberRole(),
+                memberRequestDto.getEmail(),
+                encodedPassword,
+                memberRequestDto.getNickname(),
+                memberRequestDto.getAge(),
+                memberRequestDto.getGenderRole(),
+                null
+        );
         memberRepository.save(member);
 
         return new MemberResponseDto(member.getId(), member.getMemberRole(), member.getEmail(), member.getNickname());

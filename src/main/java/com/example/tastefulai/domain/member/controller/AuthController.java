@@ -24,14 +24,7 @@ public class AuthController {
     // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<CommonResponseDto<MemberResponseDto>> signup(@Valid @RequestBody MemberRequestDto memberRequestDto) {
-        MemberResponseDto memberResponseDto = authService.signup(
-                memberRequestDto.getMemberRole(),
-                memberRequestDto.getEmail(),
-                memberRequestDto.getPassword(),
-                memberRequestDto.getNickname(),
-                memberRequestDto.getAge(),
-                memberRequestDto.getGenderRole()
-        );
+        MemberResponseDto memberResponseDto = authService.signup(memberRequestDto);
 
         return new ResponseEntity<>(new CommonResponseDto<>("회원가입 완료", memberResponseDto), HttpStatus.CREATED);
     }
