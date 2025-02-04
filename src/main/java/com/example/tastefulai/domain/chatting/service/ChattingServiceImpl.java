@@ -9,6 +9,7 @@ import com.example.tastefulai.domain.chatting.repository.ChattingMessageReposito
 import com.example.tastefulai.domain.chatting.repository.ChattingroomRepository;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.MemberRole;
+import com.example.tastefulai.domain.member.service.AdminMemberService;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
@@ -28,13 +29,14 @@ public class ChattingServiceImpl implements ChattingService {
     private final ChattingMessageRepository chattingMessageRepository;
     private final MemberService memberService;
     private final RedisMessageServiceImpl redisMessageServiceImpl;
+    private final AdminMemberService adminMemberService;
 
     @Override
     @Transactional
     public ChattingroomResponseDto createChattingroom(String roomName, Long adminId) {
         Member admin = memberService.findById(adminId);
 
-        validateAdminRole(admin);
+        adminMemberService.validateAdminRole(adminId);
 
         if (chattingroomRepository.existsByRoomName(roomName)) {
             throw new CustomException(ErrorCode.DUPLICATE_CHATROOM_NAME);

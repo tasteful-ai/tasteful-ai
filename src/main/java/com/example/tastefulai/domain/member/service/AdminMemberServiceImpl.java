@@ -46,6 +46,14 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         return convertToMemberListResponse(adminMemberRepository.findAll());
     }
 
+    @Override
+    public void validateAdminRole(Long memberId) {
+        Member admin = findMemberById(memberId);
+
+        if (admin.getMemberRole() != MemberRole.ADMIN) {
+            throw new CustomException(ErrorCode.FORBIDDEN_ADMIN_ONLY);
+        }
+    }
 
     /**
      * **** 공통 메서드 ****
