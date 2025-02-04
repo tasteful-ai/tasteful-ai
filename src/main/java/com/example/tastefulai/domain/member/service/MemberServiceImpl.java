@@ -19,6 +19,7 @@ import com.example.tastefulai.global.util.JwtProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,9 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
-    private final RedisTemplate<String, Object> redisTemplate;
+
+    @Qualifier("blacklistTemplate")
+    private final RedisTemplate<String, String> blacklistTemplate;
     private final BlacklistService blacklistService;
 
     private static final String VERIFY_PASSWORD_KEY = "verify-password:";
@@ -171,13 +174,13 @@ public class MemberServiceImpl implements MemberService {
 
     // 검증 상태 확인
     public boolean isPasswordVerified(Long memberId) {
-        String isVerified = (String) redisTemplate.opsForValue().get(VERIFY_PASSWORD_KEY + memberId);
+        String isVerified = (String) blacklistTemplate.opsForValue().get(VERIFY_PASSWORD_KEY + memberId);
         return "true".equals(isVerified);
     }
 
     // 검증 상태 제거
     public void clearPasswordVerification(Long memberId) {
-        redisTemplate.delete(VERIFY_PASSWORD_KEY + memberId);
+        blacklistTemplate.delete(VERIFY_PASSWORD_KEY + memberId);
     }
 
     // 비밀번호 검증 공통 로직
@@ -188,7 +191,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     private void storeRefreshToken(String email, String refreshToken) {
-        redisTemplate.opsForValue().set(
+        blacklistTemplate.opsForValue().set(
                 REFRESH_TOKEN_KEY + email,
                 refreshToken,
                 jwtProvider.getRefreshTokenExpiryMillis(),
@@ -197,7 +200,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     private void deleteRefreshToken(String email) {
-        redisTemplate.delete(REFRESH_TOKEN_KEY + email);
+        blacklistTemplate.delete(REFRESH_TOKEN_KEY + email);
     }
 
     @Override
@@ -211,6 +214,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     private void savePasswordVerification(Long memberId) {
-        redisTemplate.opsForValue().set(VERIFY_PASSWORD_KEY + memberId, "true");
+        blacklistTemplate.opsForValue().set(VERIFY_PASSWORD_KEY + memberId, "true");
     }
 }
