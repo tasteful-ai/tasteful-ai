@@ -43,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    // 회원가입
     @Override
     @Transactional
     public MemberResponseDto signup(MemberRole memberRole, String email, String password, String nickname,
@@ -57,6 +58,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    // 로그인
     @Override
     public JwtAuthResponse login(String email, String password) {
         memberValidation.validateLogin(email, password);
@@ -86,6 +88,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    // 로그아웃
     @Override
     public void logout(String token) {
         blacklistService.addToBlacklist(token, jwtProvider.getAccessTokenExpiryMillis());

@@ -17,7 +17,7 @@ public class AdminMemberController {
 
     private final AdminMemberService adminMemberService;
 
-    // 1. 회원 삭제 - ADMIN 전용
+    // 회원 삭제
     @DeleteMapping("/{memberId}")
     public ResponseEntity<CommonResponseDto<Void>> deleteMemberByAdmin(@PathVariable Long memberId) {
         adminMemberService.deleteMemberByAdmin(memberId);
@@ -26,7 +26,7 @@ public class AdminMemberController {
     }
 
 
-    // 2. 회원 전체 조회 - ADMIN 전용
+    // 회원 전체 조회
     @GetMapping
     public ResponseEntity<CommonResponseDto<List<MemberListResponseDto>>> getAllMembers() {
         List<MemberListResponseDto> members = adminMemberService.getAllMembers();
