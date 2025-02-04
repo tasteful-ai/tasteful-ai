@@ -12,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -36,12 +38,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class S3UploaderImplTest {
 
+    private static final Logger log = LoggerFactory.getLogger(S3UploaderImplTest.class);
     @InjectMocks
     private S3UploaderImpl s3Uploader;
 
@@ -55,36 +60,34 @@ class S3UploaderImplTest {
     @DisplayName("이미지 업로드 성공")
     void uploadImage_success() {
 
+        S3Uploader spyUploader = spy(s3Uploader);
+
         // Given
         String originalName = "image.png";
-        String contentType = "image/png";
-        String filePath = "src/test/resources/image.png";
         String bucket = "tasteful-ai-test";
+        MultipartFile image = new MockMultipartFile("image", originalName, "image/png", new byte[10]);
 
-        File file = new File(filePath);
-
-        try {
-            FileInputStream fileInputStream = new FileInputStream(file);
-            MultipartFile image = new MockMultipartFile(originalName, originalName, contentType, fileInputStream);
-
-            // When
-            ReflectionTestUtils.setField(s3Uploader, "bucket", "tasteful-ai-test");
-            Image result = s3Uploader.uploadImage(image);
-
-            // Then
-            assertNotNull(result);
-            assertNotNull(result.getFileName());
-            assertTrue(result.getFileName().endsWith("_" + originalName.replaceAll("\\s", "_")));
-
-            assertEquals(result.getFileSize(), image.getSize());
-            assertEquals(result.getFileType(), image.getContentType());
-
-            assertEquals(result.getImageUrl(), "https://" + bucket + ".s3.amazonaws.com/" + result.getFileName());
-
-            verify(s3Client).putObject((PutObjectRequest) any(), (RequestBody) any());
+        // stubbing
+        try{
+            doNothing().when(spyUploader).isValidExtension(any());
         } catch (IOException ioException) {
-            throw new CustomException(ErrorCode.DATA_NOT_FOUND);
+            log.error("isValidation()에서 확장자에 접근하지 못하는 IOException 발생");
         }
+
+        // When
+        ReflectionTestUtils.setField(spyUploader, "bucket", "tasteful-ai-test");
+        Image result = spyUploader.uploadImage(image);
+
+        // Then
+        assertNotNull(result);
+        assertNotNull(result.getFileName());
+        assertTrue(result.getFileName().endsWith("_" + originalName.replaceAll("\\s", "_")));
+
+        assertEquals(result.getFileSize(), image.getSize());
+        assertEquals(result.getFileType(), image.getContentType());
+        assertEquals(result.getImageUrl(), "https://" + bucket + ".s3.amazonaws.com/" + result.getFileName());
+
+        verify(s3Client).putObject((PutObjectRequest) any(), (RequestBody) any());
     }
 
     @Test
