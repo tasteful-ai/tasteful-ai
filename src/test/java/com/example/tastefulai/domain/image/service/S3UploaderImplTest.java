@@ -4,7 +4,7 @@ import com.example.tastefulai.domain.image.entity.Image;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.BadRequestException;
 import com.example.tastefulai.global.error.exception.CustomException;
-import groovy.util.logging.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,7 +39,6 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class S3UploaderImplTest {
 
-    private static final Logger log = LoggerFactory.getLogger(S3UploaderImplTest.class);
     @InjectMocks
     private S3UploaderImpl s3Uploader;
 
@@ -50,7 +47,7 @@ class S3UploaderImplTest {
 
     @Test
     @DisplayName("이미지 업로드 성공")
-    void uploadImage_success() {
+    void uploadImage_success() throws IOException {
 
         S3Uploader spyUploader = spy(s3Uploader);
 
@@ -60,11 +57,7 @@ class S3UploaderImplTest {
         MultipartFile image = new MockMultipartFile("image", originalName, "image/png", new byte[10]);
 
         // stubbing
-        try {
-            doNothing().when(spyUploader).isValidExtension(any());
-        } catch (IOException ioException) {
-            log.error("isValidation()에서 확장자에 접근하지 못하는 IOException 발생");
-        }
+        doNothing().when(spyUploader).isValidExtension(any());
 
         // When
         ReflectionTestUtils.setField(spyUploader, "bucket", "tasteful-ai-test");
@@ -84,9 +77,8 @@ class S3UploaderImplTest {
 
     @Test
     @DisplayName("이미지 확장자 검사 성공")
-    void isValidExtension_success() {
+    void isValidExtension_success() throws IOException {
 
-        try {
             // Given
             String originalName = "typeTest.jpg";
             String contentType = "image/jpg";
@@ -98,10 +90,6 @@ class S3UploaderImplTest {
 
             // when & then
             assertDoesNotThrow(() -> s3Uploader.isValidExtension(image));
-
-        } catch (IOException ioException) {
-            throw new CustomException(ErrorCode.DATA_NOT_FOUND);
-        }
     }
 
     @Test
