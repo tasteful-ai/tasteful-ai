@@ -39,7 +39,7 @@ public class ImageController {
 
     // 프로필 사진 삭제
     @DeleteMapping
-    public ResponseEntity<CommonResponseDto<Void>> deleteImage(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
+    public ResponseEntity<CommonResponseDto<String>> deleteImage(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
         Long memberId = memberDetailsImpl.getId();
 
