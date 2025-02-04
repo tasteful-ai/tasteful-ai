@@ -143,22 +143,17 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
 
     @Override
     @Transactional
-    public TasteResponseDto updateSpicyLevel(Long memberId, List<Integer> spicyLevelRequest) {
+    public TasteResponseDto updateSpicyLevel(Long memberId, Integer spicyLevelRequest) {
+
         Member member = memberService.findById(memberId);
 
         tasteSpicyLevelRepository.deleteByMember(member);
 
-        List<TasteSpicyLevel> spicyLevelList = spicyLevelRequest.stream()
-                .distinct()
-                .map(level -> {
-                    SpicyLevel spicyLevel =  spicyLevelRepository.findBySpicyLevel(level)
-                            .orElseGet(() -> spicyLevelRepository.save(new SpicyLevel(level)));
+        SpicyLevel spicyLevel = spicyLevelRepository.findBySpicyLevel(spicyLevelRequest)
+                .orElseGet(() -> spicyLevelRepository.save(new SpicyLevel(spicyLevelRequest)));
 
-                    return new TasteSpicyLevel(member, spicyLevel);
-                })
-                .toList();
-
-        tasteSpicyLevelRepository.saveAll(spicyLevelList);
+        TasteSpicyLevel tasteSpicyLevel = new TasteSpicyLevel(member, spicyLevel);
+        tasteSpicyLevelRepository.save(tasteSpicyLevel);
 
         return new TasteResponseDto(null, null, null, null, spicyLevelRequest);
     }

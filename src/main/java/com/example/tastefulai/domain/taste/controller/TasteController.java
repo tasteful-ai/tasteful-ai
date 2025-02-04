@@ -71,7 +71,7 @@ public class TasteController {
     }
 
     @PatchMapping("/spicyLevel")
-    public ResponseEntity<CommonResponseDto<List<Integer>>> updateSpicyLevel(@AuthenticationPrincipal MemberDetailsImpl memberDetails,
+    public ResponseEntity<CommonResponseDto<Integer>> updateSpicyLevel(@AuthenticationPrincipal MemberDetailsImpl memberDetails,
                                                                        @Valid @RequestBody TasteRequestDto tasteRequestDto) {
         Long memberId = memberDetails.getId();
 
@@ -127,7 +127,7 @@ public class TasteController {
     }
 
     @GetMapping("/spicyLevel")
-    public ResponseEntity<CommonResponseDto<List<Integer>>> getSpicyLevel(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+    public ResponseEntity<CommonResponseDto<Integer>> getSpicyLevel(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         Long memberId = memberDetails.getId();
 
