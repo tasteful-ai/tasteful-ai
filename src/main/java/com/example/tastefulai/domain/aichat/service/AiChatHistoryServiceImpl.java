@@ -18,6 +18,7 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -67,7 +68,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
         // MySQL에 저장
         AiChatHistory aiChatHistory = new AiChatHistory(sessionId, recommendation, tasteData, member);
         aiChatHistoryRepository.save(aiChatHistory);
-        log.info("MySQL AI 채팅 히스토리 저장 완료 - 회원 ID: {}, 세션 ID: {}", memberId, sessionId);
+        log.debug("MySQL AI 채팅 히스토리 저장 완료 - 회원 ID: {}, 세션 ID: {}", memberId, sessionId);
 
         // Redis에 캐싱 (세션 기준으로)
         cacheChatHistory(sessionId, recommendation);
@@ -81,7 +82,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
         listOps.rightPush(historyKey, recommendation);
 
         aiChatRedisTemplate.expire(historyKey, 1, TimeUnit.DAYS);
-        log.info("Redis AI 추천 결과 캐싱 완료 - 세션 ID: {}, 추천 메뉴: {}", sessionId, recommendation);
+        log.debug("Redis AI 추천 결과 캐싱 완료 - 세션 ID: {}, 추천 메뉴: {}", sessionId, recommendation);
     }
 
     // AI 추천 히스토리 조회 (Redis 우선 조회, 없으면 MySQL 조회 후 Redis 저장)
@@ -94,7 +95,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
 
         List<String> cachedHistory = listOps.range(historyKey, 0, -1);
         if (cachedHistory != null && !cachedHistory.isEmpty()) {
-            log.info("Redis에서 AI 채팅 히스토리 반환 - 회원 ID: {}", memberId);
+            log.debug("Redis에서 AI 채팅 히스토리 반환 - 회원 ID: {}", memberId);
 
             return cachedHistory.stream().map(Object::toString).collect(Collectors.toList());
         }
@@ -116,7 +117,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
             listOps.rightPushAll(historyKey, recommendations);
 
             aiChatRedisTemplate.expire(historyKey, 1, TimeUnit.DAYS);
-            log.info("MySQL에서 가져와 Redis에 AI 채팅 히스토리 캐싱 완료 - 회원 ID: {}", memberId);
+            log.debug("MySQL에서 가져와 Redis에 AI 채팅 히스토리 캐싱 완료 - 회원 ID: {}", memberId);
         }
 
         return recommendations;
@@ -143,7 +144,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
             log.warn("잘못된 memberId 값 감지 - 입력 값: {}", memberId);
             throw new CustomException(ErrorCode.INVALID_REQUEST, "잘못된 memberId 값: " + memberId);
         }
-        log.info("유효한 memberId 검증 완료 - memberId: {}", memberId);
+        log.debug("유효한 memberId 검증 완료 - memberId: {}", memberId);
     }
 
     private void validateSessionId(String sessionId) {
@@ -151,7 +152,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
             log.warn("잘못된 sessionId 값 감지 - 입력 값: {}", sessionId);
             throw new CustomException(ErrorCode.INVALID_REQUEST, "잘못된 sessionId 값: " + sessionId);
         }
-        log.info("유효한 sessionId 검증 완료 - sessionId: {}", sessionId);
+        log.debug("유효한 sessionId 검증 완료 - sessionId: {}", sessionId);
     }
 
     private String serializeTasteData(Long memberId) {
