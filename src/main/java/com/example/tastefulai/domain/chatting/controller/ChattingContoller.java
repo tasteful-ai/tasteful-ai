@@ -43,33 +43,6 @@ public class ChattingContoller {
         return new ResponseEntity<>(new CommonResponseDto<>("채팅방 생성 성공", chattingroomResponseDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/rooms")
-    public ResponseEntity<CommonResponseDto<List<ChattingroomResponseDto>>> getAllChattingrooms() {
-
-        List<ChattingroomResponseDto> chattingrooms = chattingService.getAllChattingrooms();
-
-        return new ResponseEntity<>(new CommonResponseDto<>("채팅방 목록 조회 성공", chattingrooms), HttpStatus.OK);
-    }
-
-    @DeleteMapping("/rooms/{roomId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommonResponseDto<Void>> deleteChattingroom(@PathVariable Long roomId) {
-
-        chattingService.deleteChattingroom(roomId);
-
-        return new ResponseEntity<>(new CommonResponseDto<>("채팅방 삭제 완료", null), HttpStatus.OK);
-    }
-
-    @PatchMapping("/rooms/{roomId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommonResponseDto<ChattingroomResponseDto>> updateChattingroom(@PathVariable Long roomId,
-                                                                                         @Valid @RequestBody ChattingroomRequestDto chattingroomRequestDto) {
-
-        ChattingroomResponseDto updatedChattingroom = chattingService.updateChattingroom(roomId, chattingroomRequestDto.getRoomName());
-
-        return new ResponseEntity<>(new CommonResponseDto<>("채팅방 이름 변경 성공", updatedChattingroom), HttpStatus.OK);
-    }
-
     @PostMapping("/rooms/{roomId}/messages")
     public ResponseEntity<CommonResponseDto<ChattingMessageResponseDto>> sendMessage(@Valid @RequestBody ChattingMessageRequestDto chattingMessageRequestDto,
                                                                                      @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -81,12 +54,39 @@ public class ChattingContoller {
         return new ResponseEntity<>(new CommonResponseDto<>("메시지 전송 성공", chattingMessageResponseDto), HttpStatus.CREATED);
     }
 
+    @GetMapping("/rooms")
+    public ResponseEntity<CommonResponseDto<List<ChattingroomResponseDto>>> getAllChattingrooms() {
+
+        List<ChattingroomResponseDto> chattingrooms = chattingService.getAllChattingrooms();
+
+        return new ResponseEntity<>(new CommonResponseDto<>("채팅방 목록 조회 성공", chattingrooms), HttpStatus.OK);
+    }
+
     @GetMapping("/rooms/{roomId}/messages")
     public ResponseEntity<CommonResponseDto<List<ChattingMessageResponseDto>>> getMessages(@PathVariable Long roomId) {
 
         List<ChattingMessageResponseDto> messages = chattingService.getMessages(roomId);
 
         return new ResponseEntity<>(new CommonResponseDto<>("메시지 조회 성공", messages), HttpStatus.OK);
+    }
+    
+    @PatchMapping("/rooms/{roomId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CommonResponseDto<ChattingroomResponseDto>> updateChattingroom(@PathVariable Long roomId,
+                                                                                         @Valid @RequestBody ChattingroomRequestDto chattingroomRequestDto) {
+
+        ChattingroomResponseDto updatedChattingroom = chattingService.updateChattingroom(roomId, chattingroomRequestDto.getRoomName());
+
+        return new ResponseEntity<>(new CommonResponseDto<>("채팅방 이름 변경 성공", updatedChattingroom), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/rooms/{roomId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CommonResponseDto<Void>> deleteChattingroom(@PathVariable Long roomId) {
+
+        chattingService.deleteChattingroom(roomId);
+
+        return new ResponseEntity<>(new CommonResponseDto<>("채팅방 삭제 완료", null), HttpStatus.OK);
     }
 
 }
