@@ -57,6 +57,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
 
     // AI 추천 내역 MySQL에 저장 & Redis 캐싱
     @Override
+    @Transactional
     public void saveChatHistory(Long memberId, String sessionId, String recommendation) {
 
         validateMemberId(memberId);
