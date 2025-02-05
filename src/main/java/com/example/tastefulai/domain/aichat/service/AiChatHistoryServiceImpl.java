@@ -121,7 +121,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
         Member member = memberService.findById(memberId);
 
         // MySQL에서 AI 채팅 기록 삭제
-        aiChatHistoryRepository.deleteByMember(memberId);
+        aiChatHistoryRepository.deleteByMember(member);
         log.info("MySQL에서 AI 채팅 히스토리 삭제 완료 - 회원 ID: {}", memberId);
 
         // Redis에서도 해당 회원의 캐시 삭제

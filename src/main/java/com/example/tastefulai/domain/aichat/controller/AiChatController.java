@@ -3,7 +3,6 @@ package com.example.tastefulai.domain.aichat.controller;
 import com.example.tastefulai.domain.aichat.dto.AiChatRequestDto;
 import com.example.tastefulai.domain.aichat.dto.AiChatResponseDto;
 import com.example.tastefulai.domain.aichat.service.AiChatHistoryService;
-import com.example.tastefulai.domain.aichat.service.AiChatHistoryServiceImpl;
 import com.example.tastefulai.domain.aichat.service.AiChatService;
 import com.example.tastefulai.global.common.dto.CommonResponseDto;
 import com.example.tastefulai.global.config.auth.MemberDetailsImpl;
