@@ -1,6 +1,9 @@
 package com.example.tastefulai.domain.member.dto;
 
+import com.example.tastefulai.domain.member.entity.Member;
 import lombok.Getter;
+
+import java.time.format.DateTimeFormatter;
 
 @Getter
 public class MemberListResponseDto {
@@ -23,5 +26,17 @@ public class MemberListResponseDto {
         this.gender = gender;
         this.role = role;
         this.deletedAt = deletedAt;
+    }
+
+    public static MemberListResponseDto fromEntity(Member member) {
+        return new MemberListResponseDto(
+                member.getId(),
+                member.getCreatedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd")),
+                member.getNickname(),
+                member.getEmail(),
+                member.getGenderRole().name(),
+                member.getMemberRole().name(),
+                (member.getDeletedAt() != null) ? member.getDeletedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd")) : null
+        );
     }
 }
