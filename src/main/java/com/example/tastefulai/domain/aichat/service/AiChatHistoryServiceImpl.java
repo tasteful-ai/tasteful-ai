@@ -35,14 +35,14 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
     private final ObjectMapper objectMapper;
 
     @Qualifier("aiChatRedisTemplate")
-    private final RedisTemplate<String, Object> aiChatRedisTemplate;
+    private final RedisTemplate<String, String> aiChatRedisTemplate;
 
     // 세션 Id 가져오기 (없으면 생성)
     @Override
     public String getSessionId(Long memberId) {
 
         String sessionKey = RedisKeyUtil.getSessionKey(memberId);
-        ValueOperations<String, Object> sessionOps = aiChatRedisTemplate.opsForValue();
+        ValueOperations<String, String> sessionOps = aiChatRedisTemplate.opsForValue();
         String sessionId = (String) sessionOps.get(sessionKey);
 
         if (sessionId == null) {
@@ -77,7 +77,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
     private void cacheChatHistory(String sessionId, String recommendation) {
 
         String historyKey = RedisKeyUtil.getHistoryKey(sessionId);
-        ListOperations<String, Object> listOps = aiChatRedisTemplate.opsForList();
+        ListOperations<String, String> listOps = aiChatRedisTemplate.opsForList();
         listOps.rightPush(historyKey, recommendation);
 
         aiChatRedisTemplate.expire(historyKey, 1, TimeUnit.DAYS);
@@ -90,9 +90,9 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
 
         String sessionId = getSessionId(memberId);
         String historyKey = RedisKeyUtil.getHistoryKey(sessionId);
-        ListOperations<String, Object> listOps = aiChatRedisTemplate.opsForList();
+        ListOperations<String, String> listOps = aiChatRedisTemplate.opsForList();
 
-        List<Object> cachedHistory = listOps.range(historyKey, 0, -1);
+        List<String> cachedHistory = listOps.range(historyKey, 0, -1);
         if (cachedHistory != null && !cachedHistory.isEmpty()) {
             log.info("Redis에서 AI 채팅 히스토리 반환 - 회원 ID: {}", memberId);
 
@@ -112,7 +112,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
                 .collect(Collectors.toList());
 
         if (!recommendations.isEmpty()) {
-            ListOperations<String, Object> listOps = aiChatRedisTemplate.opsForList();
+            ListOperations<String, String> listOps = aiChatRedisTemplate.opsForList();
             listOps.rightPushAll(historyKey, recommendations);
 
             aiChatRedisTemplate.expire(historyKey, 1, TimeUnit.DAYS);
