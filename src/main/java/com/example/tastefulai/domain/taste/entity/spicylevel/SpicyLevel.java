@@ -28,7 +28,7 @@ public class SpicyLevel extends BaseEntity {
     private Integer spicyLevel;
 
     @OneToMany(mappedBy = "spicyLevel")
-    private List<TasteSpicyLevel> tasteSpicyLevels = new ArrayList<>();
+    private List<TasteSpicyLevel> tasteSpicyLevel = new ArrayList<>();
 
     public SpicyLevel(Integer spicyLevel) {
         this.spicyLevel = spicyLevel;

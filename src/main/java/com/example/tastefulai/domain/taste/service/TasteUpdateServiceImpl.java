@@ -61,16 +61,15 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
                         .orElseGet(() -> genresRepository.save(new Genres(genreName))))
                 .toList();
 
-        genresList.forEach(genres -> tasteGenresRepository.save(new TasteGenres(member, genres)));
-
         // 저장된 장르 이름 반환
-        List<String> updateGenres = genresList.stream()
-                .map(Genres::getGenreName)
+        List<TasteGenres> tasteGenresList = genresList.stream()
+                .map(genres -> new TasteGenres(member, genres))
                 .toList();
 
-        return new TasteResponseDto(updateGenres, null, null, null, null);
-    }
+        tasteGenresRepository.saveAll(tasteGenresList);
 
+        return new TasteResponseDto(genresList.stream().map(Genres::getGenreName).toList(), null, null, null, null);
+    }
 
     @Override
     @Transactional
@@ -86,13 +85,13 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
                         .orElseGet(() -> likeFoodsRepository.save(new LikeFoods(likeName))))
                 .toList();
 
-        likeFoodsList.forEach(likeFoods -> tasteLikeFoodsRepository.save(new TasteLikeFoods(member, likeFoods)));
-
-        List<String> updateLikeFoods = likeFoodsList.stream()
-                .map(LikeFoods::getLikeName)
+        List<TasteLikeFoods> tasteLikeFoodsList = likeFoodsList.stream()
+                .map(likeFoods -> new TasteLikeFoods(member, likeFoods))
                 .toList();
 
-        return new TasteResponseDto(null, updateLikeFoods, null, null, null);
+        tasteLikeFoodsRepository.saveAll(tasteLikeFoodsList);
+
+        return new TasteResponseDto(null, likeFoodsList.stream().map(LikeFoods::getLikeName).toList(), null, null, null);
     }
 
     @Override
@@ -109,13 +108,13 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
                         .orElseGet(() -> dislikeFoodsRepository.save(new DislikeFoods(dislikeName))))
                 .toList();
 
-        dislikeFoodsList.forEach(dislikeFoods -> tasteDislikeFoodsRepository.save(new TasteDislikeFoods(member, dislikeFoods)));
-
-        List<String> updateDislikeFoods = dislikeFoodsList.stream()
-                .map(DislikeFoods::getDislikeName)
+        List<TasteDislikeFoods> tasteDislikeFoodsList = dislikeFoodsList.stream()
+                .map(dislikeFoods -> new TasteDislikeFoods(member, dislikeFoods))
                 .toList();
 
-        return new TasteResponseDto(null, null, updateDislikeFoods, null, null);
+        tasteDislikeFoodsRepository.saveAll(tasteDislikeFoodsList);
+
+        return new TasteResponseDto(null, null, dislikeFoodsList.stream().map(DislikeFoods::getDislikeName).toList(),null, null);
     }
 
     @Override
@@ -132,13 +131,13 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
                         .orElseGet(() -> dietaryPreferencesRepository.save(new DietaryPreferences(preferenceName))))
                 .toList();
 
-        dietaryPreferencesList.forEach(dietaryPreferences -> tasteDietaryPreferencesRepository.save(new TasteDietaryPreferences(member, dietaryPreferences)));
-
-        List<String> updateDietaryPreferences = dietaryPreferencesList.stream()
-                .map(DietaryPreferences::getPreferenceName)
+        List<TasteDietaryPreferences> tasteDietaryPreferencesList = dietaryPreferencesList.stream()
+                .map(dietaryPreferences -> new TasteDietaryPreferences(member, dietaryPreferences))
                 .toList();
 
-        return new TasteResponseDto(null, null, null, updateDietaryPreferences, null);
+        tasteDietaryPreferencesRepository.saveAll(tasteDietaryPreferencesList);
+
+        return new TasteResponseDto(null, null,null, dietaryPreferencesList.stream().map(DietaryPreferences::getPreferenceName).toList(),null);
     }
 
     @Override
