@@ -37,9 +37,9 @@ public class MemberController {
 
     @PostMapping("/password/check")
     public ResponseEntity<CommonResponseDto<Void>> verifyPassword(@Valid @RequestBody PasswordVerifyRequestDto passwordVerifyRequestDto,
-                                                                  @AuthenticationPrincipal MemberDetailsImpl currentUser) {
+                                                                  @AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
         String password = passwordVerifyRequestDto.getPassword();
-        Long memberId = currentUser.getId();
+        Long memberId = memberDetailsImpl.getId();
 
         memberService.verifyPassword(memberId, password);
 
@@ -47,18 +47,18 @@ public class MemberController {
     }
 
 
-    @DeleteMapping("/me")
-    public ResponseEntity<CommonResponseDto<String>> deleteOwnAccount(@AuthenticationPrincipal MemberDetailsImpl MemberDetailsImpl) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<CommonResponseDto<String>> deleteOwnAccount(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
-        Long memberId = MemberDetailsImpl.getId();
+        Long memberId = memberDetailsImpl.getId();
         memberService.deleteMember(memberId);
 
-        return ResponseEntity.ok(new CommonResponseDto<>("회원 추방 완료", null));
+        return ResponseEntity.ok(new CommonResponseDto<>("회원 삭제 완료", null));
     }
 
 
-    @PatchMapping("/profile/nickname")
-    public ResponseEntity<CommonResponseDto<Void>> updateNickname(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
+    @PatchMapping("/profiles/nickname")
+    public ResponseEntity<CommonResponseDto<String>> updateNickname(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
                                                                   @RequestBody ProfileRequestDto profileRequestDto) {
 
         Long memberId = memberDetailsImpl.getId();
