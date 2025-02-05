@@ -1,7 +1,8 @@
 package com.example.tastefulai.domain.member.validation;
 
-import com.example.tastefulai.domain.member.enums.GenderRole;
-import com.example.tastefulai.domain.member.enums.MemberRole;
+import com.example.tastefulai.domain.member.dto.LoginRequestDto;
+import com.example.tastefulai.domain.member.dto.MemberRequestDto;
+import com.example.tastefulai.domain.member.dto.PasswordUpdateRequestDto;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
@@ -18,15 +19,13 @@ public class MemberValidation {
     private final MemberRepository memberRepository;
 
     // 회원가입 유효성 검사
-    public void validateSignUp(MemberRole memberRole, String email, String password,
-                               String nickname, Integer age, GenderRole genderRole) {
-        if (memberRole == null || email == null || password == null ||
-                nickname == null || age == null || genderRole == null) {
+    public void validateSignUp(MemberRequestDto memberRequestDto) {
+        if (memberRequestDto == null) {
             throw new CustomException(ErrorCode.INVALID_REQUEST);
         }
-        validateEmail(email);
-        validatePassword(password);
-        validateNicknameOrEmail(email, nickname);
+        validateEmail(memberRequestDto.getEmail());
+        validatePassword(memberRequestDto.getPassword());
+        validateNicknameOrEmail(memberRequestDto.getEmail(), memberRequestDto.getNickname());
     }
 
     // 로그인 유효성 검사
