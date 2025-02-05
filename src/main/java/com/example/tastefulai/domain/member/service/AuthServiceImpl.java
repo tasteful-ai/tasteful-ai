@@ -60,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
         );
         memberRepository.save(member);
 
-        return new MemberResponseDto(member.getId(), member.getMemberRole(), member.getEmail(), member.getNickname());
+        return MemberResponseDto.fromEntity(member);
     }
 
 
