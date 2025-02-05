@@ -1,7 +1,8 @@
 package com.example.tastefulai.chatting;
 
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
-import com.example.tastefulai.domain.chatting.redis.service.RedisMessageService;
+import com.example.tastefulai.domain.chatting.service.RedisMessageService;
+import com.example.tastefulai.domain.chatting.service.RedisMessageServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class RedisMessageServiceTest {
+class RedisMessageServiceImplTest {
 
     @InjectMocks
     private RedisMessageService redisMessageService;
