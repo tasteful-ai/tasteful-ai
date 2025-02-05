@@ -27,7 +27,7 @@ public class ChattingServiceImpl implements ChattingService {
     private final ChattingroomRepository chattingroomRepository;
     private final ChattingMessageRepository chattingMessageRepository;
     private final MemberService memberService;
-    private final RedisMessageServiceImpl redisMessageServiceImpl;
+    private final RedisMessageService redisMessageService;
     private final AdminMemberService adminMemberService;
 
     @Override
@@ -94,13 +94,13 @@ public class ChattingServiceImpl implements ChattingService {
 
         ChattingMessageResponseDto chattingMessageResponseDto = ChattingMessageResponseDto.fromEntity(chattingMessage);
 
-        redisMessageServiceImpl.saveMessage(chattingroom.getId(), chattingMessageResponseDto);
+        redisMessageService.saveMessage(chattingroom.getId(), chattingMessageResponseDto);
         return chattingMessageResponseDto;
     }
 
     @Override
     public List<ChattingMessageResponseDto> getMessages(Long chattingroomId) {
-        List<ChattingMessageResponseDto> cachedMessages = redisMessageServiceImpl.getRecentMessages(chattingroomId);
+        List<ChattingMessageResponseDto> cachedMessages = redisMessageService.getRecentMessages(chattingroomId);
 
         if (cachedMessages == null || cachedMessages.isEmpty()) {
             List<ChattingMessage> messages = chattingMessageRepository.findTop50ByChattingroomIdOrderByCreatedAtDesc(chattingroomId);
