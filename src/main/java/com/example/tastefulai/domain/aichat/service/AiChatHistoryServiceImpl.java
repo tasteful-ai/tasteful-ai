@@ -6,6 +6,8 @@ import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.domain.taste.dto.TasteResponseDto;
 import com.example.tastefulai.domain.taste.service.TasteGetService;
+import com.example.tastefulai.global.error.errorcode.ErrorCode;
+import com.example.tastefulai.global.error.exception.CustomException;
 import com.example.tastefulai.global.util.RedisKeyUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -138,14 +140,18 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
 
     private void validateMemberId(Long memberId) {
         if (memberId == null || memberId <= 0) {
-            throw new IllegalArgumentException("잘못된 memberId 값: " + memberId);
+            log.warn("잘못된 memberId 값 감지 - 입력 값: {}", memberId);
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "잘못된 memberId 값: " + memberId);
         }
+        log.info("유효한 memberId 검증 완료 - memberId: {}", memberId);
     }
 
     private void validateSessionId(String sessionId) {
         if (sessionId == null || sessionId.trim().isEmpty()) {
-            throw new IllegalArgumentException("잘못된 sessionId 값: " + sessionId);
+            log.warn("잘못된 sessionId 값 감지 - 입력 값: {}", sessionId);
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "잘못된 sessionId 값: " + sessionId);
         }
+        log.info("유효한 sessionId 검증 완료 - sessionId: {}", sessionId);
     }
 
     private String serializeTasteData(Long memberId) {
