@@ -48,10 +48,10 @@ public class AiChatServiceImpl implements AiChatService {
         );
 
         // ChatClient를 사용해 AI에게 요청
-//        String response = chatClient.prompt().user(prompt).call().content();
+        String response = chatClient.prompt().user(prompt).call().content();
 
         // AI 요청 (임시 Mock 데이터 사용)
-        String response = "{\"recommendation\": \"김치찌개\"}";   // TODO: chatClient 로직으로 대체
+//        String response = "{\"recommendation\": \"김치찌개\"}";   // TODO: chatClient 로직으로 대체
 
         // JSON 응답 파싱
         String recommendation;
