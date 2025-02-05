@@ -7,12 +7,13 @@ import com.example.tastefulai.domain.member.repository.AdminMemberRepository;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,36 +23,29 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 
     private final AdminMemberRepository adminMemberRepository;
 
-    // 1. 회원 탈퇴 - ADMIN 전용
+    @Qualifier("blacklistTemplate")
+    private final RedisTemplate<String, String> blacklistTemplate;
+
+    private static final String VERIFY_PASSWORD_KEY = "verify-password:";
+
+
     @Override
     @Transactional
     public void deleteMemberByAdmin(Long memberId) {
-        // ADMIN 권한 검증
+
         validateAdminPermission();
-
-        // 삭제 대상 사용자 확인
         Member targetMember = findMemberById(memberId);
-
-        // ADMIN 권한이 아닌 경우에만 삭제 가능
         validateNotAdminRoleForDeletion(targetMember);
 
         targetMember.softDelete();
         adminMemberRepository.save(targetMember);
+        clearPasswordVerification(memberId);
+
     }
-
-
-    // 2. 회원 전체 조회 - ADMIN 전용
-    @Override
-    public List<MemberListResponseDto> getAllMembers() {
-        return convertToMemberListResponse(adminMemberRepository.findAll());
-    }
-
 
     /**
-     * **** 공통 메서드 ****
+     * ADMIN 권한 검증
      */
-
-    // ADMIN 권한 검증
     private void validateAdminPermission() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().stream()
@@ -63,34 +57,36 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         }
     }
 
-    // 회원 정보 찾기
-    private Member findMemberById(Long memberId) {
-        return adminMemberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-    }
-
-    // ADMIN 권한이 아닌 경우에만 삭제 가능
+    /**
+     * ADMIN 권한이 아닌 경우에만 삭제 가능
+     */
     private void validateNotAdminRoleForDeletion(Member targetMember) {
         if (targetMember.getMemberRole() == MemberRole.ADMIN) {
             throw new CustomException(ErrorCode.ADMIN_CANNOT_REMOVE_ADMIN);
         }
     }
 
-    private List<MemberListResponseDto> convertToMemberListResponse(List<Member> members) {
-        return members.stream()
-                .map(this::convertToMemberListResponseDto)
-                .collect(Collectors.toList());
+    private Member findMemberById(Long memberId) {
+        return adminMemberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    private MemberListResponseDto convertToMemberListResponseDto(Member member) {
-        return new MemberListResponseDto(
-                member.getId(),
-                member.getCreatedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd")),
-                member.getNickname(),
-                member.getEmail(),
-                member.getGenderRole().name(),
-                member.getMemberRole().name(),
-                (member.getDeletedAt() != null) ? member.getDeletedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd")) : null
-        );
+    /**
+     * 검증 상태 제거
+     */
+    public void clearPasswordVerification(Long memberId) {
+        blacklistTemplate.delete(VERIFY_PASSWORD_KEY + memberId);
+    }
+
+
+    @Override
+    public List<MemberListResponseDto> getAllMembers() {
+        return convertToMemberListResponse(adminMemberRepository.findAll());
+    }
+
+    private List<MemberListResponseDto> convertToMemberListResponse(List<Member> members) {
+        return members.stream()
+                .map(MemberListResponseDto :: fromEntity)
+                .collect(Collectors.toList());
     }
 }
