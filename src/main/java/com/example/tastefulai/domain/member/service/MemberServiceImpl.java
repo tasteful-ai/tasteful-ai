@@ -4,16 +4,19 @@ import com.example.tastefulai.domain.member.dto.ProfileResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
 import com.example.tastefulai.domain.member.validation.MemberValidation;
+import com.example.tastefulai.domain.taste.dto.TasteDto;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
 import com.example.tastefulai.global.error.exception.NotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -142,5 +145,25 @@ public class MemberServiceImpl implements MemberService {
     public Member findMemberWithTasteById(Long memberId) {
         return memberRepository.findMemberWithTasteById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TasteDto getMemberTaste(Long memberId) {
+
+        Member member = findMemberWithTasteById(memberId);
+
+        List<String> genres = member.getTasteGenres().stream()
+                .map(tg -> tg.getGenres().getGenreName()).toList();
+        List<String> likeFoods = member.getTasteLikeFoods().stream()
+                .map(tl -> tl.getLikeFoods().getLikeName()).toList();
+        List<String> dislikeFoods = member.getTasteDislikeFoods().stream()
+                .map(td -> td.getDislikeFoods().getDislikeName()).toList();
+        List<String> dietaryPreferences = member.getTasteDietaryPreferences().stream()
+                .map(tp -> tp.getDietaryPreferences().getPreferenceName()).toList();
+        Integer spicyLevel = member.getTasteSpicyLevels().isEmpty() ? null :
+                member.getTasteSpicyLevels().getFirst().getSpicyLevel().getSpicyLevel();
+
+        return new TasteDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevel);
     }
 }
