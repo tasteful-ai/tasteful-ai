@@ -22,7 +22,6 @@ public class WebSocketChatController {
     private final JwtProvider jwtProvider;
     private final MemberService memberService;
 
-    // WebSocket을 통해 클라이언트로부터 메시지 수신
     @MessageMapping("/chat")
     public void publishMessage(ChatMessageDto chatMessageDto) {
 

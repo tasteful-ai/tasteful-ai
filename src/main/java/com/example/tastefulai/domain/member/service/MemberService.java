@@ -18,4 +18,6 @@ public interface MemberService {
     void updateNickname(Long memberId, String nickname);
 
     ProfileResponseDto getMemberProfile(Long memberId);
+
+    Member findMemberWithTasteById(Long memberId);
 }

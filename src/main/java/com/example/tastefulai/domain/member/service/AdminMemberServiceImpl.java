@@ -43,6 +43,15 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 
     }
 
+    @Override
+    public void validateAdminRole(Long memberId) {
+        Member admin = findMemberById(memberId);
+
+        if (admin.getMemberRole() != MemberRole.ADMIN) {
+            throw new CustomException(ErrorCode.FORBIDDEN_ADMIN_ONLY);
+        }
+    }
+
     /**
      * ADMIN 권한 검증
      */

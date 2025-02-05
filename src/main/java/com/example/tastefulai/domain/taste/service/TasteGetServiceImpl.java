@@ -93,22 +93,18 @@ public class TasteGetServiceImpl implements TasteGetService {
     @Override
     public TasteResponseDto getCompleteTaste(Long memberId) {
 
-        Member member = memberService.findById(memberId);
-        List<String> genres = tasteGenresRepository.findByMember(member).stream()
-                .map(tg -> tg.getGenres().getGenreName())
-                .collect(Collectors.toList());
-        List<String> likeFoods = tasteLikeFoodsRepository.findByMember(member).stream()
-                .map(tl -> tl.getLikeFoods().getLikeName())
-                .collect(Collectors.toList());
-        List<String> dislikeFoods = tasteDislikeFoodsRepository.findByMember(member).stream()
-                .map(td -> td.getDislikeFoods().getDislikeName())
-                .collect(Collectors.toList());
-        List<String> dietaryPreferences = tasteDietaryPreferencesRepository.findByMember(member).stream()
-                .map(tp -> tp.getDietaryPreferences().getPreferenceName())
-                .collect(Collectors.toList());
-        Integer spicyLevel = tasteSpicyLevelRepository.findByMember(member)
-                .map(ts -> ts.getSpicyLevel().getSpicyLevel())
-                .orElse(null);
+        Member member = memberService.findMemberWithTasteById(memberId);
+
+        List<String> genres = member.getTasteGenres().stream()
+                .map(tg -> tg.getGenres().getGenreName()).toList();
+        List<String> likeFoods = member.getTasteLikeFoods().stream()
+                .map(tl -> tl.getLikeFoods().getLikeName()).toList();
+        List<String> dislikeFoods = member.getTasteDislikeFoods().stream()
+                .map(td -> td.getDislikeFoods().getDislikeName()).toList();
+        List<String> dietaryPreferences = member.getTasteDietaryPreferences().stream()
+                .map(tp -> tp.getDietaryPreferences().getPreferenceName()).toList();
+        Integer spicyLevel = member.getTasteSpicyLevels().isEmpty() ? null :
+                member.getTasteSpicyLevels().getFirst().getSpicyLevel().getSpicyLevel();
 
         return new TasteResponseDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevel);
     }
