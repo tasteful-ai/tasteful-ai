@@ -1,4 +1,4 @@
-package com.example.tastefulai.domain.chatting.redis.service;
+package com.example.tastefulai.domain.chatting.service;
 
 import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,14 +15,17 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RedisMessageService {
+public class RedisMessageServiceImpl implements RedisMessageService {
 
     @Qualifier("messageCacheRedisTemplate")
     private final RedisTemplate<String, Object> messageCacheRedisTemplate;
     private final ObjectMapper objectMapper;
     private static final int MAX_MESSAGE_COUNT = 50;
 
-    // Redis 에 메시지 저장 -> 채팅 메시지를 직렬화 후 Redis 리스트로 추가, 메시지가 50개를 초과하면 가장 오래된 메시지 삭제
+    /**
+     * Redis 에 메시지 저장 -> 채팅 메시지를 직렬화 후 Redis 리스트로 추가, 메시지가 50개를 초과하면 가장 오래된 메시지 삭제
+     */
+    @Override
     public void saveMessage(Long chattingroomId, ChattingMessageResponseDto chattingMessageResponseDto) {
         try {
             String key = getRedisKey(chattingroomId);
@@ -36,6 +39,7 @@ public class RedisMessageService {
         }
     }
 
+    @Override
     public List<ChattingMessageResponseDto> getRecentMessages(Long chattingroomId) {
         String key = getRedisKey(chattingroomId);
         List<Object> messages = messageCacheRedisTemplate.opsForList().range(key, 0, -1);

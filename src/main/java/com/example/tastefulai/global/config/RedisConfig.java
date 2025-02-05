@@ -47,7 +47,7 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-        @Bean(name = "aiChatRedisTemplate")
+    @Bean(name = "aiChatRedisTemplate")
     public RedisTemplate<String, Object> aiChatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
@@ -107,24 +107,26 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    // Redis Pub/Sub 메시지 리스너 : 수신한 메시지를 처리
+    /**
+     * Redis Pub/Sub 메시지 리스너 : 수신한 메시지를 처리
+     */
     @Bean
     public MessageListenerAdapter messageListener(RedisSubscriber redisSubscriber) {
         return new MessageListenerAdapter(redisSubscriber, "handleMessage");
     }
 
-    // Redis 채널 구독 및 메시지 수신 처리 : 메시지 리스너를 등록하여 Redis 채널 메시지를 수신
+    /**
+     * Redis 채널 구독 및 메시지 수신 처리 : 메시지 리스너를 등록하여 Redis 채널 메시지를 수신
+     */
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisConnectionFactory chatRedisConnectionFactory,
-            MessageListenerAdapter messageListener,
-            RedisSubscriber redisSubscriber) {
+            MessageListenerAdapter messageListener) {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
 
         // 특정 채널 "chatroom"을 구독
         redisMessageListenerContainer.setConnectionFactory(chatRedisConnectionFactory);
-        redisMessageListenerContainer.addMessageListener(new MessageListenerAdapter(redisSubscriber, "handleMessage"),
-                new PatternTopic("chatroom:*"));
+        redisMessageListenerContainer.addMessageListener(messageListener, new PatternTopic("chatroom:*"));
 
         return redisMessageListenerContainer;
     }

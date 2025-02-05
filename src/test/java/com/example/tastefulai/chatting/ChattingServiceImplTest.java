@@ -5,13 +5,15 @@ import com.example.tastefulai.domain.chatting.dto.ChattingMessageResponseDto;
 import com.example.tastefulai.domain.chatting.dto.ChattingroomResponseDto;
 import com.example.tastefulai.domain.chatting.entity.ChattingMessage;
 import com.example.tastefulai.domain.chatting.entity.Chattingroom;
-import com.example.tastefulai.domain.chatting.redis.service.RedisMessageService;
+import com.example.tastefulai.domain.chatting.service.RedisMessageService;
+import com.example.tastefulai.domain.chatting.service.RedisMessageServiceImpl;
 import com.example.tastefulai.domain.chatting.repository.ChattingMessageRepository;
 import com.example.tastefulai.domain.chatting.repository.ChattingroomRepository;
 import com.example.tastefulai.domain.chatting.service.ChattingServiceImpl;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
+import com.example.tastefulai.domain.member.service.AdminMemberService;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
@@ -26,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,6 +58,9 @@ class ChattingServiceImplTest {
     private MemberService memberService;
 
     @Mock
+    private AdminMemberService adminMemberService;
+
+    @Mock
     private RedisMessageService redisMessageService;
 
     private Member admin;
@@ -71,8 +79,10 @@ class ChattingServiceImplTest {
     void createChattingroom_Success() {
         Long adminId = 1L;
 
+        doNothing().when(adminMemberService).validateAdminRole(adminId);
+
         when(memberService.findById(adminId)).thenReturn(admin);
-        when(chattingroomRepository.existsByRoomName("Test Room")).thenReturn(false);
+        when(chattingroomRepository.findByRoomName("Test Room")).thenReturn(Optional.empty());
         when(chattingroomRepository.save(any(Chattingroom.class))).thenReturn(chattingroom);
 
         ChattingroomResponseDto chattingroomResponseDto = chattingService.createChattingroom("Test Room", adminId);
@@ -89,8 +99,7 @@ class ChattingServiceImplTest {
     void createChattingroom_DuplicateName() {
         Long adminId = 1L;
 
-        when(memberService.findById(adminId)).thenReturn(admin);
-        when(chattingroomRepository.existsByRoomName("Test Room")).thenReturn(true);
+        when(chattingroomRepository.findByRoomName("Test Room")).thenReturn(Optional.of(chattingroom));
 
         CustomException customException = assertThrows(CustomException.class,
                 () -> chattingService.createChattingroom("Test Room", adminId));
@@ -103,7 +112,7 @@ class ChattingServiceImplTest {
     void createChattingroom_NotAdmin() {
         Long userId = 2L;
 
-        when(memberService.findById(userId)).thenReturn(user);
+        doThrow(new UnAuthorizedException(ErrorCode.FORBIDDEN_ADMIN_ONLY)).when(adminMemberService).validateAdminRole(userId);
 
         UnAuthorizedException unAuthorizedException = assertThrows(UnAuthorizedException.class,
                 () -> chattingService.createChattingroom("Test Room", userId));
@@ -130,7 +139,7 @@ class ChattingServiceImplTest {
         ChattingMessageRequestDto chattingMessageRequestDto = new ChattingMessageRequestDto("Hello");
 
         when(memberService.findById(memberId)).thenReturn(user);
-        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId)).thenReturn(chattingroom);
+        when(chattingroomRepository.findById(roomId)).thenReturn(Optional.of(chattingroom));
 
         ChattingMessage chattingMessage = new ChattingMessage(chattingroom, user, "Hello");
 
@@ -152,7 +161,7 @@ class ChattingServiceImplTest {
         Long roomId = 1L;
         Long memberId = 2L;
 
-        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId))
+        when(chattingroomRepository.findById(roomId))
                 .thenThrow(new NotFoundException(ErrorCode.NOT_FOUND_CHATTINGROOM));
 
         CustomException customException = assertThrows(CustomException.class,
@@ -168,7 +177,7 @@ class ChattingServiceImplTest {
         Long memberId = 2L;
 
         when(memberService.findById(memberId)).thenReturn(user);
-        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId)).thenReturn(chattingroom);
+        when(chattingroomRepository.findById(roomId)).thenReturn(Optional.of(chattingroom));
 
         CustomException customException = assertThrows(CustomException.class,
                 () -> chattingService.createMessage(roomId, memberId, new ChattingMessageRequestDto("")));
@@ -195,7 +204,7 @@ class ChattingServiceImplTest {
     @DisplayName("채팅방 삭제")
     void deleteChattingroom_Success() {
         Long roomId = 1L;
-        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId)).thenReturn(chattingroom);
+        when(chattingroomRepository.findById(roomId)).thenReturn(Optional.of(chattingroom));
 
         chattingService.deleteChattingroom(roomId);
 
@@ -206,7 +215,7 @@ class ChattingServiceImplTest {
     @DisplayName("예외 - 존재하지 않는 채팅방")
     void deleteChattingroom_NotFound() {
         Long roomId = 99L;
-        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId))
+        when(chattingroomRepository.findById(roomId))
                 .thenThrow(new NotFoundException(ErrorCode.NOT_FOUND_CHATTINGROOM));
 
         assertThrows(NotFoundException.class, () -> chattingService.deleteChattingroom(roomId));
@@ -218,7 +227,7 @@ class ChattingServiceImplTest {
         Long roomId = 1L;
         String newRoomName = "Updated Room";
 
-        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId)).thenReturn(chattingroom);
+        when(chattingroomRepository.findById(roomId)).thenReturn(Optional.of(chattingroom));
 
         ChattingroomResponseDto responseDto = chattingService.updateChattingroom(roomId, newRoomName);
 
@@ -231,7 +240,7 @@ class ChattingServiceImplTest {
         Long roomId = 99L;
         String newRoomName = "New Room Name";
 
-        when(chattingroomRepository.findChattingroomByIdOrThrow(roomId))
+        when(chattingroomRepository.findById(roomId))
                 .thenThrow(new NotFoundException(ErrorCode.NOT_FOUND_CHATTINGROOM));
 
         assertThrows(NotFoundException.class, () -> chattingService.updateChattingroom(roomId, newRoomName));

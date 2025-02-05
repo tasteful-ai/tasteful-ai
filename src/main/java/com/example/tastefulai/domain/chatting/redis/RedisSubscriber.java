@@ -16,7 +16,6 @@ public class RedisSubscriber {
     private final ChattingService chattingService;
     private final ObjectMapper objectMapper;
 
-    //redis 채널에서 수신한 메시지 처리
     public void handleMessage(String message) {
         try {
             ChattingMessageResponseDto chattingMessageResponseDto = objectMapper.readValue(message, ChattingMessageResponseDto.class);
