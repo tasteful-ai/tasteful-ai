@@ -117,7 +117,6 @@ public class MemberServiceImpl implements MemberService {
         blacklistTemplate.delete(VERIFY_PASSWORD_KEY + memberId);
     }
 
-
     // 닉네임 수정
     @Override
     @Transactional
@@ -130,7 +129,6 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
     }
 
-
     // 프로필 조회
     @Override
     public ProfileResponseDto getMemberProfile(Long memberId) {
@@ -138,5 +136,11 @@ public class MemberServiceImpl implements MemberService {
         Member member = findById(memberId);
 
         return ProfileResponseDto.fromMember(member);
+    }
+
+    @Override
+    public Member findMemberWithTasteById(Long memberId) {
+        return memberRepository.findMemberWithTasteById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }
