@@ -71,6 +71,10 @@ public class AuthServiceImpl implements AuthService {
 
         Member member = findByEmail(email);
 
+        if (member.isDeleted()) {
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }

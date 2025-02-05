@@ -89,6 +89,10 @@ public class Member extends BaseEntity {
                 .collect(Collectors.toList());
     }
 
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
+
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
     }
@@ -99,9 +103,5 @@ public class Member extends BaseEntity {
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    public void updateMemberRole(MemberRole memberRole) {
-        this.memberRole = memberRole;
     }
 }
