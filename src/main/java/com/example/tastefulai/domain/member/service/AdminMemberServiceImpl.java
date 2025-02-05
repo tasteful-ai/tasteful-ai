@@ -7,6 +7,8 @@ import com.example.tastefulai.domain.member.repository.AdminMemberRepository;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,12 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 
     private final AdminMemberRepository adminMemberRepository;
 
+    @Qualifier("blacklistTemplate")
+    private final RedisTemplate<String, String> blacklistTemplate;
+
+    private static final String VERIFY_PASSWORD_KEY = "verify-password:";
+
+
     // 회원 탈퇴
     @Override
     @Transactional
@@ -33,6 +41,8 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 
         targetMember.softDelete();
         adminMemberRepository.save(targetMember);
+        clearPasswordVerification(memberId);
+
     }
 
     /**
@@ -61,6 +71,13 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     private Member findMemberById(Long memberId) {
         return adminMemberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    /**
+     * 검증 상태 제거
+     */
+    public void clearPasswordVerification(Long memberId) {
+        blacklistTemplate.delete(VERIFY_PASSWORD_KEY + memberId);
     }
 
 
