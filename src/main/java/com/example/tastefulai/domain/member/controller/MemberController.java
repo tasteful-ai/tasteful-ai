@@ -18,7 +18,6 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    // 비밀번호 변경
     @PatchMapping("/password")
     public ResponseEntity<CommonResponseDto<Void>> updatePassword(@Valid @RequestBody PasswordUpdateRequestDto passwordUpdateRequestDto,
                                                                   @AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
@@ -36,7 +35,6 @@ public class MemberController {
     }
 
 
-    // 비밀번호 검증
     @PostMapping("/password/check")
     public ResponseEntity<CommonResponseDto<Void>> verifyPassword(@Valid @RequestBody PasswordVerifyRequestDto passwordVerifyRequestDto,
                                                                   @AuthenticationPrincipal MemberDetailsImpl currentUser) {
@@ -49,18 +47,16 @@ public class MemberController {
     }
 
 
-    // 회원 탈퇴
     @DeleteMapping("/me")
-    public ResponseEntity<CommonResponseDto<Void>> deleteOwnAccount(@AuthenticationPrincipal MemberDetailsImpl MemberDetailsImpl) {
+    public ResponseEntity<CommonResponseDto<String>> deleteOwnAccount(@AuthenticationPrincipal MemberDetailsImpl MemberDetailsImpl) {
 
         Long memberId = MemberDetailsImpl.getId();
         memberService.deleteMember(memberId);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new CommonResponseDto<>("회원 추방 완료", null));
     }
 
 
-    // 닉네임 수정
     @PatchMapping("/profile/nickname")
     public ResponseEntity<CommonResponseDto<Void>> updateNickname(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl,
                                                                   @RequestBody ProfileRequestDto profileRequestDto) {
@@ -72,7 +68,7 @@ public class MemberController {
         return new ResponseEntity<>(new CommonResponseDto<>("닉네임 변경 완료", null), HttpStatus.OK);
     }
 
-    // 프로필 조회
+
     @GetMapping("/profiles")
     public ResponseEntity<CommonResponseDto<ProfileResponseDto>> getProfile(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl) {
 
