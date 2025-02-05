@@ -21,7 +21,7 @@ public class AdminMemberController {
     public ResponseEntity<CommonResponseDto<String>> deleteMemberByAdmin(@PathVariable Long memberId) {
         adminMemberService.deleteMemberByAdmin(memberId);
 
-        return ResponseEntity.ok(new CommonResponseDto<>("회원 삭제 완료", null));
+        return ResponseEntity.ok(new CommonResponseDto<>("회원 추방 완료", null));
     }
 
 
