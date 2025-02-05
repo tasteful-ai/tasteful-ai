@@ -19,17 +19,17 @@ public class AiChatServiceImpl implements AiChatService {
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
     private final TasteGetService tasteGetService;
-    private final AiChatCountService aiChatCountService;
-    private final AiChatSessionService aiChatSessionService;
+    private final AiChatCountServiceImpl aiChatCountServiceImpl;
+    private final AiChatHistoryServiceImpl aiChatHistoryServiceImpl;
 
     @Override
     public AiChatResponseDto createMenuRecommendation(AiChatRequestDto aiChatRequestDto, Long memberId) {
 
         // 요청 횟수 증가 (제한 초과 시 예외)
-        aiChatCountService.incrementRequestCount(memberId);
+        aiChatCountServiceImpl.incrementRequestCount(memberId);
 
         // 세션 Id 가져오기
-        String sessionId = aiChatSessionService.getSessionId(memberId);
+        String sessionId = aiChatHistoryServiceImpl.getSessionId(memberId);
 
         // taste 정보 가져오기
         TasteResponseDto tasteResponseDto = tasteGetService.getCompleteTaste(memberId);
@@ -63,14 +63,9 @@ public class AiChatServiceImpl implements AiChatService {
             recommendation = "추천할 메뉴를 파싱하는 데 실패했습니다.";
         }
 
-        // AI 추천 히스토리 저장
-        aiChatSessionService.saveRecommendation(sessionId, recommendation);
+        // AI 추천 히스토리 MySQL + Redis에 저장
+        aiChatHistoryServiceImpl.saveChatHistory(memberId, sessionId, recommendation);
 
         return new AiChatResponseDto(recommendation);
-    }
-
-    @Override
-    public void clearChatHistory(Long memberId) {
-        aiChatSessionService.clearChatHistory(memberId);
     }
 }
