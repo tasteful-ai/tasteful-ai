@@ -4,13 +4,12 @@
 
 **AI 메뉴 추천 & 맛집 지도 검색 & 오픈 채팅**
 
-![9조_프로젝트 커버 파일_오늘 뭐 먹지](https://github.com/user-attachments/assets/2ce955ee-0c88-4102-9c90-639b608b37e5)
-
+![브로셔 이미지 2025-02-05 오전 2 01 51](https://github.com/user-attachments/assets/d66f7b57-b17b-4ccf-963b-ca83c7cf2b2e)
 
 <aside>
-💡
 
-**사용자 취향 기반 AI 메뉴 추천 서비스**
+
+**💡 사용자 취향 기반 AI 메뉴 추천 서비스**
 
 ---
 
