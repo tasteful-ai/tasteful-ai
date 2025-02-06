@@ -655,97 +655,19 @@ AWS S3를 활용하여 **사용자 프로필 이미지 관리 기능**을 구현
 
 ## 🍙 기술 스택
 
----
 
- **🖥 Language**
+| 분류                 | 사용 기술 / 도구                                                     |
+|---------------------|-----------------------------------------------------------------
+| **🖥 Language**       | Java 21                                                             |
+| **📲 IDE**            | IntelliJ IDEA                                                       |
+| **🧑🏻‍💻 Backend**       | - Spring Framework 3.3.1 / Spring Boot<br>- Spring Data JPA<br>- Spring Security 6.4.2<br>- Spring AI → OpenAI<br>- WebSocket & STOMP & SockJS  |
+| **💁🏻 Frontend**       | - React<br>- Node.js                                                 |
+| **🗃 DB & Optimization** | - MySQL 8+<br>- Redis 7.2.7<br>- S3                                  |
+| **🚢 Deployment & Distribution** | - Docker<br>- AWS (EC2, S3, CloudFront, Application Load Balancer, Route 53, Certificate Manager)<br>- GitHub Actions |
+| **📡 API**            | - OpenAI GPT-3.5 Turbo<br>- Kakao Map                                 |
+| **📟 Test**           | - Postman<br>- JMeter<br>- H2                                          |
+| **👥 Collaboration**   | - GitHub<br>- Slack<br>- Notion<br>- Figma<br>- ERD Cloud<br>- Canva       |
 
-Java 21 
-
- **📲 Interface Description Language**
-
-IntelliJ IDEA
-
- **🧑🏻‍💻 Backend**
-
-Spring Framework 3.3.1 / Spring Boot 
-
-Spring Data JPA
-
-Spring Security 6.4.2
-
-Spring AI → OpenAI
-
-WebSocket & STOMP & SockJS
-
- **💁🏻 Frontend**
-
-React
-
-Node.js
-
- **🗃 Data Base & Optimization**
-
-MySQL 8+
-
-Redis 7.2.7
-
-S3
-
- **📡 API**
-
-OpenAI GPT-3.5 Turbo
-
-Kakao Map
-
- **📟 Test**
-
-Postman
-
-JMeter
-
-H2
-
- **🚢 Deployment & Distribution** 
-
-Docker
-
----
-
-AWS
-
-EC2
-
-S3
-
-Cloud Front
-
-Application Load Balancer
-
-Route 53
-
-Certificate Manager
-
----
-
-Github Actions
-
- **👥 Collaboration Tool**
-
-Github
-
----
-
-Slack
-
-Notion
-
----
-
-Figma
-
-ERD Cloud
-
-Canva
 
 ---
 
