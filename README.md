@@ -82,28 +82,37 @@
 
 ---
 
-![오늘 뭐 먹지__최종.drawio.png](attachment:a5e409b3-ba00-41ae-b0c1-87aaad6497a5:오늘_뭐_먹지__최종.drawio.png)
+![오늘 뭐 먹지__최종 drawio](https://github.com/user-attachments/assets/06df3c71-e71d-41b4-931b-06062133ff20)
 
-### 🔧 **최적의 인프라 설계, 이렇게 하면 됩니다!**
+
+<details>
+<summary><h3>🔧 최적의 인프라 설계, 이렇게 하면 됩니다!</h3></summary>
 
 - 배포 및 CI/CD
     - **GitHub & GitHub Actions** : 코드가 GitHub에 업로드되면 GitHub Actions를 활용하여 자동으로 빌드 및 배포가 진행됩니다.
     - **Docker** : 애플리케이션이 Docker 컨테이너로 패키징되어 배포됩니다.
+
 - 프론트엔드
     - **React** 기반의 프론트엔드 애플리케이션이 Amazon CloudFront를 통해 배포 됩니다.
-    - **Route 5**3을 사용하여 도메인을 관리하고, CloudFront를 통해 정적 자원을 빠르게 제공하도록 설정되어 있습니다.
+    - **Route 53**을 사용하여 도메인을 관리하고, CloudFront를 통해 정적 자원을 빠르게 제공하도록 설정되어 있습니다.
+
 - 백엔드
     - 백엔드는 **Spring Boot** 기반 애플리케이션으로  AWS EC2 인스턴스에서 실행됩니다.
     - ALB (Application Load Balancer)를 사용하여 사용자 요청을 백엔드 서버 2개로 라우팅합니다.
+
 - 데이터베이스 및 캐시
     - **MySQL** : 애플리케이션의 주요 데이터를 저장하며 앱 서버와 분리된 EC2 인스턴스에 배포되어있습니다.
     - **Redis** : 자주 사용하는 데이터를 저장하는 메모리로 앱 서버와 분리된 EC2 인스턴스에 배포되어있습니다.
+
 - 클라우드 스토리지
     - **S3**로 프로젝트에서 사용하는 이미지를 저장하고 관리하고 있습니다.
     - 프론트 배포를 위해 **S3**에 프론트 파일들을 업로드해두었습니다.
+
 - 외부 API
     - **Open AI(gpt 3.5 turbo)**의 API로 메뉴추천을 위한 AI를 연결하였습니다.
     - **Kakao Map API**를 통해 주변의 맛집을 검색하는 기능을 도입하였습니다.
+
+</details>
 
 ---
 
