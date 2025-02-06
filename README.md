@@ -1614,4 +1614,3 @@ Tasteful-AI 트러블 슈팅 (1)
 - 지도 검색 화면 구현(카카오 지도 API 연동) | https://github.com/beunyeong |
 
 
-그대로 복붙하니까 토글이 누락되서 추가해서 README.md 에 넣을 마크다운 만들어줘
