@@ -701,9 +701,9 @@ AWS S3를 활용하여 **사용자 프로필 이미지 관리 기능**을 구현
 ---
 
 <aside>
-💡
 
-- Java 버전은 무엇을 사용해야 할까요?
+<details>
+<summary><h3>💡 Java 버전은 무엇을 사용해야 할까요?</h3></summary>
     
     ## 1. 배경 (Background)
     
@@ -797,10 +797,13 @@ AWS S3를 활용하여 **사용자 프로필 이미지 관리 기능**을 구현
     
 </aside>
 
-<aside>
-💡
+</details>
 
-- 인증 인가는 어떤 방식으로 해야할까요?
+
+<aside>
+
+<details>
+<summary><h3>💡 인증 인가는 어떤 방식으로 해야할까요?</h3></summary>
     
     ## 1. 배경 (Background)
     
@@ -906,10 +909,13 @@ AWS S3를 활용하여 **사용자 프로필 이미지 관리 기능**을 구현
     
 </aside>
 
-<aside>
-💡
+</details>
 
-- DB는 어떤 것을 사용해야 할까요?
+<aside>
+
+
+<details>
+<summary><h3>💡 DB는 어떤 것을 사용해야 할까요?</h3></summary>
     
     ## 1. 배경 (Background)
     
@@ -1007,6 +1013,8 @@ AWS S3를 활용하여 **사용자 프로필 이미지 관리 기능**을 구현
     대용량 데이터 및 동시성 문제가 발생할 경우, **Redis 캐싱과 샤딩을 활용하여 확장성을 확보**하는 방식으로 해결할 수 있습니다.
     
 </aside>
+
+</details>
 
 <aside>
 💡
