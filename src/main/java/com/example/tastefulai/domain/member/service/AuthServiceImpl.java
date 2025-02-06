@@ -9,7 +9,7 @@ import com.example.tastefulai.global.common.dto.JwtAuthResponse;
 import com.example.tastefulai.global.error.errorcode.ErrorCode;
 import com.example.tastefulai.global.error.exception.CustomException;
 import com.example.tastefulai.global.util.JwtProvider;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
