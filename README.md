@@ -11,8 +11,6 @@
 
 ## **💡 사용자 취향 기반 AI 메뉴 추천 서비스**
 
----
-
 ### **“점심, 저녁 무엇을 먹을 지 매번 고민하지마세요!“**
 
 **바쁘신 시간을 살아가는 현대인의 메뉴 결정 시간을 절약해주는 AI 기반 메뉴 추천 어플리케이션 입니다. 추천 받은 메뉴를 지도에서 검색하여 맛집을 찾을 수 있습니다.**
@@ -24,8 +22,6 @@
 ---
 
 ## 🍙 KEY SUMMARY
-
----
 
 <details>
 <summary><h3>🔍 단일 서버 vs. 이중 서버, 성능 차이는 얼마나 날까?</h3></summary>
@@ -80,7 +76,6 @@
 
 ## 🍙 인프라 설계도
 
----
 
 ![오늘 뭐 먹지__최종 drawio](https://github.com/user-attachments/assets/06df3c71-e71d-41b4-931b-06062133ff20)
 
@@ -118,9 +113,9 @@
 
 ## 🍙 주요 기능 MVP
 
----
 
-### **🖤 인증/인가 (Spring Security)**
+<details>
+<summary><h3>🖤 인증/인가 (Spring Security)</h3></summary>
 
 # 🔐 인증 인가 Authentication/Authorization
 
@@ -196,6 +191,8 @@ Spring Security와 JWT를 활용하여 무상태 인증을 구현하고, Redis�
 
 - TTL 기반 만료 관리로 **성능 최적화 및 부하 감소**
 - Redis를 활용한 **빠른 검증**으로 응답 속도 향상 및 사용자 편의성 증대
+
+</details>
 
 ---
 
