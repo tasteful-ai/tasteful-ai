@@ -10,4 +10,6 @@ public interface AdminMemberService {
 
     List<MemberListResponseDto> getAllMembers();
 
+    void validateAdminRole(Long memberId);
+
 }

@@ -17,16 +17,14 @@ public class AdminMemberController {
 
     private final AdminMemberService adminMemberService;
 
-    // 1. 회원 삭제 - ADMIN 전용
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<CommonResponseDto<Void>> deleteMemberByAdmin(@PathVariable Long memberId) {
+    public ResponseEntity<CommonResponseDto<String>> deleteMemberByAdmin(@PathVariable Long memberId) {
         adminMemberService.deleteMemberByAdmin(memberId);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new CommonResponseDto<>("회원 추방 완료", null));
     }
 
 
-    // 2. 회원 전체 조회 - ADMIN 전용
     @GetMapping
     public ResponseEntity<CommonResponseDto<List<MemberListResponseDto>>> getAllMembers() {
         List<MemberListResponseDto> members = adminMemberService.getAllMembers();

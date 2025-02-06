@@ -1,5 +1,6 @@
 package com.example.tastefulai.domain.member.entity;
 
+import com.example.tastefulai.domain.aichat.entity.AiChatHistory;
 import com.example.tastefulai.domain.image.entity.Image;
 import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
@@ -70,6 +71,9 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TasteSpicyLevel> tasteSpicyLevels = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<AiChatHistory> aiChatHistories = new ArrayList<>();
+
     // 생성자
     public Member(MemberRole memberRole, String email, String password, String nickname, Integer age,
                   GenderRole genderRole, LocalDateTime deletedAt) {
@@ -89,6 +93,10 @@ public class Member extends BaseEntity {
                 .collect(Collectors.toList());
     }
 
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
+
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
     }
@@ -99,9 +107,5 @@ public class Member extends BaseEntity {
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    public void updateMemberRole(MemberRole memberRole) {
-        this.memberRole = memberRole;
     }
 }

@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -38,37 +40,28 @@ class ChattingroomRepositoryTest {
     }
 
     @Test
-    @DisplayName("채팅방 ID로 찾기")
+    @DisplayName("채팅방 찾기 - 성공")
     void findChattingroomById_Success() {
-        Chattingroom foundChattingroom = chattingroomRepository.findChattingroomByIdOrThrow(chattingroom.getId());
+        Optional<Chattingroom> foundChattingroom = chattingroomRepository.findById(chattingroom.getId());
 
-        assertThat(foundChattingroom).isNotNull();
-        assertThat(foundChattingroom.getRoomName()).isEqualTo("Test Room");
+        assertThat(foundChattingroom).isPresent();
+        assertThat(foundChattingroom.get().getRoomName()).isEqualTo("Test Room");
     }
 
     @Test
-    @DisplayName("예외 - 없는 채팅방 ID")
-    void findChattingroomByIdOrThrow_NotFound() {
-        assertThrows(NotFoundException.class, () -> {
-            chattingroomRepository.findChattingroomByIdOrThrow(999L);
-        });
+    @DisplayName("채팅방 찾기 - 존재하지 않음")
+    void findChattingroomById_NotFound() {
+        Optional<Chattingroom> foundChattingroom = chattingroomRepository.findById(999L);
+
+        assertThat(foundChattingroom).isEmpty();
     }
 
     @Test
-    @DisplayName("예외 - 존재하는 채팅방 이름")
-    void existsByRoomName_Exists() {
+    @DisplayName("채팅방 이름 존재 여부 확인")
+    void existsByRoomName() {
+        Optional<Chattingroom> foundChattingroom = chattingroomRepository.findByRoomName("Test Room");
 
-        boolean exists = chattingroomRepository.existsByRoomName("Test Room");
-
-        assertThat(exists).isTrue();
-    }
-
-    @Test
-    @DisplayName("예외 -존재하지 않는 채팅방 이름")
-    void existsByRoomName_NotExists() {
-
-        boolean exists = chattingroomRepository.existsByRoomName("Nonexistent Room");
-
-        assertThat(exists).isFalse();
+        assertThat(foundChattingroom).isPresent();
+        assertThat(foundChattingroom.get().getRoomName()).isEqualTo("Test Room");
     }
 }

@@ -1,13 +1,8 @@
 package com.example.tastefulai.domain.member.service;
 
 import com.example.tastefulai.domain.member.dto.ProfileResponseDto;
-import com.example.tastefulai.domain.member.dto.MemberResponseDto;
 import com.example.tastefulai.domain.member.entity.Member;
-import com.example.tastefulai.domain.member.enums.GenderRole;
-import com.example.tastefulai.domain.member.enums.MemberRole;
-import com.example.tastefulai.global.common.dto.JwtAuthResponse;
-
-import java.util.List;
+import com.example.tastefulai.domain.taste.dto.TasteDto;
 
 public interface MemberService {
 
@@ -15,11 +10,7 @@ public interface MemberService {
 
     Member findById(Long memberId);
 
-    MemberResponseDto signup(MemberRole memberRole, String email, String password, String nickname, Integer age, GenderRole genderRole);
-
-    JwtAuthResponse login(String email, String password);
-
-    void logout(String token);
+    Member findMemberWithTasteById(Long memberId);
 
     void updatePassword(String email, String currentPassword, String newPassword, String currentAccessToken);
 
@@ -30,4 +21,6 @@ public interface MemberService {
     void updateNickname(Long memberId, String nickname);
 
     ProfileResponseDto getMemberProfile(Long memberId);
+
+    TasteDto getMemberTaste(Long memberId);
 }
