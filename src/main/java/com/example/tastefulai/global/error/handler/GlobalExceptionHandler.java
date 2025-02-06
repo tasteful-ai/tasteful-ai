@@ -101,14 +101,6 @@ public class GlobalExceptionHandler {
         return ErrorResponse.toResponseEntity(ErrorCode.NOT_FOUND);
     }
 
-    // 예상하지 못한 모든 예외 처리
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonResponseDto<String>> handleGenericException(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new CommonResponseDto<>("서버 오류가 발생했습니다.", null));
-    }
-
     // 데이터베이스 제약 조건 위반 시 발생 예외 처리
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException customException) {

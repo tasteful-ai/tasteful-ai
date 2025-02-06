@@ -3,6 +3,7 @@ package com.example.tastefulai.domain.location.service;
 import com.example.tastefulai.domain.location.dto.LocationResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -24,6 +25,7 @@ import java.util.Map;
 @Slf4j
 public class LocationServiceImpl implements LocationService {
 
+    @Qualifier("locationRedisTemplate")
     private final RedisTemplate<String, Object> locationRedisTemplate;
 
     @Value("${kakao.api.key}")
@@ -31,20 +33,16 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public List<LocationResponseDto> findByKeyword(String keyword) {
-        // Redis 키 설정
         String cacheKey = "search:" + keyword;
 
-        // Redis에서 캐시 확인
         List<LocationResponseDto> cachedResults = (List<LocationResponseDto>) locationRedisTemplate.opsForValue().get(cacheKey);
         if (cachedResults != null) {
             log.info("Redis 캐시에서 검색 결과를 가져옴: {}", cacheKey);
             return cachedResults;
         }
 
-        // 캐시에 없을 경우 Kakao API 호출
         List<LocationResponseDto> results = fetchFromKakaoApi(keyword);
 
-        // Redis에 검색 결과 저장
         if (!results.isEmpty()) {
             locationRedisTemplate.opsForValue().set(cacheKey, results, Duration.ofMinutes(5));  // 캐시 TTL 설정 (5분)
             log.info("Redis 캐시에 검색 결과 저장: {}", cacheKey);
@@ -56,9 +54,9 @@ public class LocationServiceImpl implements LocationService {
     private List<LocationResponseDto> fetchFromKakaoApi(String keyword) {
         String url = "https://dapi.kakao.com/v2/local/search/keyword.json";
         String requestUrl = UriComponentsBuilder.fromHttpUrl(url)
-                .queryParam("query", keyword)   // 검색 키워드
-                .queryParam("radius", 5000) // 5km 반경
-                .queryParam("size", 10) // 최대 10개 결과
+                .queryParam("query", keyword)
+                .queryParam("radius", 5000)
+                .queryParam("size", 10)
                 .toUriString();
 
         HttpHeaders headers = new HttpHeaders();

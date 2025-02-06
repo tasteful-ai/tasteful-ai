@@ -2,6 +2,7 @@ package com.example.tastefulai.global.config;
 
 import com.example.tastefulai.domain.chatting.redis.RedisSubscriber;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -19,10 +20,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
     // Redis 서버와 연결
     @Bean(name = "chatRedisConnectionFactory")
     public RedisConnectionFactory redisConnectionFactory() {
-        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory("localhost", 6379);
+        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisHost, 6379);
         log.info("Redis 연결 생성: {}:{}", lettuceConnectionFactory.getHostName(), lettuceConnectionFactory.getPort());
         return lettuceConnectionFactory;
     }
