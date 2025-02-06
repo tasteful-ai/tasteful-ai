@@ -15,6 +15,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import org.apache.tika.Tika;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
@@ -89,6 +90,10 @@ public class S3UploaderImpl implements S3Uploader {
     @Override
     @Transactional
     public void deleteS3Image(String imageName) {
-            s3Client.deleteObject(builder -> builder.bucket(bucket).key(imageName).build());
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(imageName)
+                .build();
+        s3Client.deleteObject(deleteRequest);
     }
 }
