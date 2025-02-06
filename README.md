@@ -659,99 +659,93 @@ AWS S3를 활용하여 **사용자 프로필 이미지 관리 기능**을 구현
 
  **🖥 Language**
 
-[Java 21 ](https://www.notion.so/Java-21-192c6e685f1081cfa64bd4f95eb41c41?pvs=21)
+Java 21 
 
  **📲 Interface Description Language**
 
-[IntelliJ IDEA](https://www.notion.so/IntelliJ-IDEA-192c6e685f10816d9a6edad1748d4253?pvs=21)
+IntelliJ IDEA
 
  **🧑🏻‍💻 Backend**
 
-[Spring Framework 3.3.1](https://www.notion.so/Spring-Framework-3-3-1-192c6e685f1081a2883eeb31b8881a7b?pvs=21)
+Spring Framework 3.3.1 / Spring Boot 
 
-[Spring Boot 6.4.2](https://www.notion.so/Spring-Boot-6-4-2-192c6e685f1081119362d3ae0181d873?pvs=21)
+Spring Data JPA
 
-[Spring Data JPA](https://www.notion.so/Spring-Data-JPA-192c6e685f10812a853adcc954a4d91c?pvs=21)
+Spring Security 6.4.2
 
-[Spring Security ](https://www.notion.so/Spring-Security-192c6e685f1081cb91bcd409e0f24080?pvs=21)
+Spring AI → OpenAI
 
-[Spring AI → OpenAI](https://www.notion.so/Spring-AI-OpenAI-192c6e685f10817da0d0e5cb668fd443?pvs=21)
-
-[WebSocket](https://www.notion.so/WebSocket-192c6e685f10819db060c1b6ef36c6b3?pvs=21)
-
-[ STOMP](https://www.notion.so/STOMP-192c6e685f1081658952e18eeae031e6?pvs=21)
-
-[SockJS](https://www.notion.so/SockJS-192c6e685f108120a1dcc91fa037edfa?pvs=21)
+WebSocket & STOMP & SockJS
 
  **💁🏻 Frontend**
 
-[React](https://www.notion.so/React-192c6e685f10817b919ae2b2880783ad?pvs=21)
+React
 
-[Node.js](https://www.notion.so/Node-js-192c6e685f1081eea4d3d772fa23464a?pvs=21)
+Node.js
 
  **🗃 Data Base & Optimization**
 
-[MySQL 8+](https://www.notion.so/MySQL-8-192c6e685f1081bdb4e4dc95b0f2687b?pvs=21)
+MySQL 8+
 
-[Redis 7.2.7](https://www.notion.so/Redis-7-2-7-192c6e685f10810bb7a1ffd3e70fc159?pvs=21)
+Redis 7.2.7
 
-[S3](https://www.notion.so/S3-192c6e685f1081e7b395e12446d2d628?pvs=21)
+S3
 
  **📡 API**
 
-[OpenAI GPT-3.5 Turbo](https://www.notion.so/OpenAI-GPT-3-5-Turbo-192c6e685f108173b57fd551e12e9bf0?pvs=21)
+OpenAI GPT-3.5 Turbo
 
-[Kakao Map](https://www.notion.so/Kakao-Map-192c6e685f108137a679d51ab5d5eab0?pvs=21)
+Kakao Map
 
  **📟 Test**
 
-[Postman](https://www.notion.so/Postman-192c6e685f1081eda854f7e2de4db700?pvs=21)
+Postman
 
-[JMeter](https://www.notion.so/JMeter-192c6e685f1081caa469fdf69ae5e301?pvs=21)
+JMeter
 
-[H2](https://www.notion.so/H2-192c6e685f10810bb388e803831ade0f?pvs=21)
+H2
 
  **🚢 Deployment & Distribution** 
 
-[Docker](https://www.notion.so/Docker-192c6e685f10819b9b37d7ef0233e2cf?pvs=21)
+Docker
 
 ---
 
-[AWS](https://www.notion.so/AWS-192c6e685f108117b58cc14b843844c9?pvs=21)
+AWS
 
-[EC2](https://www.notion.so/EC2-192c6e685f10813e8fa1c447e6939b40?pvs=21)
+EC2
 
-[S3](https://www.notion.so/S3-192c6e685f1081049169db6d5002e202?pvs=21)
+S3
 
-[Cloud Front](https://www.notion.so/Cloud-Front-192c6e685f1081f19d37e9f174434ab3?pvs=21)
+Cloud Front
 
-[Application Load Balancer](https://www.notion.so/Application-Load-Balancer-192c6e685f108105b7b6d5bf332760fc?pvs=21)
+Application Load Balancer
 
-[Route 53](https://www.notion.so/Route-53-192c6e685f1081089570e24e2ad73ef6?pvs=21)
+Route 53
 
-[Certificate Manager](https://www.notion.so/Certificate-Manager-192c6e685f10818bb4d9dc9d964f9e18?pvs=21)
+Certificate Manager
 
 ---
 
-[Github Actions](https://www.notion.so/Github-Actions-192c6e685f1081c18239daf30bef0ede?pvs=21)
+Github Actions
 
  **👥 Collaboration Tool**
 
-[Github](https://www.notion.so/Github-192c6e685f1081c380d6e53ffa3ff6a4?pvs=21)
+Github
 
 ---
 
-[Slack](https://www.notion.so/Slack-192c6e685f10811daffec0241574f7f3?pvs=21)
+Slack
 
-[Notion](https://www.notion.so/Notion-192c6e685f1081b687b0d6473c476590?pvs=21)
+Notion
 
 ---
 
-[Figma](https://www.notion.so/Figma-192c6e685f10817d8965d6943063efb7?pvs=21)
+Figma
 
-[ERD Cloud](https://www.notion.so/ERD-Cloud-192c6e685f108138b794c4dd68e81a93?pvs=21)
+ERD Cloud
 
-[Canva](https://www.notion.so/Canva-192c6e685f10814d98a6f455202954e9?pvs=21)
+Canva
 
 ---
 
