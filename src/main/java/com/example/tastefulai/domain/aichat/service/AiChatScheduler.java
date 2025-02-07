@@ -12,7 +12,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AiChatScheduler {
 
-    private final AiChatCountServiceImpl aiChatCountServiceImpl;
+    private final AiChatCountService aiChatCountService;
 
     @Qualifier("aiCountRedisTemplate")
     private final RedisTemplate<String, Integer> aiCountRedisTemplate;
