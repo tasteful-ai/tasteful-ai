@@ -19,11 +19,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m FROM Member m " +
             "LEFT JOIN FETCH m.tasteGenres tg LEFT JOIN FETCH tg.genres " +
-            "LEFT JOIN FETCH m.tasteLikeFoods tl LEFT JOIN FETCH tl.likeFoods " +
-            "LEFT JOIN FETCH m.tasteDislikeFoods td LEFT JOIN FETCH td.dislikeFoods " +
-            "LEFT JOIN FETCH m.tasteDietaryPreferences tp LEFT JOIN FETCH tp.dietaryPreferences " +
-            "LEFT JOIN FETCH m.tasteSpicyLevels ts LEFT JOIN FETCH ts.spicyLevel " +
-            "WHERE m.id = : id")
+            "LEFT JOIN m.tasteLikeFoods tl LEFT JOIN tl.likeFoods " +
+            "LEFT JOIN m.tasteDislikeFoods td LEFT JOIN td.dislikeFoods " +
+            "LEFT JOIN m.tasteDietaryPreferences tp LEFT JOIN tp.dietaryPreferences " +
+            "LEFT JOIN m.tasteSpicyLevels ts LEFT JOIN ts.spicyLevel " +
+            "WHERE m.id = :id")
 
     Optional<Member> findMemberWithTasteById(@Param("id") Long id);
 }
