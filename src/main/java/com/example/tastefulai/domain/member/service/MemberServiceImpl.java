@@ -143,7 +143,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member findMemberWithTasteById(Long memberId) {
-        return memberRepository.findMemberWithTasteById(memberId)
+        return memberRepository.findMemberWithTasteGenresById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
@@ -153,17 +153,50 @@ public class MemberServiceImpl implements MemberService {
 
         Member member = findMemberWithTasteById(memberId);
 
-        List<String> genres = member.getTasteGenres().stream()
-                .map(tg -> tg.getGenres().getGenreName()).toList();
-        List<String> likeFoods = member.getTasteLikeFoods().stream()
-                .map(tl -> tl.getLikeFoods().getLikeName()).toList();
-        List<String> dislikeFoods = member.getTasteDislikeFoods().stream()
-                .map(td -> td.getDislikeFoods().getDislikeName()).toList();
-        List<String> dietaryPreferences = member.getTasteDietaryPreferences().stream()
-                .map(tp -> tp.getDietaryPreferences().getPreferenceName()).toList();
-        Integer spicyLevel = member.getTasteSpicyLevels().isEmpty() ? null :
-                member.getTasteSpicyLevels().getFirst().getSpicyLevel().getSpicyLevel();
+        member = memberRepository.findMemberWithTasteLikeFoodsByMember(member)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        return new TasteDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevel);
+        member = memberRepository.findMemberWithTasteDislikeFoodsByMember(member)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        member = memberRepository.findMemberWithTasteDietaryPreferencesByMember(member)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        member = memberRepository.findMemberWithTasteSpicyLevelsByMember(member)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return new TasteDto(
+                member.getTasteGenres().stream().map(tg -> tg.getGenres().getGenreName()).toList(),
+                member.getTasteLikeFoods().stream().map(tl -> tl.getLikeFoods().getLikeName()).toList(),
+                member.getTasteDislikeFoods().stream().map(td -> td.getDislikeFoods().getDislikeName()).toList(),
+                member.getTasteDietaryPreferences().stream().map(tp -> tp.getDietaryPreferences().getPreferenceName()).toList(),
+                member.getTasteSpicyLevels().isEmpty() ? null : member.getTasteSpicyLevels().getFirst().getSpicyLevel().getSpicyLevel()
+        );
     }
 }
+
+
+//    @Override
+//    public Member findMemberWithTasteById(Long memberId) {
+//        return memberRepository.findMemberWithTasteGenresById(memberId)
+//                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+//    }
+//
+//    @Override
+//    @Transactional(readOnly = true)
+//    public TasteDto getMemberTaste(Long memberId) {
+//
+//        Member member = findMemberWithTasteById(memberId);
+//
+//        List<Member> members = List.of(member);
+//        memberRepository.findMemberWithOtherTastesByMembers(members);
+//
+//        return new TasteDto(
+//                member.getTasteGenres().stream().map(tg -> tg.getGenres().getGenreName()).toList(),
+//                member.getTasteLikeFoods().stream().map(tl -> tl.getLikeFoods().getLikeName()).toList(),
+//                member.getTasteDislikeFoods().stream().map(td -> td.getDislikeFoods().getDislikeName()).toList(),
+//                member.getTasteDietaryPreferences().stream().map(tp -> tp.getDietaryPreferences().getPreferenceName()).toList(),
+//                member.getTasteSpicyLevels().isEmpty() ? null : member.getTasteSpicyLevels().getFirst().getSpicyLevel().getSpicyLevel()
+//        );
+//    }
+//}

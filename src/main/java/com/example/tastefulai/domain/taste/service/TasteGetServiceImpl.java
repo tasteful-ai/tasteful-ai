@@ -2,6 +2,7 @@ package com.example.tastefulai.domain.taste.service;
 
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.domain.member.service.MemberService;
+import com.example.tastefulai.domain.taste.dto.TasteDto;
 import com.example.tastefulai.domain.taste.dto.TasteResponseDto;
 import com.example.tastefulai.domain.taste.entity.spicylevel.TasteSpicyLevel;
 import com.example.tastefulai.domain.taste.repository.dietarypreferences.TasteDietaryPreferencesRepository;
@@ -91,21 +92,39 @@ public class TasteGetServiceImpl implements TasteGetService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TasteResponseDto getCompleteTaste(Long memberId) {
+        TasteDto tasteDto = memberService.getMemberTaste(memberId);
 
-        Member member = memberService.findMemberWithTasteById(memberId);
-
-        List<String> genres = member.getTasteGenres().stream()
-                .map(tg -> tg.getGenres().getGenreName()).toList();
-        List<String> likeFoods = member.getTasteLikeFoods().stream()
-                .map(tl -> tl.getLikeFoods().getLikeName()).toList();
-        List<String> dislikeFoods = member.getTasteDislikeFoods().stream()
-                .map(td -> td.getDislikeFoods().getDislikeName()).toList();
-        List<String> dietaryPreferences = member.getTasteDietaryPreferences().stream()
-                .map(tp -> tp.getDietaryPreferences().getPreferenceName()).toList();
-        Integer spicyLevel = member.getTasteSpicyLevels().isEmpty() ? null :
-                member.getTasteSpicyLevels().getFirst().getSpicyLevel().getSpicyLevel();
-
-        return new TasteResponseDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevel);
+        return new TasteResponseDto(
+                tasteDto.getGenres(),
+                tasteDto.getLikeFoods(),
+                tasteDto.getDislikeFoods(),
+                tasteDto.getDietaryPreferences(),
+                tasteDto.getSpicyLevel()
+        );
     }
 }
+
+// 아래 코드는 성능 최적화 비교 테스트를 진행한 뒤 가장 빠른 최적화 코드로 수정하여 주석 삭제할 예정
+
+//    @Override
+//    @Transactional(readOnly = true)
+//    public TasteResponseDto getCompleteTaste(Long memberId) {
+//
+//        Member member = memberService.findMemberWithTasteById(memberId);
+//
+//        List<String> genres = member.getTasteGenres().stream()
+//                .map(tg -> tg.getGenres().getGenreName()).toList();
+//        List<String> likeFoods = member.getTasteLikeFoods().stream()
+//                .map(tl -> tl.getLikeFoods().getLikeName()).toList();
+//        List<String> dislikeFoods = member.getTasteDislikeFoods().stream()
+//                .map(td -> td.getDislikeFoods().getDislikeName()).toList();
+//        List<String> dietaryPreferences = member.getTasteDietaryPreferences().stream()
+//                .map(tp -> tp.getDietaryPreferences().getPreferenceName()).toList();
+//        Integer spicyLevel = member.getTasteSpicyLevels().isEmpty() ? null :
+//                member.getTasteSpicyLevels().getFirst().getSpicyLevel().getSpicyLevel();
+//
+//        return new TasteResponseDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevel);
+//    }
+//}
