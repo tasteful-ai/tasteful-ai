@@ -92,8 +92,6 @@ public class Member extends BaseEntity {
         this.images = images;
     }
 
-    @VisibleForTesting
-
 
     public List<GrantedAuthority> getAuthorities() {
         return List.of(memberRole)
