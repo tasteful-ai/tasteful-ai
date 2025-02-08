@@ -4,6 +4,9 @@ import com.example.tastefulai.domain.aichat.dto.AiChatRequestDto;
 import com.example.tastefulai.domain.aichat.dto.AiChatResponseDto;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.domain.taste.dto.TasteDto;
+import com.example.tastefulai.global.error.errorcode.ErrorCode;
+import com.example.tastefulai.global.error.exception.CustomException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
@@ -48,7 +51,6 @@ public class AiChatServiceImpl implements AiChatService {
                 tasteDto.getDietaryPreferences(),
                 tasteDto.getSpicyLevel()
         );
-
         // ChatClient를 사용해 AI에게 요청
         String response = chatClient.prompt().user(prompt).call().content();
 
@@ -58,17 +60,19 @@ public class AiChatServiceImpl implements AiChatService {
         // JSON 응답 파싱
         String recommendation;
         String description;
+
         try {
             Map<String, String> responseMap = objectMapper.readValue(response, Map.class);
-            recommendation = Optional.ofNullable(responseMap.get("recommendation"))
-                    .orElse("추천할 메뉴가 없습니다.").trim();
-            description = Optional.ofNullable(responseMap.get("description"))
-                    .orElse("설명이 제공되지 않았습니다.").trim();
-        } catch (Exception exception) {
-            recommendation = "추천할 메뉴를 파싱하는 데 실패했습니다.";
-            description = "설명을 파싱하는데 실패했습니다.";
-        }
 
+            recommendation = Optional.ofNullable(responseMap.get("recommendation"))
+                    .orElseThrow(() -> new CustomException(ErrorCode.RECOMMENDATION_PARSING_ERROR));
+
+            description = Optional.ofNullable(responseMap.get("description"))
+                    .orElseThrow(() -> new CustomException(ErrorCode.DESCRIPTION_PARSING_ERROR));
+
+        } catch (JsonProcessingException jsonProcessingException) {
+            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
+        }
         // AI 추천 히스토리 MySQL + Redis에 저장
         aiChatHistoryService.saveChatHistory(memberId, sessionId, recommendation, description);
 
