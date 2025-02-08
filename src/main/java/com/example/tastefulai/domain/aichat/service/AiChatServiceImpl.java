@@ -37,7 +37,7 @@ public class AiChatServiceImpl implements AiChatService {
         // AI 프롬프트 생성 (취향 정보를 포함하여 AI에게 전달)
         String prompt = String.format(
                 "나는 다음과 같은 음식 취향을 가지고 있어. 참고해줘." +
-                        "선호하는 장르: %s, 좋아하는 음식: %s, 선호하지 않는 음식: %s, 식단 성향: %s, 매운 음식 선호도: %s." +
+                        "선호하는 장르: %s, 좋아하는 음식: %s, 선호하지 않는 음식: %s, 식단 성향: %s, 매운 음식 가능정도: %s." +
                         "하지만 항상 같은 취향의 메뉴만 추천하지 말고, 가끔은 새로운 메뉴도 추천해줘." +
                         "내가 한 번도 먹어보지 못했을 법한 흥미로운 메뉴도 제안해줘." +
                         "응답 형식은 반드시 JSON 형식으로 제공해야 해." +
@@ -57,17 +57,21 @@ public class AiChatServiceImpl implements AiChatService {
 
         // JSON 응답 파싱
         String recommendation;
+        String description;
         try {
             Map<String, String> responseMap = objectMapper.readValue(response, Map.class);
             recommendation = Optional.ofNullable(responseMap.get("recommendation"))
                     .orElse("추천할 메뉴가 없습니다.").trim();
+            description = Optional.ofNullable(responseMap.get("description"))
+                    .orElse("설명이 제공되지 않았습니다.").trim();
         } catch (Exception exception) {
             recommendation = "추천할 메뉴를 파싱하는 데 실패했습니다.";
+            description = "설명을 파싱하는데 실패했습니다.";
         }
 
         // AI 추천 히스토리 MySQL + Redis에 저장
-        aiChatHistoryService.saveChatHistory(memberId, sessionId, recommendation);
+        aiChatHistoryService.saveChatHistory(memberId, sessionId, recommendation, description);
 
-        return new AiChatResponseDto(recommendation);
+        return new AiChatResponseDto(recommendation, description);
     }
 }
