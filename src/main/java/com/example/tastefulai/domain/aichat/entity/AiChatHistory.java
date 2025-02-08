@@ -30,6 +30,9 @@ public class AiChatHistory extends BaseEntity {
     @Column(name = "recommendation", nullable = false)
     private String recommendation;
 
+    @Column(name = "description", nullable = false)
+    private String description;
+
     @Column(columnDefinition = "Text", nullable = true)
     private String tasteData;
 
@@ -37,9 +40,10 @@ public class AiChatHistory extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    public AiChatHistory(String sessionId, String recommendation, String tasteData, Member member) {
+    public AiChatHistory(String sessionId, String recommendation, String description, String tasteData, Member member) {
         this.sessionId = sessionId;
         this.recommendation = recommendation;
+        this.description = description;
         this.tasteData = tasteData;
         this.member = member;
     }

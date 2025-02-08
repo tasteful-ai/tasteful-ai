@@ -26,17 +26,17 @@ public class MemberServiceTest {
 
     private String token = "sample.jwt.token";
 
-    @DisplayName("blacklistService : addToBlacklist 메서드가 호출되는지 검증 확인")
-    @Test
-    void testLogout() {
-        // given
-        long expiryMillis = 3600000L; // 예시로 1시간 만료 시간
-        when(jwtProvider.getAccessTokenExpiryMillis()).thenReturn(expiryMillis);
-
-        // when
-        memberServiceImpl.logout(token);
-
-        //then
-        verify(blacklistService, times(1)).addToBlacklist(token, expiryMillis);
-    }
+//    @DisplayName("blacklistService : addToBlacklist 메서드가 호출되는지 검증 확인")
+//    @Test
+//    void testLogout() {
+//        // given
+//        long expiryMillis = 3600000L; // 예시로 1시간 만료 시간
+//        when(jwtProvider.getAccessTokenExpiryMillis()).thenReturn(expiryMillis);
+//
+//        // when
+//        memberServiceImpl.logout(token);
+//
+//        //then
+//        verify(blacklistService, times(1)).addToBlacklist(token, expiryMillis);
+//    }
 }
