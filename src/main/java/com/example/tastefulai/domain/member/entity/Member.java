@@ -13,6 +13,7 @@ import com.example.tastefulai.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.VisibleForTesting;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -74,7 +75,6 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<AiChatHistory> aiChatHistories = new ArrayList<>();
 
-    // 생성자
     public Member(MemberRole memberRole, String email, String password, String nickname, Integer age,
                   GenderRole genderRole, LocalDateTime deletedAt) {
         this.memberRole = memberRole;
@@ -85,6 +85,15 @@ public class Member extends BaseEntity {
         this.genderRole = genderRole;
         this.deletedAt = deletedAt;
     }
+
+    @VisibleForTesting
+    public Member(Long id, List<Image> images) {
+        this.id = id;
+        this.images = images;
+    }
+
+    @VisibleForTesting
+
 
     public List<GrantedAuthority> getAuthorities() {
         return List.of(memberRole)
