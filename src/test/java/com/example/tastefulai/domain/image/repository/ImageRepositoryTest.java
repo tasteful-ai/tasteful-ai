@@ -45,18 +45,16 @@ class ImageRepositoryTest {
         assertEquals(member.getId(), foundImage.getMember().getId());
         assertEquals(1L, foundImage.getId());
         assertEquals("image.jpg", foundImage.getFileName());
-        assertEquals("image/jpg", foundImage.getFileType());
+        assertEquals("image/jpeg", foundImage.getFileType());
         assertEquals(10L, foundImage.getFileSize());
         assertEquals("https://imageUrl.jpg", foundImage.getImageUrl());
     }
 
     @Test
-    @DisplayName("H2 : 멤버 Id로 사용자 검색 시 이미지 부재")
+    @DisplayName("멤버 Id로 사용자 검색 시 이미지 부재")
     void findByMemberId_noImage() {
-        Long memberId = 1L;
-        Member member = new Member(memberId, null);
 
-        Image foundImage = imageRepository.findByMemberId(memberId);
+        Image foundImage = imageRepository.findByMemberId(99L);
 
         assertNull(foundImage);
     }
