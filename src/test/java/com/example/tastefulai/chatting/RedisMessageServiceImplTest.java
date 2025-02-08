@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 class RedisMessageServiceImplTest {
 
     @InjectMocks
-    private RedisMessageService redisMessageService;
+    private RedisMessageServiceImpl redisMessageService;
 
     @Mock
     private RedisTemplate<String, Object> messageCacheRedisTemplate;
