@@ -7,13 +7,17 @@ import com.example.tastefulai.domain.member.enums.MemberRole;
 import com.example.tastefulai.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ImageRepositoryTest {
 
     @Autowired
@@ -34,6 +38,7 @@ class ImageRepositoryTest {
     }
 
     @Test
+    @Order(1)
     @DisplayName("멤버 Id로 사용자 검색 시 존재하는 이미지 반환")
     void findByMemberId_success() {
 
@@ -49,6 +54,7 @@ class ImageRepositoryTest {
     }
 
     @Test
+    @Order(2)
     @DisplayName("멤버 Id로 사용자 검색 시 이미지 부재")
     void findByMemberId_noImage() {
 
