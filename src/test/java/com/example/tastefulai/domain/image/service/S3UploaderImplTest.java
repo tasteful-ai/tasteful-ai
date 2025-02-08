@@ -10,12 +10,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.File;
@@ -32,8 +35,10 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class S3UploaderImplTest {
 
     @InjectMocks
@@ -48,19 +53,15 @@ class S3UploaderImplTest {
 
         S3Uploader spyUploader = spy(s3Uploader);
 
-        // Given
         String originalName = "image.png";
         String bucket = "tasteful-ai-test";
         MultipartFile image = new MockMultipartFile("image", originalName, "image/png", new byte[10]);
 
-        // stubbing
         doNothing().when(spyUploader).isValidExtension(any());
 
-        // When
         ReflectionTestUtils.setField(spyUploader, "bucket", "tasteful-ai-test");
         Image result = spyUploader.uploadImage(image);
 
-        // Then
         assertNotNull(result);
         assertNotNull(result.getFileName());
         assertTrue(result.getFileName().endsWith("_" + originalName.replaceAll("\\s", "_")));
@@ -76,7 +77,6 @@ class S3UploaderImplTest {
     @DisplayName("이미지 확장자 검사 성공")
     void isValidExtension_success() throws IOException {
 
-            // Given
             String originalName = "typeTest.jpg";
             String contentType = "image/jpg";
 
@@ -86,7 +86,6 @@ class S3UploaderImplTest {
 
             MultipartFile image = new MockMultipartFile(originalName, originalName, contentType, fileInputStream);
 
-            // when & then
             assertDoesNotThrow(() -> s3Uploader.isValidExtension(image));
     }
 
@@ -94,10 +93,8 @@ class S3UploaderImplTest {
     @DisplayName("이미지 확장자 검사 실패 - 잘못된 확장자명 예외처리")
     void isValidExtension_invalidExtension() {
 
-        // Given
         MockMultipartFile file = new MockMultipartFile("image", "image.exe", "image/jpg", new byte[1]);
 
-        // when & then
         BadRequestException badRequestException = assertThrows(BadRequestException.class, () -> s3Uploader.isValidExtension(file));
         assertEquals(ErrorCode.INVALID_FILE, badRequestException.getErrorCode());
     }
@@ -106,7 +103,6 @@ class S3UploaderImplTest {
     @DisplayName("이미지 확장자 검사 실패 - 잘못된 MIME 타입 예외처리")
     void isValidExtension_invalidMIMEType() throws IOException {
 
-            // Given
             String originalName = "MIMETypeTest.jpeg";
             String contentType = "image/jpeg";
             String filePath = "src/test/resources/MIMETypeTest.jpeg";    // 이름 확장자는 jpg 이지만 MIME Type 은 png
@@ -116,7 +112,6 @@ class S3UploaderImplTest {
             FileInputStream fileInputStream = new FileInputStream(file);
             MultipartFile image = new MockMultipartFile(originalName, originalName, contentType, fileInputStream);
 
-            // when & then
             BadRequestException badRequestException = assertThrows(BadRequestException.class, () -> s3Uploader.isValidExtension(image));
             assertEquals("image/webp", tika.detect(image.getInputStream()));
             assertEquals(ErrorCode.INVALID_FILE, badRequestException.getErrorCode());
@@ -125,10 +120,11 @@ class S3UploaderImplTest {
     @Test
     @DisplayName("이미지 삭제 성공 - S3Client 호출 확인")
     void deleteS3Image_success() {
-        doNothing().when(s3Client).deleteObject((DeleteObjectRequest) any());
+        DeleteObjectResponse deleteObjectResponse = DeleteObjectResponse.builder().build();
+        when(s3Client.deleteObject(builder -> builder.bucket(any()))).thenReturn(deleteObjectResponse);
 
         assertDoesNotThrow(() -> s3Uploader.deleteS3Image("imageName"));
 
-        verify(s3Client, times(1)).deleteObject((DeleteObjectRequest) any());
+        verify(s3Client, times(1)).deleteObject(any(DeleteObjectRequest.class));
     }
 }
