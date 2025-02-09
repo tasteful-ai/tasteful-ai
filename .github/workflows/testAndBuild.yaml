@@ -1,8 +1,10 @@
-name: build and deploy
+name: test and build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop", "main" ]
 
 permissions:
   contents: read
@@ -45,38 +47,3 @@ jobs:
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
           docker build  --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/9kcal:4 .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/9kcal:4
-  deploy-to-app-server-1:
-    needs: build-docker-image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to App Server 1
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.SSH_HOST_1 }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
-          script_stop: true
-          script: |
-            docker-compose down
-            docker pull kahyunjung/9kcal:4
-            docker-compose up --build -d
-
-  deploy-to-app-server-2:
-
-    needs: deploy-to-app-server-1
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to App Server 2
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.SSH_HOST_2 }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
-          script_stop: true
-          script: |
-            docker-compose down
-            docker pull kahyunjung/9kcal:4
-            docker-compose up --build -d
