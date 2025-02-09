@@ -103,7 +103,7 @@ public class ChattingServiceImpl implements ChattingService {
         List<ChattingMessageResponseDto> cachedMessages = redisMessageService.getRecentMessages(chattingroomId);
 
         if (cachedMessages == null || cachedMessages.isEmpty()) {
-            List<ChattingMessage> messages = chattingMessageRepository.findTop50ByChattingroomIdOrderByCreatedAtDesc(chattingroomId);
+            List<ChattingMessage> messages = chattingMessageRepository.findTop50ByChattingroomIdOrderByCreatedAtAsc(chattingroomId);
 
             return messages.stream()
                     .map(ChattingMessageResponseDto::fromEntity)

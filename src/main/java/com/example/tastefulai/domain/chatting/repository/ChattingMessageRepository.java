@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ChattingMessageRepository extends JpaRepository<ChattingMessage, Long> {
 
-    List<ChattingMessage> findTop50ByChattingroomIdOrderByCreatedAtDesc(Long chattingroomId);
+    List<ChattingMessage> findTop50ByChattingroomIdOrderByCreatedAtAsc(Long chattingroomId);
 
     @Transactional
     int deleteByCreatedAtBefore(LocalDateTime dateTime);

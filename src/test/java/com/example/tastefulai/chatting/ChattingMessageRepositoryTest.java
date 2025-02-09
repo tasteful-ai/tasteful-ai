@@ -53,7 +53,7 @@ class ChattingMessageRepositoryTest {
     @Test
     @DisplayName("최신 50개 메시지 조회")
     void findTop50ByChattingroomIdOrderByCreatedAtDesc_Success() {
-        List<ChattingMessage> messages = chattingMessageRepository.findTop50ByChattingroomIdOrderByCreatedAtDesc(chattingroom.getId());
+        List<ChattingMessage> messages = chattingMessageRepository.findTop50ByChattingroomIdOrderByCreatedAtAsc(chattingroom.getId());
 
         assertNotNull(messages);
         assertEquals(50, messages.size());
