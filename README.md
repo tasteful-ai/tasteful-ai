@@ -1497,7 +1497,7 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 
 ## **1. 문제 상황**
 
--WebSocket은 연결 이후 지속적인 메시지 교환 방식인 Stateful 방식을 사용하기 때문에 HTTP 요청의 Authorization header를 사용할 수 없어 JWT 인증이 어려움
+- WebSocket은 연결 이후 지속적인 메시지 교환 방식인 Stateful 방식을 사용하기 때문에 HTTP 요청의 Authorization header를 사용할 수 없어 JWT 인증이 어려움
 
 ## **2. 원인 분석**
 
@@ -1507,7 +1507,13 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 
 ## **3. 해결 방법**
 
+- ChatMessageDto 내부에 Token 필드를 추가하여 WebSocket 메시지 전송 시 JWT를 포함하여 인증
+
 ## **4. 결과**
+
+- WebSocket에서도 JWT 기반 사용자 인증이 가능해져 연결 이후에도 메시지 마다 사용자 검증이 가능해짐.
+
+- HTTP API와의 일관성이 유지되고 검증을 통한 보안성이 확보 됨
 
 </details>
 
