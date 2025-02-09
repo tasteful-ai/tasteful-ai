@@ -1492,38 +1492,11 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 ## 🍙 트러블슈팅
 
 ---
-
-
-Tasteful-AI 트러블 슈팅 (1)
-
-# WebSocket 연결 후 사용자 인증 시 JWT 인증이 되지 않는 문제 발생 및 해결 방법
-
-[WebSocket 인증 및 Spring Security와 충돌 문제](https://www.notion.so/WebSocket-Spring-Security-192c6e685f1081f0975acb55f53cc8fa?pvs=21)
-
-[JPA에서  Member ID 조회로 인한
-`UnsatisfiedDependencyException` 발생](https://www.notion.so/JPA-Member-ID-UnsatisfiedDependencyException-192c6e685f10819da90efc2ecbaf2449?pvs=21)
-
-[N+1 문제 해결 - findMemberWithTasteById()](https://www.notion.so/N-1-findMemberWithTasteById-192c6e685f1081268b53dfd01021a1c1?pvs=21)
-
-[Redis에서 관리하는 AI 채팅 세션과 추천 내역 Repository의 복잡도 증가](https://www.notion.so/Redis-AI-Repository-192c6e685f1081f99023c2ef22f8bbec?pvs=21)
-
-[AI 채팅 히스토리 삭제 시 MySQL과 Redis의 데이터 동기화 문제 발생](https://www.notion.so/AI-MySQL-Redis-192c6e685f1081439c3defec316c8e5a?pvs=21)
-
-[단위 테스트 진행 시 **`NullPointException`
-** 발생 원인 및 해결 방법](https://www.notion.so/NullPointException-192c6e685f108105b76bf373bc7e915d?pvs=21)
-
-[**JPA 영속성 컨텍스트로 인한 이미지 삭제 오류 해결**](https://www.notion.so/JPA-192c6e685f108185a16dc7d5f59b7ee8?pvs=21)
-
-[**S3 정적 호스팅 페이지 새로고침 시 페이지 다이렉트 실패 문제 해결**](https://www.notion.so/S3-192c6e685f108129bf11de66d28cfe2a?pvs=21)
-
-[docker 연결 중 레디스 연결이 안 되는 문제 해결 ](https://www.notion.so/docker-192c6e685f1081718135da48ff056789?pvs=21)
-
-[Mac으로 Docker 배포 시 생기는 **CPU 아키텍쳐 호환문제 해결
-**](https://www.notion.so/Mac-Docker-CPU-192c6e685f108185b5a1d0f05055da5c?pvs=21)
-
-[**Jackson 역직렬화 오류 해결 방법**](https://www.notion.so/Jackson-192c6e685f1081318485ff1920ac4223?pvs=21)
-
-[**403 FORBIDDEN 에러 발생 원인 및 해결 방법**](https://www.notion.so/403-FORBIDDEN-192c6e685f10812c8643e7952c19442b?pvs=21)
+<details>
+<summary><h3>WebSocket 연결 후 사용자 인증 시 JWT 인증이 되지 않는 문제 발생 및 해결 방법</h3></summary>
+## **1. 문제 상황**
+WebSocket은 연결 이후 지속적인 메시지 교환 방식인 Stateful 방식을 사용하기 때문에 HTTP 요청의 Authorization header를 사용할 수 없어 JWT 인증이 어려움
+</details>
 ---
 
 ## 🍙 CONTRIBUTORS
