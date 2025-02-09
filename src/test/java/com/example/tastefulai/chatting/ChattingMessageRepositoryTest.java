@@ -57,7 +57,7 @@ class ChattingMessageRepositoryTest {
 
         assertNotNull(messages);
         assertEquals(50, messages.size());
-        assertTrue(messages.get(0).getCreatedAt().isAfter(messages.get(49).getCreatedAt()));
+        assertTrue(messages.get(0).getCreatedAt().isBefore(messages.get(49).getCreatedAt()));
     }
 
     @Test
