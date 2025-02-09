@@ -1493,37 +1493,449 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 
 ---
 
+## [김지윤]
 
-Tasteful-AI 트러블 슈팅 (1)
+<details>
+<summary><h3>WebSocket 연결 후 사용자 인증 시 JWT 인증이 되지 않는 문제 발생 및 해결 방법</h3></summary>
 
-# WebSocket 연결 후 사용자 인증 시 JWT 인증이 되지 않는 문제 발생 및 해결 방법
+## **1. 문제 상황**
 
-[WebSocket 인증 및 Spring Security와 충돌 문제](https://www.notion.so/WebSocket-Spring-Security-192c6e685f1081f0975acb55f53cc8fa?pvs=21)
+- WebSocket은 연결 이후 지속적인 메시지 교환 방식인 Stateful 방식을 사용하기 때문에 HTTP 요청의 Authorization header를 사용할 수 없어 JWT 인증이 어려움
 
-[JPA에서  Member ID 조회로 인한
-`UnsatisfiedDependencyException` 발생](https://www.notion.so/JPA-Member-ID-UnsatisfiedDependencyException-192c6e685f10819da90efc2ecbaf2449?pvs=21)
+## **2. 원인 분석**
 
-[N+1 문제 해결 - findMemberWithTasteById()](https://www.notion.so/N-1-findMemberWithTasteById-192c6e685f1081268b53dfd01021a1c1?pvs=21)
+- 일반적인 JWT 인증 방식은 요청마다 토큰을 검증하지만 WebSocket은 한 번 연결이 되고 나면 계속 데이터가 교환이 되어 요청 마다 인증할 수 없음
 
-[Redis에서 관리하는 AI 채팅 세션과 추천 내역 Repository의 복잡도 증가](https://www.notion.so/Redis-AI-Repository-192c6e685f1081f99023c2ef22f8bbec?pvs=21)
+- WebSocket의 handshake는 HTTP 기반이지만, 이후의 메시지 전송은 WebSocket Frame 기반으로 진행되어 토큰 인증이 불가능함
 
-[AI 채팅 히스토리 삭제 시 MySQL과 Redis의 데이터 동기화 문제 발생](https://www.notion.so/AI-MySQL-Redis-192c6e685f1081439c3defec316c8e5a?pvs=21)
+## **3. 해결 방법**
 
-[단위 테스트 진행 시 **`NullPointException`
-** 발생 원인 및 해결 방법](https://www.notion.so/NullPointException-192c6e685f108105b76bf373bc7e915d?pvs=21)
+- ChatMessageDto 내부에 Token 필드를 추가하여 WebSocket 메시지 전송 시 JWT를 포함하여 인증
 
-[**JPA 영속성 컨텍스트로 인한 이미지 삭제 오류 해결**](https://www.notion.so/JPA-192c6e685f108185a16dc7d5f59b7ee8?pvs=21)
+## **4. 결과**
 
-[**S3 정적 호스팅 페이지 새로고침 시 페이지 다이렉트 실패 문제 해결**](https://www.notion.so/S3-192c6e685f108129bf11de66d28cfe2a?pvs=21)
+- WebSocket에서도 JWT 기반 사용자 인증이 가능해져 연결 이후에도 메시지 마다 사용자 검증이 가능해짐.
 
-[docker 연결 중 레디스 연결이 안 되는 문제 해결 ](https://www.notion.so/docker-192c6e685f1081718135da48ff056789?pvs=21)
+- HTTP API와의 일관성이 유지되고 검증을 통한 보안성이 확보 됨
 
-[Mac으로 Docker 배포 시 생기는 **CPU 아키텍쳐 호환문제 해결
-**](https://www.notion.so/Mac-Docker-CPU-192c6e685f108185b5a1d0f05055da5c?pvs=21)
+</details>
 
-[**Jackson 역직렬화 오류 해결 방법**](https://www.notion.so/Jackson-192c6e685f1081318485ff1920ac4223?pvs=21)
 
-[**403 FORBIDDEN 에러 발생 원인 및 해결 방법**](https://www.notion.so/403-FORBIDDEN-192c6e685f10812c8643e7952c19442b?pvs=21)
+<details>
+<summary><h3>WebSocket 인증 및 Spring Security와 충돌 문제</h3></summary>
+
+## **1. 문제 상황**
+
+- WebSocket 연결 시 Authorization 헤더에 Access Token이 포함되지 않아 Spring Security의 인증이 실패하여 연결이 차단 됨
+
+- 알고보니 Access Token이 쿠키에 저장되고 있어서 인증이 되지 않았고, 이를 해결하기 위해 WebSocket 연결 시 Headers의 Cookie 값에 자동으로 쿠키에 저장된 토큰 값을 불러오는 방식으로
+  로직을 변경해봤지만 인증이 여전히 되지 않았음
+
+## **2. 원인 분석**
+
+- Spring Security 구현하는 과정에서 보안을 위해 Access Token 값을 Cookie에 저장하였는데, WebSocket 요청은 기본적으로 Authorization 헤더를 사용하여 토큰을 전달하는
+  방식이므로, header에 토큰 값이 들어가지 않아 인증이 되지 않았음
+
+- Access Token을 Cookie에 저장하고, WebSocket 요청을 허용하기 위해 CSRF 보호를 비활성화하였다. 하지만 WebSocket 요청 시 Authorization 헤더에 토큰이 포함되지 않았기
+  때문에 인증이 이루어지지 않았고, CSRF 보호가 비활성화된 상태에서도 요청이 차단되었습니다.
+
+- CSRF 보호의 문제가 아닌 WebSocket의 인증 방식(Authorization헤더에 AccessToken이 있어야함)과 Authorization 헤더누락(Access Token은 Cookie에 저장되있음)의
+  충돌의 문제
+
+## **3. 해결 방법**
+
+- Access Token을 쿠키에 저장하지 않고, Response Body로 반환하도록 수정 후 클라이언트 측에서 WebSocket 연결 요청을 보낼 때 Authorization 헤더에 Access Token을
+  포함시켜 토큰 전달함. → 인증 됨
+
+## **4. 결과**
+
+- 수정 후 WebSocket 인증이 성공적으로 이루어졌고, 연결 및 메시지 송수신이 정상적으로 동작하는 것을 확인
+
+</details>
+
+## [허수연]
+
+<details>
+<summary><h3>JPA에서  Member ID 조회로 인한 UnsatisfiedDependencyException 발생</h3></summary>
+
+## **1. 문제 상황**
+
+- AI 채팅 히스토리를 MySQL과 Redis에서 관리하는 과정에서 UnsatisfiedDependencyException 발생.
+
+- 테스트 실행 시 contextLoads() 실패 및 IllegalArgumentException 발생.
+
+## **2. 원인 분석**
+
+- AiChatHistoryRepository에서 findByMemberIdOrderByCreatedAtDesc(Long memberId)을 사용했는데, JPA에서 Long 대신 Member 엔티티를 직접 참조하는
+  것이 필요했음.
+
+- deleteByMember(Long memberId)도 같은 문제 발생.
+
+## **3. 해결 방법**
+
+- findByMemberIdOrderByCreatedAtDesc(Member member)로 변경하여 JPA가 올바르게 동작하도록 수정.
+
+- deleteByMember(Long memberId)를 deleteByMember(Member member)로 변경하고, 서비스 계층에서 memberService.findById(memberId)를 통해
+  Member 객체를 먼저 조회하도록 변경.
+
+## **4. 결과**
+
+- contextLoads() 테스트가 정상적으로 통과되었으며, UnsatisfiedDependencyException이 해결됨.
+
+- AI 채팅 히스토리가 올바르게 저장 및 삭제되며, Redis와 MySQL 간 데이터 일관성이 유지됨.
+
+</details>
+
+<details>
+<summary><h3>N+1 문제 해결 - findMemberWithTasteById()</h3></summary>
+
+## **1. 문제 상황**
+
+- AI 추천 기능에서 회원의 음식 취향 정보를 조회할 때, 연관된 Taste 엔티티(장르, 선호 음식, 비선호 음식, 식단 성향, 매운 정도)를 개별 조회하면서 N+1 문제가 발생
+
+- 기존 로직에서는 Member 엔티티를 먼저 가져오고, 이후 Taste 엔티티들을 각각 조회하는 방식이었기 때문에, 회원이 많아질수록 데이터베이스에 과부하가 걸리고 성능이 저하되는 문제가 발생
+
+## **2. 원인 분석**
+
+- JPA에서 연관된 엔티티를 가져올 때, 기본적으로 LAZY 로딩 전략이 적용됨.
+
+- Member를 조회한 후, Taste 엔티티 목록을 하나씩 조회할 때마다 추가적인 SELECT 쿼리가 발생하였음.
+  예를 들어, 회원 1명을 조회하면 기본적으로 1개의 쿼리가 실행되지만, 그 회원이 5개의 Taste 데이터를 가지고 있을 경우 추가적으로 5개의 쿼리가 실행되어 총 6개의 쿼리가 발생.
+
+- 회원이 많아질수록 이 문제는 기하급수적으로 증가하여 성능 저하로 이어질 수 있음
+
+## **3. 해결 방법**
+
+- JPQL의 FETCH JOIN을 사용하여 연관된 Taste 엔티티들을 한 번의 쿼리로 가져오도록 변경
+
+- MemberRepository에 findMemberWithTasteById() 메서드를 추가하고, JPQL을 사용하여 LEFT JOIN FETCH를 적용하였다.
+
+- 이를 통해 Taste 엔티티들이 함께 로딩되면서 쿼리 실행 횟수를 최소화할 수 있었다.
+
+- @EntityGraph를 활용하여 쿼리 최적화를 추가적으로 진행
+
+## **4. 결과**
+
+- N+1 문제가 해결되어 DB 쿼리 실행 횟수가 대폭 감소하였고, 조회 속도가 향상됨
+
+- 기존에는 회원 1명을 조회할 때 5개의 쿼리가 실행되었으나, 최적화 이후에는 1개의 쿼리로 모든 연관 데이터를 가져올 수 있게 됨.
+
+- AI 추천 기능의 응답 시간이 평균적으로 40% 이상 단축되었으며, 대량의 트래픽이 몰릴 때도 성능 저하 없이 안정적인 조회가 가능.
+
+- DB 부하가 감소하면서 전체 시스템의 처리량(TPS)도 개선.
+
+</details>
+
+<details>
+<summary><h3>Redis에서 관리하는 AI 채팅 세션과 추천 내역 Repository의 복잡도 증가</h3></summary>
+
+## **1. 문제 상황**
+
+- AI 채팅 세션과 추천 내역을 Redis에서 관리할 때 AiChatRedisRepository가 너무 많은 역할을 담당하여 코드가 복잡해짐
+
+## **2. 원인 분석**
+
+- AI 채팅 세션 관리 (getSessionId, saveSessionId)와 추천 내역 관리 (saveRecommendation, deleteChatHistory)가 하나의 Repository에서 처리되었음.
+
+- 단일 책임 원칙(SRP)에 어긋났고, 유지보수가 어려워짐.
+
+## **3. 해결 방법**
+
+- AiChatRedisRepository를 두 개로 분리.
+
+- AiChatSessionRedisRepository는 세션 관리, AiChatRecommendationRedisRepository는 추천 내역 관리 담당.
+
+- clearChatHistory()에서 각각의 Repository를 호출하도록 수정.
+
+## **4. 결과**
+
+- 코드가 단순해지고 유지보수가 쉬워짐. clearChatHistory() 실행 시 Redis에서 세션과 추천 내역을 명확하게 구분하여 삭제하도록 개선됨.
+
+</details>
+
+<details>
+<summary><h3>AI 채팅 히스토리 삭제 시 MySQL과 Redis의 데이터 동기화 문제 발생</h3></summary>
+
+## **1. 문제 상황**
+
+- AI 채팅 히스토리 삭제 시 MySQL과 Redis의 데이터 동기화가 맞지 않아 deleteByMember() 실행 후 Redis 캐시가 남아 있는 문제 발생.
+
+## **2. 원인 분석**
+
+- MySQL의 데이터를 삭제했지만, Redis에서 해당 사용자 세션과 추천 내역을 삭제하는 로직이 없거나 누락되었음.
+
+- deleteChatHistory(Long memberId)에서 sessionId를 가져오지 못해 Redis 데이터가 그대로 남아 있음.
+
+## **3. 해결 방법**
+
+- clearChatHistory()에서 AiChatSessionRedisRepository.getSessionId(memberId)를 먼저 호출하여 sessionId를 가져온 후,
+
+- AiChatSessionRedisRepository.deleteSession(memberId)와 AiChatRecommendationRedisRepository.deleteRecommendations(
+  sessionId)를 호출하도록 수정.
+
+## **4. 결과**
+
+- MySQL에서 데이터 삭제 후 Redis에서도 관련 캐시가 정상적으로 삭제됨.
+
+- 테스트 실행 시 Redis와 MySQL 데이터가 일관되게 유지됨.
+
+</details>
+
+<details>
+<summary><h3>단위 테스트 진행 시 NullPointException 발생 원인 및 해결 방법</h3></summary>
+
+## **1. 문제 상황**
+
+-TasteUpdateServiceImplTest로 단위 테스트를 하는 과정에서 NPE 가 발생
+
+````
+error message
+java.lang.NullPointerException
+at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+````
+
+## **2. 원인 분석**
+
+- genresRequest가 null이거나 빈 리스트일 가능성이 있음.
+
+-genresRepository.findByGenreName(genreName)가 Optional.empty()를 반환해야 하는데, 실제 null을 반환
+
+- Mockito가 tasteGenresRepository.save(...)를 Mock 처리하지 않았을 가능성
+
+- tasteGenresRepository.deleteByMember(member); 호출 시 tasteGenresRepository가 null일 가능성이 있음.
+
+## **3. 해결 방법**
+
+-genresRepository.findByGenreName()의 반환값을 명확히 설정하여 Mockito가 null이 아닌 Optional.empty()를 반환하도록 설정해야 함
+
+- genresRepository.save()가 null을 반환하는 경우 방지
+  일부 경우에서 save()가 null을 반환하면 이후 .map() 과정에서 NPE가 발생 가능성이 있어 Mockito에서 save()가 올바른 객체를 반환하도록 설정
+
+- tasteGenresRepository.save(...) Mock 설정 추가
+  삭제 후 다시 저장하는 과정에서 tasteGenresRepository.save()가 null을 반환하면서 NPE가 발생할 가능성이 있음.
+
+## **4. 결과**
+
+- 이제 Optional을 제대로 반환하고, save() 메서드에서 null을 방지하여 NPE가 발생하지 않음
+
+- Mockito의 when().thenReturn(null); 대신 Optional.empty()를 명확하게 반환하도록 설정
+
+- Mockito에서 save()를 호출할 때, null이 반환되지 않도록 thenAnswer(invocation -> ...) 활용
+
+</details>
+
+## [정가현]
+
+<details>
+<summary><h3>JPA 영속성 컨텍스트로 인한 이미지 삭제  오류 해결</h3></summary>
+
+## **1. 문제 상황**
+
+- 유저와 프로필 사진을 1:1 양방향매핑하여 연관관계 설정
+- 사진 업로드 api에 이미 저장된 프로필 사진이 있으면 이를 hard delete하고 새로 업로드하게끔 구현
+
+→ repository의 delete 메서드가 제대로 작동하지 않았음
+
+## **2. 원인 분석**
+
+- 연관관계가 맺어진 객체들이 모두 영속성 컨텍스트에 올라와 있을 때, 부모 객체를 삭제하려해도 자식객체가 남아있으면 JPA가 데이터의 무결성을 지키기 위해 삭제를 제한 -> 양방향 매핑이 되어있어 해당됨
+
+- 중첩 트랜잭션으로 내부의 deleteImage 메서드에 적용된 트랜잭션이 무시
+
+## **3. 해결 방법**
+
+[해결1]
+
+- 삭제 전에 두 연관관계를 끊어줌
+- deleteImage에 삭제 후 flush()를 해서 영속성 컨텍스트의 내용을 동기화
+
+[해결2]
+
+- 리팩토링 과정에서 유저와 프로필 사진을 1:N 양방향 매핑 연관관계로 변경
+  ⇒ 부모-자식간의 의존성이 느슨해져 삭제 제한 완화
+
+## **4. 결과**
+
+- 사진이 repository에서 정상적으로 삭제
+
+</details>
+
+
+<details>
+<summary><h3>S3 정적 호스팅 페이지 새로고침 시 페이지 다이렉트 실패 문제 해결</h3></summary>
+
+## **1. 문제 상황**
+
+1. 메인페이지에 접속이 안되는 문제
+   → 404 NoSuchKey 에러 발생
+
+2. 메인페이지에서 버튼을 눌러 다른 페이지로는 이동이 되는데 거기서 새로고침을 하거나 url 로 직접 경로 추가(ex. /mypage)를 할 경우 접속이 안되는 문제
+   → 403 AccessDenied 에러 발생
+
+## **2. 원인 분석**
+
+1. 기본 루트 객체를 /index.html 로 설정했기때문
+   ⇒ 경로가 아니라 객체를 찾기때문에 /를 빼고 index.html 이라고 작성해주었어야함
+
+2. S3는 정적인 웹사이트만 배포가 가능해서 경로에 /mypage 를 추가하면 가장 먼저 S3 저장소에서 /mypage를 찾음.
+   버튼을 눌렀을때 리다이렉팅이 된 이유는 index.html 에서 리액트가 라우팅을 내부적으로 해주고 있었기때문.
+
+## **3. 해결 방법**
+
+1. 기본 루트 객체를 index.html 로 설정
+
+2. Cloud Front 에서 오류 페이지 설정을 하여 404가 뜰 때 200 OK를 반환하고 /index.html 로 리다이렉팅하게끔 하면 설정
+   ⇒ /mypage 를 못 찾아도 index.html 로 리다이렉트 되어 /mypage로 내부 라우팅이 됨
+
+## **4. 결과**
+
+- 정상적으로 웹 사이트에 접속 가능
+
+</details>
+
+<details>
+<summary><h3>docker 연결 중 레디스 연결이 안 되는 문제 해결 </h3></summary>
+
+## **1. 문제 상황**
+
+- Redis 배포 후 앱서버에서 실행을 돌렸는데 Redis가 연결이 되지 않는 오류 발생
+  → RedisConnectionException: unable to connect to root cause
+
+## **2. 원인 분석**
+
+1. RedisConfig에 Redis의 주소가 localhost로 되어있었음.
+
+2. 프로젝트 파일을 변경할 때마다 gradlew를 clean 하고 jar 파일을 다시 build해주는 것이 필요했음.
+
+→ 컨테이너 삭제 후 재생성을 해주어야하는데 docker-compose up 만으로는 프로젝트 수정사항이 반영이 됨
+
+3. docker-compose up 만 쓸 경우, 기존의 만든 이미지와 컨테이너를 재사용하기 때문
+
+## **3. 해결 방법**
+
+1. application.properties에
+   spring.data.redis.host={REDIS_HOST} 로 환경변수 처리 후, 인텔리제이에는 localhost를, compose.yaml 파일에는 redis 호스트명(ip)으로 변경
+
+2. 컨테이너 삭제 후 Dockerfile을 다시 build
+   → (컨테이너 삭제)
+   docker compose down
+   → (jar 파일 다시 빌드)
+   ./gradlew clean build -x test
+   → (docker 이미지 새로 빌드)
+   docker build --platform linux/amd64 -t kahyunjung/9kcal:latest .
+
+3. --build 를 하면 이미지를 새로 생성
+   → docker-compose up --build
+
+## **4. 결과**
+
+- 앱서버에서 Redis에 무사히 연결
+
+</details>
+
+<details>
+<summary><h3>Mac으로 Docker 배포 시 생기는 CPU 아키텍쳐 호환문제 해결</h3></summary>
+
+## **1. 문제 상황**
+
+- EC2 앱서버에서 Docker로 앱 이미지를 내려받으려는데 오류 발생
+  → no matching manifest for linux/amd64 in the manifest list entries
+
+## **2. 원인 분석**
+
+- docker Image의 경우 각각 지원하는 CPU 아키텍처가 다름
+  → 지원하지 않는 아키텍처의 이미지를 pull 받으려고 했기때문
+
+→amd64 에러가 걸리니 --platform arm64 로 pull
+
+그러자 이미지 컨테이너화 할 때 다시 에러 :
+! webapp The requested image's platform (linux/arm64/v8) does not match the detected host platform (linux/amd64/v3) and
+no specific platform was requested
+
+⇒ 애초에 이미지를 만들 때부터 amd64로 만들어야함.  
+(설정하지 않으면 실리콘 mac은 arm64로 만들기 때문)
+
+## **3. 해결 방법**
+
+- docker image를 build 할 때
+  -- platform linux/amd64 옵션을 추가해서 지원 아키텍처를 호스트 아키텍처에 맞게 설정 후 build
+
+## **4. 결과**
+
+- 백엔드 앱 이미지를 만들 때 docker build --platform linux/amd64 -t kahyunjung/9kcal 로 이미지를 build 하여 EC2 서버에서 pull 받자 컨테이너 생성까지 문제
+  없이 진행됨
+
+</details>
+
+## [백은영]
+
+<details>
+<summary><h3>Jackson 역직렬화 오류 해결 방법</h3></summary>
+
+## **1. 문제 상황**
+
+- PasswordVerifyRequestDto 클래스에서 Jackson 역직렬화 오류가 발생
+
+- JSON parse error: Cannot construct instance of 'com.example.tastefulai.domain.mem.dto.PasswordVerifyRequestDto' (
+  although at least one Creator exists): cannot deserialize from Object value (no delegate- or property-based Creator)]
+
+## **2. 원인 분석**
+
+- PasswordVerifyRequestDto 클래스에 필드가 하나인 경우 JSON 데이터를 객체로 역직렬화할 때 어떤 생성자를 사용할지 명확히 알지 못한다.
+
+- 클래스가 final 필드를 가지고 있으며 기본 생성자가 없는 경우, Jackson은 객체를 생성할 수 없다.
+
+## **3. 해결 방법**
+
+- @JsonCreator를 통해 Jackson에게 어떤 생성자를 사용할지 알려주고, @JsonProperty로 JSON 키와 생성자 매개변수를 매핑하여 역직렬화 처리
+
+## **4. 결과**
+
+- 불변성을 유지하며, Jackson 역직렬화 문제를 해결 할 수 있었고, 객체의 안전성을 유지하여 예측 가능한 설계 보장
+
+</details>
+
+<details>
+<summary><h3>403 FORBIDDEN 에러 발생 원인 및 해결 방법</h3></summary>
+
+## **1. 문제 상황**
+
+- 사용자가 API 요청을 보낼 때 지속적으로 403 Forbidden 에러가 발생
+- 403 에러는 권한 부족을 나타내는 상태 코드이지만, 인증 실패 401 Unauthorized 상황에서도 403이 반환됨
+- 이로 인해 인증 실패와 권한 부족 상황이 구분되지 않아 디버깅 과정에서 원인 파악이 어려움
+
+## **2. 원인 분석**
+
+1. JwtAuthFilter에서 발생한 인증 실패 예외가 처리 되지 않음
+
+- 토큰이 유효하거나 만료된 경우, JwtAuthFilter에서 CustomException이 발생하지만 필터 내부에서 예외가 처리되지 않음
+- 처리되지 않은 예외가 Spring Security의 기본 흐름으로 전달, Security는 이를 403 Forbidden으로 간주하여 반환
+
+2. Spring Security의 기본 예외 처리
+
+- 일반적으로 Spring에서는 예외 발생 시 별도 처리가 없다면 500 에러를 반환.
+- 그러나 Spring Security에서는 403 Forbidden을 반환하는 기본 동작을 수행.→ 따라서 JWT 검증 실패와 같은 인증 실패 상황에서도 403 에러가 발생.
+
+## **3. 해결 방법**
+
+1. JwtAuthFilter에서 예외 처리
+
+- JwtAuthFilter 내부에서 발생하는 인증 실패 예외 CustomException 를 명시적으로 처리
+  인증 실패 시 403이 아닌 401 Unauthorized 응답을 반환하도록 수정
+
+2. SecurityConfig 예외 처리 설정
+
+- SecurityConfig에서 전역적으로 예외 처리를 설정
+- 인증 실패(401)와 권한 부족(403)을 명확히 구분하여 처리
+
+## **4. 결과**
+
+1. JWT 검증 실패 : JWT가 없거나 잘못된 경우, 401 Unauthorized 응답 반환
+
+2. 권한 부족 : 인증된 사용자가 권한이 없는 리소스를 요청하는 경우, 403 Forbidden 응답 반환
+
+</details>
+
 ---
 
 ## 🍙 CONTRIBUTORS
