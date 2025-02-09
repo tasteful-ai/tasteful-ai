@@ -1654,7 +1654,7 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 </details>
 
 <details>
-<summary><h3># AI 채팅 히스토리 삭제 시 MySQL과 Redis의 데이터 동기화 문제 발생</h3></summary>
+<summary><h3>AI 채팅 히스토리 삭제 시 MySQL과 Redis의 데이터 동기화 문제 발생</h3></summary>
 
 ## **1. 문제 상황**
 
