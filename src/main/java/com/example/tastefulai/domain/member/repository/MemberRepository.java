@@ -15,10 +15,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByEmail(String email);
 
-    @Query("SELECT m FROM Member m WHERE m.email = :email AND m.deletedAt IS NULL")
-    Optional<Member> findActiveByEmail(@Param("email") String email);
-
-
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.tasteGenres tg LEFT JOIN FETCH tg.genres " +
             "WHERE m.id = :id")
