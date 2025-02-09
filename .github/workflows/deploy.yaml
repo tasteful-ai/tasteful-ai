@@ -50,7 +50,7 @@ jobs:
 
   deploy-to-app-server-1:
     needs: build-docker-image
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy to App Server 1
         uses: appleboy/ssh-action@v0.1.6
@@ -69,7 +69,7 @@ jobs:
 
     needs: deploy-to-app-server-1
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy to App Server 2
         uses: appleboy/ssh-action@v0.1.6
