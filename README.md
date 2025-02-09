@@ -1724,33 +1724,217 @@ at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.jav
 
 </details>
 
+## [정가현]
+
 <details>
-<summary><h3></h3></summary>
+<summary><h3>JPA 영속성 컨텍스트로 인한 이미지 삭제  오류 해결</h3></summary>
 
 ## **1. 문제 상황**
 
+- 유저와 프로필 사진을 1:1 양방향매핑하여 연관관계 설정
+- 사진 업로드 api에 이미 저장된 프로필 사진이 있으면 이를 hard delete하고 새로 업로드하게끔 구현
+
+→ repository의 delete 메서드가 제대로 작동하지 않았음
+
 ## **2. 원인 분석**
+
+- 연관관계가 맺어진 객체들이 모두 영속성 컨텍스트에 올라와 있을 때, 부모 객체를 삭제하려해도 자식객체가 남아있으면 JPA가 데이터의 무결성을 지키기 위해 삭제를 제한 -> 양방향 매핑이 되어있어 해당됨
+
+- 중첩 트랜잭션으로 내부의 deleteImage 메서드에 적용된 트랜잭션이 무시
 
 ## **3. 해결 방법**
 
+[해결1]
+
+- 삭제 전에 두 연관관계를 끊어줌
+- deleteImage에 삭제 후 flush()를 해서 영속성 컨텍스트의 내용을 동기화
+
+[해결2]
+
+- 리팩토링 과정에서 유저와 프로필 사진을 1:N 양방향 매핑 연관관계로 변경
+  ⇒ 부모-자식간의 의존성이 느슨해져 삭제 제한 완화
+
 ## **4. 결과**
+
+- 사진이 repository에서 정상적으로 삭제
 
 </details>
 
 
 <details>
-<summary><h3></h3></summary>
+<summary><h3>S3 정적 호스팅 페이지 새로고침 시 페이지 다이렉트 실패 문제 해결</h3></summary>
 
 ## **1. 문제 상황**
 
+1. 메인페이지에 접속이 안되는 문제
+   → 404 NoSuchKey 에러 발생
+
+2. 메인페이지에서 버튼을 눌러 다른 페이지로는 이동이 되는데 거기서 새로고침을 하거나 url 로 직접 경로 추가(ex. /mypage)를 할 경우 접속이 안되는 문제
+   → 403 AccessDenied 에러 발생
+
 ## **2. 원인 분석**
+
+1. 기본 루트 객체를 /index.html 로 설정했기때문
+   ⇒ 경로가 아니라 객체를 찾기때문에 /를 빼고 index.html 이라고 작성해주었어야함
+
+2. S3는 정적인 웹사이트만 배포가 가능해서 경로에 /mypage 를 추가하면 가장 먼저 S3 저장소에서 /mypage를 찾음.
+   버튼을 눌렀을때 리다이렉팅이 된 이유는 index.html 에서 리액트가 라우팅을 내부적으로 해주고 있었기때문.
 
 ## **3. 해결 방법**
 
+1. 기본 루트 객체를 index.html 로 설정
+
+2. Cloud Front 에서 오류 페이지 설정을 하여 404가 뜰 때 200 OK를 반환하고 /index.html 로 리다이렉팅하게끔 하면 설정
+   ⇒ /mypage 를 못 찾아도 index.html 로 리다이렉트 되어 /mypage로 내부 라우팅이 됨
+
 ## **4. 결과**
+
+- 정상적으로 웹 사이트에 접속 가능
 
 </details>
 
+<details>
+<summary><h3>docker 연결 중 레디스 연결이 안 되는 문제 해결 </h3></summary>
+
+## **1. 문제 상황**
+
+- Redis 배포 후 앱서버에서 실행을 돌렸는데 Redis가 연결이 되지 않는 오류 발생
+  → RedisConnectionException: unable to connect to root cause
+
+## **2. 원인 분석**
+
+1. RedisConfig에 Redis의 주소가 localhost로 되어있었음.
+
+2. 프로젝트 파일을 변경할 때마다 gradlew를 clean 하고 jar 파일을 다시 build해주는 것이 필요했음.
+
+→ 컨테이너 삭제 후 재생성을 해주어야하는데 docker-compose up 만으로는 프로젝트 수정사항이 반영이 됨
+
+3. docker-compose up 만 쓸 경우, 기존의 만든 이미지와 컨테이너를 재사용하기 때문
+
+## **3. 해결 방법**
+
+1. application.properties에
+   spring.data.redis.host={REDIS_HOST} 로 환경변수 처리 후, 인텔리제이에는 localhost를, compose.yaml 파일에는 redis 호스트명(ip)으로 변경
+
+2. 컨테이너 삭제 후 Dockerfile을 다시 build
+   → (컨테이너 삭제)
+   docker compose down
+   → (jar 파일 다시 빌드)
+   ./gradlew clean build -x test
+   → (docker 이미지 새로 빌드)
+   docker build --platform linux/amd64 -t kahyunjung/9kcal:latest .
+
+3. --build 를 하면 이미지를 새로 생성
+   → docker-compose up --build
+
+## **4. 결과**
+
+- 앱서버에서 Redis에 무사히 연결
+
+</details>
+
+<details>
+<summary><h3>Mac으로 Docker 배포 시 생기는 CPU 아키텍쳐 호환문제 해결</h3></summary>
+
+## **1. 문제 상황**
+
+- EC2 앱서버에서 Docker로 앱 이미지를 내려받으려는데 오류 발생
+  → no matching manifest for linux/amd64 in the manifest list entries
+
+## **2. 원인 분석**
+
+- docker Image의 경우 각각 지원하는 CPU 아키텍처가 다름
+  → 지원하지 않는 아키텍처의 이미지를 pull 받으려고 했기때문
+
+→amd64 에러가 걸리니 --platform arm64 로 pull
+
+그러자 이미지 컨테이너화 할 때 다시 에러 :
+! webapp The requested image's platform (linux/arm64/v8) does not match the detected host platform (linux/amd64/v3) and
+no specific platform was requested
+
+⇒ 애초에 이미지를 만들 때부터 amd64로 만들어야함.  
+(설정하지 않으면 실리콘 mac은 arm64로 만들기 때문)
+
+## **3. 해결 방법**
+
+- docker image를 build 할 때
+  -- platform linux/amd64 옵션을 추가해서 지원 아키텍처를 호스트 아키텍처에 맞게 설정 후 build
+
+## **4. 결과**
+
+- 백엔드 앱 이미지를 만들 때 docker build --platform linux/amd64 -t kahyunjung/9kcal 로 이미지를 build 하여 EC2 서버에서 pull 받자 컨테이너 생성까지 문제
+  없이 진행됨
+
+</details>
+
+## [백은영]
+
+<details>
+<summary><h3>Jackson 역직렬화 오류 해결 방법</h3></summary>
+
+## **1. 문제 상황**
+
+- PasswordVerifyRequestDto 클래스에서 Jackson 역직렬화 오류가 발생
+
+- JSON parse error: Cannot construct instance of 'com.example.tastefulai.domain.mem.dto.PasswordVerifyRequestDto' (
+  although at least one Creator exists): cannot deserialize from Object value (no delegate- or property-based Creator)]
+
+## **2. 원인 분석**
+
+- PasswordVerifyRequestDto 클래스에 필드가 하나인 경우 JSON 데이터를 객체로 역직렬화할 때 어떤 생성자를 사용할지 명확히 알지 못한다.
+
+- 클래스가 final 필드를 가지고 있으며 기본 생성자가 없는 경우, Jackson은 객체를 생성할 수 없다.
+
+## **3. 해결 방법**
+
+- @JsonCreator를 통해 Jackson에게 어떤 생성자를 사용할지 알려주고, @JsonProperty로 JSON 키와 생성자 매개변수를 매핑하여 역직렬화 처리
+
+## **4. 결과**
+
+- 불변성을 유지하며, Jackson 역직렬화 문제를 해결 할 수 있었고, 객체의 안전성을 유지하여 예측 가능한 설계 보장
+
+</details>
+
+<details>
+<summary><h3>403 FORBIDDEN 에러 발생 원인 및 해결 방법</h3></summary>
+
+## **1. 문제 상황**
+
+- 사용자가 API 요청을 보낼 때 지속적으로 403 Forbidden 에러가 발생
+- 403 에러는 권한 부족을 나타내는 상태 코드이지만, 인증 실패 401 Unauthorized 상황에서도 403이 반환됨
+- 이로 인해 인증 실패와 권한 부족 상황이 구분되지 않아 디버깅 과정에서 원인 파악이 어려움
+
+## **2. 원인 분석**
+
+1. JwtAuthFilter에서 발생한 인증 실패 예외가 처리 되지 않음
+
+- 토큰이 유효하거나 만료된 경우, JwtAuthFilter에서 CustomException이 발생하지만 필터 내부에서 예외가 처리되지 않음
+- 처리되지 않은 예외가 Spring Security의 기본 흐름으로 전달, Security는 이를 403 Forbidden으로 간주하여 반환
+
+2. Spring Security의 기본 예외 처리
+
+- 일반적으로 Spring에서는 예외 발생 시 별도 처리가 없다면 500 에러를 반환.
+- 그러나 Spring Security에서는 403 Forbidden을 반환하는 기본 동작을 수행.→ 따라서 JWT 검증 실패와 같은 인증 실패 상황에서도 403 에러가 발생.
+
+## **3. 해결 방법**
+
+1. JwtAuthFilter에서 예외 처리
+
+- JwtAuthFilter 내부에서 발생하는 인증 실패 예외 CustomException 를 명시적으로 처리
+  인증 실패 시 403이 아닌 401 Unauthorized 응답을 반환하도록 수정
+
+2. SecurityConfig 예외 처리 설정
+
+- SecurityConfig에서 전역적으로 예외 처리를 설정
+- 인증 실패(401)와 권한 부족(403)을 명확히 구분하여 처리
+
+## **4. 결과**
+
+1. JWT 검증 실패 : JWT가 없거나 잘못된 경우, 401 Unauthorized 응답 반환
+
+2. 권한 부족 : 인증된 사용자가 권한이 없는 리소스를 요청하는 경우, 403 Forbidden 응답 반환
+
+</details>
 
 ---
 
