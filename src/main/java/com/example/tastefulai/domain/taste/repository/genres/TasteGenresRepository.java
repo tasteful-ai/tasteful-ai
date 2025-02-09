@@ -13,5 +13,8 @@ public interface TasteGenresRepository extends JpaRepository<TasteGenres, Long> 
 
     @EntityGraph(attributePaths = {"genres"})
     List<TasteGenres> findByMember(Member member);
+    /**
+     * 기존 데이터 삭제
+     */
     void deleteByMember(Member member);
 }

@@ -106,25 +106,3 @@ public class TasteGetServiceImpl implements TasteGetService {
     }
 }
 
-// 아래 코드는 성능 최적화 비교 테스트를 진행한 뒤 가장 빠른 최적화 코드로 수정하여 주석 삭제할 예정
-
-//    @Override
-//    @Transactional(readOnly = true)
-//    public TasteResponseDto getCompleteTaste(Long memberId) {
-//
-//        Member member = memberService.findMemberWithTasteById(memberId);
-//
-//        List<String> genres = member.getTasteGenres().stream()
-//                .map(tg -> tg.getGenres().getGenreName()).toList();
-//        List<String> likeFoods = member.getTasteLikeFoods().stream()
-//                .map(tl -> tl.getLikeFoods().getLikeName()).toList();
-//        List<String> dislikeFoods = member.getTasteDislikeFoods().stream()
-//                .map(td -> td.getDislikeFoods().getDislikeName()).toList();
-//        List<String> dietaryPreferences = member.getTasteDietaryPreferences().stream()
-//                .map(tp -> tp.getDietaryPreferences().getPreferenceName()).toList();
-//        Integer spicyLevel = member.getTasteSpicyLevels().isEmpty() ? null :
-//                member.getTasteSpicyLevels().getFirst().getSpicyLevel().getSpicyLevel();
-//
-//        return new TasteResponseDto(genres, likeFoods, dislikeFoods, dietaryPreferences, spicyLevel);
-//    }
-//}
