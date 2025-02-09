@@ -25,6 +25,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
+        env:
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
         run: ./gradlew clean build
 
       - name: gradlew bootJar
