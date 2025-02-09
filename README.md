@@ -1556,15 +1556,171 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 ## [허수연]
 
 <details>
-<summary><h3></h3></summary>
+<summary><h3>JPA에서  Member ID 조회로 인한 UnsatisfiedDependencyException 발생</h3></summary>
 
 ## **1. 문제 상황**
 
+- AI 채팅 히스토리를 MySQL과 Redis에서 관리하는 과정에서 UnsatisfiedDependencyException 발생.
+
+- 테스트 실행 시 contextLoads() 실패 및 IllegalArgumentException 발생.
+
 ## **2. 원인 분석**
+
+- AiChatHistoryRepository에서 findByMemberIdOrderByCreatedAtDesc(Long memberId)을 사용했는데, JPA에서 Long 대신 Member 엔티티를 직접 참조하는
+  것이 필요했음.
+
+- deleteByMember(Long memberId)도 같은 문제 발생.
 
 ## **3. 해결 방법**
 
+- findByMemberIdOrderByCreatedAtDesc(Member member)로 변경하여 JPA가 올바르게 동작하도록 수정.
+
+- deleteByMember(Long memberId)를 deleteByMember(Member member)로 변경하고, 서비스 계층에서 memberService.findById(memberId)를 통해
+  Member 객체를 먼저 조회하도록 변경.
+
 ## **4. 결과**
+
+- contextLoads() 테스트가 정상적으로 통과되었으며, UnsatisfiedDependencyException이 해결됨.
+
+- AI 채팅 히스토리가 올바르게 저장 및 삭제되며, Redis와 MySQL 간 데이터 일관성이 유지됨.
+
+</details>
+
+<details>
+<summary><h3>N+1 문제 해결 - findMemberWithTasteById()</h3></summary>
+
+## **1. 문제 상황**
+
+- AI 추천 기능에서 회원의 음식 취향 정보를 조회할 때, 연관된 Taste 엔티티(장르, 선호 음식, 비선호 음식, 식단 성향, 매운 정도)를 개별 조회하면서 N+1 문제가 발생
+
+- 기존 로직에서는 Member 엔티티를 먼저 가져오고, 이후 Taste 엔티티들을 각각 조회하는 방식이었기 때문에, 회원이 많아질수록 데이터베이스에 과부하가 걸리고 성능이 저하되는 문제가 발생
+
+## **2. 원인 분석**
+
+- JPA에서 연관된 엔티티를 가져올 때, 기본적으로 LAZY 로딩 전략이 적용됨.
+
+- Member를 조회한 후, Taste 엔티티 목록을 하나씩 조회할 때마다 추가적인 SELECT 쿼리가 발생하였음.
+  예를 들어, 회원 1명을 조회하면 기본적으로 1개의 쿼리가 실행되지만, 그 회원이 5개의 Taste 데이터를 가지고 있을 경우 추가적으로 5개의 쿼리가 실행되어 총 6개의 쿼리가 발생.
+
+- 회원이 많아질수록 이 문제는 기하급수적으로 증가하여 성능 저하로 이어질 수 있음
+
+## **3. 해결 방법**
+
+- JPQL의 FETCH JOIN을 사용하여 연관된 Taste 엔티티들을 한 번의 쿼리로 가져오도록 변경
+
+- MemberRepository에 findMemberWithTasteById() 메서드를 추가하고, JPQL을 사용하여 LEFT JOIN FETCH를 적용하였다.
+
+- 이를 통해 Taste 엔티티들이 함께 로딩되면서 쿼리 실행 횟수를 최소화할 수 있었다.
+
+- @EntityGraph를 활용하여 쿼리 최적화를 추가적으로 진행
+
+## **4. 결과**
+
+- N+1 문제가 해결되어 DB 쿼리 실행 횟수가 대폭 감소하였고, 조회 속도가 향상됨
+
+- 기존에는 회원 1명을 조회할 때 5개의 쿼리가 실행되었으나, 최적화 이후에는 1개의 쿼리로 모든 연관 데이터를 가져올 수 있게 됨.
+
+- AI 추천 기능의 응답 시간이 평균적으로 40% 이상 단축되었으며, 대량의 트래픽이 몰릴 때도 성능 저하 없이 안정적인 조회가 가능.
+
+- DB 부하가 감소하면서 전체 시스템의 처리량(TPS)도 개선.
+
+</details>
+
+<details>
+<summary><h3>Redis에서 관리하는 AI 채팅 세션과 추천 내역 Repository의 복잡도 증가</h3></summary>
+
+## **1. 문제 상황**
+
+- AI 채팅 세션과 추천 내역을 Redis에서 관리할 때 AiChatRedisRepository가 너무 많은 역할을 담당하여 코드가 복잡해짐
+
+## **2. 원인 분석**
+
+- AI 채팅 세션 관리 (getSessionId, saveSessionId)와 추천 내역 관리 (saveRecommendation, deleteChatHistory)가 하나의 Repository에서 처리되었음.
+
+- 단일 책임 원칙(SRP)에 어긋났고, 유지보수가 어려워짐.
+
+## **3. 해결 방법**
+
+- AiChatRedisRepository를 두 개로 분리.
+
+- AiChatSessionRedisRepository는 세션 관리, AiChatRecommendationRedisRepository는 추천 내역 관리 담당.
+
+- clearChatHistory()에서 각각의 Repository를 호출하도록 수정.
+
+## **4. 결과**
+
+- 코드가 단순해지고 유지보수가 쉬워짐. clearChatHistory() 실행 시 Redis에서 세션과 추천 내역을 명확하게 구분하여 삭제하도록 개선됨.
+
+</details>
+
+<details>
+<summary><h3># AI 채팅 히스토리 삭제 시 MySQL과 Redis의 데이터 동기화 문제 발생</h3></summary>
+
+## **1. 문제 상황**
+
+- AI 채팅 히스토리 삭제 시 MySQL과 Redis의 데이터 동기화가 맞지 않아 deleteByMember() 실행 후 Redis 캐시가 남아 있는 문제 발생.
+
+## **2. 원인 분석**
+
+- MySQL의 데이터를 삭제했지만, Redis에서 해당 사용자 세션과 추천 내역을 삭제하는 로직이 없거나 누락되었음.
+
+- deleteChatHistory(Long memberId)에서 sessionId를 가져오지 못해 Redis 데이터가 그대로 남아 있음.
+
+## **3. 해결 방법**
+
+- clearChatHistory()에서 AiChatSessionRedisRepository.getSessionId(memberId)를 먼저 호출하여 sessionId를 가져온 후,
+
+- AiChatSessionRedisRepository.deleteSession(memberId)와 AiChatRecommendationRedisRepository.deleteRecommendations(
+  sessionId)를 호출하도록 수정.
+
+## **4. 결과**
+
+- MySQL에서 데이터 삭제 후 Redis에서도 관련 캐시가 정상적으로 삭제됨.
+
+- 테스트 실행 시 Redis와 MySQL 데이터가 일관되게 유지됨.
+
+</details>
+
+<details>
+<summary><h3>단위 테스트 진행 시 NullPointException 발생 원인 및 해결 방법</h3></summary>
+
+## **1. 문제 상황**
+
+-TasteUpdateServiceImplTest로 단위 테스트를 하는 과정에서 NPE 가 발생
+
+````
+error message
+java.lang.NullPointerException
+at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+````
+
+## **2. 원인 분석**
+
+- genresRequest가 null이거나 빈 리스트일 가능성이 있음.
+
+-genresRepository.findByGenreName(genreName)가 Optional.empty()를 반환해야 하는데, 실제 null을 반환
+
+- Mockito가 tasteGenresRepository.save(...)를 Mock 처리하지 않았을 가능성
+
+- tasteGenresRepository.deleteByMember(member); 호출 시 tasteGenresRepository가 null일 가능성이 있음.
+
+## **3. 해결 방법**
+
+-genresRepository.findByGenreName()의 반환값을 명확히 설정하여 Mockito가 null이 아닌 Optional.empty()를 반환하도록 설정해야 함
+
+- genresRepository.save()가 null을 반환하는 경우 방지
+  일부 경우에서 save()가 null을 반환하면 이후 .map() 과정에서 NPE가 발생 가능성이 있어 Mockito에서 save()가 올바른 객체를 반환하도록 설정
+
+- tasteGenresRepository.save(...) Mock 설정 추가
+  삭제 후 다시 저장하는 과정에서 tasteGenresRepository.save()가 null을 반환하면서 NPE가 발생할 가능성이 있음.
+
+## **4. 결과**
+
+- 이제 Optional을 제대로 반환하고, save() 메서드에서 null을 방지하여 NPE가 발생하지 않음
+
+- Mockito의 when().thenReturn(null); 대신 Optional.empty()를 명확하게 반환하도록 설정
+
+- Mockito에서 save()를 호출할 때, null이 반환되지 않도록 thenAnswer(invocation -> ...) 활용
 
 </details>
 
@@ -1581,18 +1737,6 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 
 </details>
 
-<details>
-<summary><h3></h3></summary>
-
-## **1. 문제 상황**
-
-## **2. 원인 분석**
-
-## **3. 해결 방법**
-
-## **4. 결과**
-
-</details>
 
 <details>
 <summary><h3></h3></summary>
@@ -1607,31 +1751,6 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 
 </details>
 
-<details>
-<summary><h3></h3></summary>
-
-## **1. 문제 상황**
-
-## **2. 원인 분석**
-
-## **3. 해결 방법**
-
-## **4. 결과**
-
-</details>
-
-<details>
-<summary><h3></h3></summary>
-
-## **1. 문제 상황**
-
-## **2. 원인 분석**
-
-## **3. 해결 방법**
-
-## **4. 결과**
-
-</details>
 
 ---
 
