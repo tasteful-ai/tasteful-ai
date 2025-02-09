@@ -28,7 +28,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 
     private static final String VERIFY_PASSWORD_KEY = "verify-password:";
 
-
     @Override
     @Transactional
     public void deleteMemberByAdmin(Long memberId) {
@@ -40,7 +39,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         targetMember.softDelete();
         adminMemberRepository.save(targetMember);
         clearPasswordVerification(memberId);
-
     }
 
     @Override
