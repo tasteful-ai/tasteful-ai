@@ -61,6 +61,7 @@ jobs:
           port: 22
           script_stop: true
           script: |
+            docker-compose down
             docker pull kahyunjung/9kcal:4
             docker-compose up --build -d
 
@@ -79,5 +80,6 @@ jobs:
           port: 22
           script_stop: true
           script: |
+            docker-compose down
             docker pull kahyunjung/9kcal:4
             docker-compose up --build -d
