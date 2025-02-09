@@ -8,7 +8,7 @@ public interface AiChatHistoryService {
     String getSessionId(Long memberId);
 
     // AI 추천 내역 MySQL 저장 & Redis 캐싱
-    void saveChatHistory(Long memberId, String sessionId, String recommendation);
+    void saveChatHistory(Long memberId, String sessionId, String recommendation, String description);
 
     // AI 추천 히스토리 조회 (Redis 캐싱 후 MySQL 조회)
     List<String> getChatHistory(Long memberId);

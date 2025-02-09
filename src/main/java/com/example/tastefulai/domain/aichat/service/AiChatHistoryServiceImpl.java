@@ -58,7 +58,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
     // AI 추천 내역 MySQL에 저장 & Redis 캐싱
     @Override
     @Transactional
-    public void saveChatHistory(Long memberId, String sessionId, String recommendation) {
+    public void saveChatHistory(Long memberId, String sessionId, String recommendation, String description) {
 
         validateMemberId(memberId);
         validateSessionId(sessionId);
@@ -67,23 +67,23 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
         String tasteData = serializeTasteData(memberId);
 
         // MySQL에 저장
-        AiChatHistory aiChatHistory = new AiChatHistory(sessionId, recommendation, tasteData, member);
+        AiChatHistory aiChatHistory = new AiChatHistory(sessionId, recommendation, description, tasteData, member);
         aiChatHistoryRepository.save(aiChatHistory);
         log.debug("MySQL AI 채팅 히스토리 저장 완료 - 회원 ID: {}, 세션 ID: {}", memberId, sessionId);
 
         // Redis에 캐싱 (세션 기준으로)
-        cacheChatHistory(sessionId, recommendation);
+        cacheChatHistory(sessionId, recommendation, description);
     }
 
     // Redis에 AI 추천 내역 저장
-    private void cacheChatHistory(String sessionId, String recommendation) {
+    private void cacheChatHistory(String sessionId, String recommendation, String description) {
 
         String historyKey = RedisKeyUtil.getHistoryKey(sessionId);
         ListOperations<String, String> listOps = aiChatRedisTemplate.opsForList();
-        listOps.rightPush(historyKey, recommendation);
+        listOps.rightPush(historyKey, recommendation + " - " + description);
 
         aiChatRedisTemplate.expire(historyKey, 1, TimeUnit.DAYS);
-        log.debug("Redis AI 추천 결과 캐싱 완료 - 세션 ID: {}, 추천 메뉴: {}", sessionId, recommendation);
+        log.debug("Redis AI 추천 결과 캐싱 완료 - 세션 ID: {}, 추천 메뉴: {}, 설명: {}", sessionId, recommendation, description);
     }
 
     // AI 추천 히스토리 조회 (Redis 우선 조회, 없으면 MySQL 조회 후 Redis 저장)
@@ -110,7 +110,7 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
 
         List<AiChatHistory> dbHistory = aiChatHistoryRepository.findByMemberIdOrderByCreatedAtDesc(memberId);
         List<String> recommendations = dbHistory.stream()
-                .map(AiChatHistory::getRecommendation)
+                .map(h -> h.getRecommendation() + " - " + h.getDescription())
                 .collect(Collectors.toList());
 
         if (!recommendations.isEmpty()) {

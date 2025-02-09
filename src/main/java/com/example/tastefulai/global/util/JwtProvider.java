@@ -16,25 +16,19 @@ import java.util.Date;
 @Slf4j
 public class JwtProvider {
 
-    // JWT secret-key
     @Value("${jwt.secret}")
     private String secret;
 
-    // access-token 만료 시간
     @Getter
     @Value("${jwt.access-token-expiration}")
     private long accessTokenExpiryMillis;
 
-    // refresh-token 만료 시간
     @Getter
     @Value("${jwt.refresh-token-expiration}")
     private long refreshTokenExpiryMillis;
 
-    // JWT token 생성
     public String generateToken(String email, long expiryMillis) {
-        // 현재 시간
         Date now = new Date();
-        // 만료 시간
         Date expiryDate = new Date(now.getTime() + expiryMillis);
 
         return Jwts.builder()
@@ -45,7 +39,6 @@ public class JwtProvider {
                 .compact();
     }
 
-    // JWT 유효성 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
@@ -59,7 +52,6 @@ public class JwtProvider {
         }
     }
 
-    // JWT 토큰을 통한 사용자 이메일 추출
     public String getEmailFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
@@ -69,12 +61,10 @@ public class JwtProvider {
                 .getSubject();
     }
 
-    // Access-Token 생성
     public String generateAccessToken(String email) {
         return generateToken(email, accessTokenExpiryMillis);
     }
 
-    // Refresh-Token 생성
     public String generateRefreshToken(String email) {
         return generateToken(email, refreshTokenExpiryMillis);
     }

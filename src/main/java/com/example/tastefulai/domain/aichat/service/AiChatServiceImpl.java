@@ -4,6 +4,9 @@ import com.example.tastefulai.domain.aichat.dto.AiChatRequestDto;
 import com.example.tastefulai.domain.aichat.dto.AiChatResponseDto;
 import com.example.tastefulai.domain.member.service.MemberService;
 import com.example.tastefulai.domain.taste.dto.TasteDto;
+import com.example.tastefulai.global.error.errorcode.ErrorCode;
+import com.example.tastefulai.global.error.exception.CustomException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
@@ -36,17 +39,18 @@ public class AiChatServiceImpl implements AiChatService {
 
         // AI 프롬프트 생성 (취향 정보를 포함하여 AI에게 전달)
         String prompt = String.format(
-                "내 취향은 다음과 같다." +
-                        "장르: %s, 좋아하는 음식: %s, 식단 성향: %s, 매운 정도: %s" +
-                        "이 정보를 고려해서 오늘 점심 메뉴 추천해줘." +
-                        "응답은 반드시 JSON 형식으로, {\"recommendation\": \"메뉴 이름\"} 으로 해줘.",
+                "나는 다음과 같은 음식 취향을 가지고 있어. 참고해줘." +
+                        "선호하는 장르: %s, 좋아하는 음식: %s, 선호하지 않는 음식: %s, 식단 성향: %s, 매운 음식 가능정도: %s." +
+                        "하지만 항상 같은 취향의 메뉴만 추천하지 말고, 가끔은 새로운 메뉴도 추천해줘." +
+                        "내가 한 번도 먹어보지 못했을 법한 흥미로운 메뉴도 제안해줘." +
+                        "응답 형식은 반드시 JSON 형식으로 제공해야 해." +
+                        "예시: {\"recommendation\": \"메뉴 이름\", \"description\": \"간단한 메뉴 설명\"}.",
                 tasteDto.getGenres(),
                 tasteDto.getLikeFoods(),
                 tasteDto.getDislikeFoods(),
                 tasteDto.getDietaryPreferences(),
                 tasteDto.getSpicyLevel()
         );
-
         // ChatClient를 사용해 AI에게 요청
         String response = chatClient.prompt().user(prompt).call().content();
 
@@ -55,17 +59,23 @@ public class AiChatServiceImpl implements AiChatService {
 
         // JSON 응답 파싱
         String recommendation;
+        String description;
+
         try {
             Map<String, String> responseMap = objectMapper.readValue(response, Map.class);
+
             recommendation = Optional.ofNullable(responseMap.get("recommendation"))
-                    .orElse("추천할 메뉴가 없습니다.").trim();
-        } catch (Exception exception) {
-            recommendation = "추천할 메뉴를 파싱하는 데 실패했습니다.";
+                    .orElseThrow(() -> new CustomException(ErrorCode.RECOMMENDATION_PARSING_ERROR));
+
+            description = Optional.ofNullable(responseMap.get("description"))
+                    .orElseThrow(() -> new CustomException(ErrorCode.DESCRIPTION_PARSING_ERROR));
+
+        } catch (JsonProcessingException jsonProcessingException) {
+            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
         }
-
         // AI 추천 히스토리 MySQL + Redis에 저장
-        aiChatHistoryService.saveChatHistory(memberId, sessionId, recommendation);
+        aiChatHistoryService.saveChatHistory(memberId, sessionId, recommendation, description);
 
-        return new AiChatResponseDto(recommendation);
+        return new AiChatResponseDto(recommendation, description);
     }
 }
