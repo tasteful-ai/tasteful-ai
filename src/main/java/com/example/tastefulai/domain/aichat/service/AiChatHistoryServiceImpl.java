@@ -25,6 +25,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * AI 채팅 히스토리를 관리하는 서비스 구현체
+ *
+ * <p>회원의 AI 추천 내역을 MySQL과 Redis에 저장 및 조회하며, 세션 ID를 관리
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +43,6 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
     @Qualifier("aiChatRedisTemplate")
     private final RedisTemplate<String, String> aiChatRedisTemplate;
 
-    // 세션 Id 가져오기 (없으면 생성)
     @Override
     public String getSessionId(Long memberId) {
 
@@ -55,7 +59,6 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
         return sessionId;
     }
 
-    // AI 추천 내역 MySQL에 저장 & Redis 캐싱
     @Override
     @Transactional
     public void saveChatHistory(Long memberId, String sessionId, String recommendation, String description) {
@@ -66,12 +69,10 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
         Member member = memberService.findById(memberId);
         String tasteData = serializeTasteData(memberId);
 
-        // MySQL에 저장
         AiChatHistory aiChatHistory = new AiChatHistory(sessionId, recommendation, description, tasteData, member);
         aiChatHistoryRepository.save(aiChatHistory);
         log.debug("MySQL AI 채팅 히스토리 저장 완료 - 회원 ID: {}, 세션 ID: {}", memberId, sessionId);
 
-        // Redis에 캐싱 (세션 기준으로)
         cacheChatHistory(sessionId, recommendation, description);
     }
 
@@ -86,7 +87,13 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
         log.debug("Redis AI 추천 결과 캐싱 완료 - 세션 ID: {}, 추천 메뉴: {}, 설명: {}", sessionId, recommendation, description);
     }
 
-    // AI 추천 히스토리 조회 (Redis 우선 조회, 없으면 MySQL 조회 후 Redis 저장)
+    /**
+     * 회원의 AI 채팅 히스토리를 조회
+     * <p>Redis에 데이터가 있는 경우 즉시 반환하며, 없을 경우 MySQL에서 조회 후 Redis에 저장
+     *
+     * @param memberId 회원의 ID
+     * @return AI 추천 내역 목록
+     */
     @Override
     public List<String> getChatHistory(Long memberId) {
 
@@ -101,11 +108,17 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
             return cachedHistory.stream().map(Object::toString).collect(Collectors.toList());
         }
 
-        // Redis에 없으면 MySQL에서 가져와 Redis에 저장
         return fetchAndCacheHistoryFromDB(memberId, sessionId, historyKey);
     }
 
-    // MySQL에서 가져온 후 Redis에 저장
+    /**
+     * MySQL에서 AI 추천 내역을 가져온 후 Redis에 저장
+     *
+     * @param memberId 회원의 ID
+     * @param sessionId AI 채팅 세션 ID
+     * @param historyKey Redis 키
+     * @return AI 추천 내역 목록
+     */
     private List<String> fetchAndCacheHistoryFromDB(Long memberId, String sessionId, String historyKey) {
 
         List<AiChatHistory> dbHistory = aiChatHistoryRepository.findByMemberIdOrderByCreatedAtDesc(memberId);
@@ -124,16 +137,13 @@ public class AiChatHistoryServiceImpl implements AiChatHistoryService {
         return recommendations;
     }
 
-    // AI 추천 내역 삭제 (Redis & MySQL 동시 삭제)
     @Override
     public void clearChatHistory(Long memberId) {
         Member member = memberService.findById(memberId);
 
-        // MySQL에서 AI 채팅 기록 삭제
         aiChatHistoryRepository.deleteByMember(member);
         log.info("MySQL에서 AI 채팅 히스토리 삭제 완료 - 회원 ID: {}", memberId);
 
-        // Redis에서도 해당 회원의 캐시 삭제
         String sessionId = getSessionId(memberId);
         String historyKey = RedisKeyUtil.getHistoryKey(sessionId);
         aiChatRedisTemplate.delete(List.of(historyKey, RedisKeyUtil.getSessionKey(memberId)));
