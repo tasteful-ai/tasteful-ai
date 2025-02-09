@@ -47,21 +47,27 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
 
     @Override
     @Transactional
+    /**
+     * 회원의 선호 장르를 수정
+     *
+     * <p>기존에 저장된 회원의 장르 정보를 삭제한 후, 새로운 장르 목록을 저장
+     * 만약 요청된 장르가 데이터베이스에 존재하지 않으면, 새로운 장르를 생성하여 저장
+     *
+     * @param memberId 장르 정보를 수정할 회원의 ID
+     * @param genresRequest 회원이 선호하는 장르 목록
+     * @return 업데이트된 장르 목록을 포함하는 {@link TasteResponseDto}
+     */
     public TasteResponseDto updateGenres(Long memberId, List<String> genresRequest) {
 
         Member member = memberService.findById(memberId);
-
-        // 기존 데이터 삭제
         tasteGenresRepository.deleteByMember(member);
 
-        // 새 데이터 저장
         List<Genres> genresList = genresRequest.stream()
-                .distinct() // 중복 제거 (이미 Controller에서 검증되었지만 추가 안전망)
+                .distinct()
                 .map(genreName -> genresRepository.findByGenreName(genreName)
                         .orElseGet(() -> genresRepository.save(new Genres(genreName))))
                 .toList();
 
-        // 저장된 장르 이름 반환
         List<TasteGenres> tasteGenresList = genresList.stream()
                 .map(genres -> new TasteGenres(member, genres))
                 .toList();
@@ -71,6 +77,16 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
         return new TasteResponseDto(genresList.stream().map(Genres::getGenreName).toList(), null, null, null, null);
     }
 
+    /**
+     * 회원이 좋아하는 음식을 수정
+     *
+     * <p>기존 데이터를 삭제한 후 새로운 음식 목록을 저장
+     * 만약 요청된 음식이 데이터베이스에 존재하지 않으면, 새로운 데이터를 생성하여 저장
+     *
+     * @param memberId 좋아하는 음식 정보를 수정할 회원의 ID
+     * @param likeFoodsRequest 회원이 좋아하는 음식 목록
+     * @return 업데이트된 좋아하는 음식 목록을 포함하는 {@link TasteResponseDto}
+     */
     @Override
     @Transactional
     public TasteResponseDto updateLikeFoods(Long memberId, List<String> likeFoodsRequest) {
@@ -94,6 +110,16 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
         return new TasteResponseDto(null, likeFoodsList.stream().map(LikeFoods::getLikeName).toList(), null, null, null);
     }
 
+    /**
+     * 회원이 싫어하는 음식을 수정
+     *
+     * <p>기존 데이터를 삭제한 후 새로운 음식 목록을 저장
+     * 만약 요청된 음식이 데이터베이스에 존재하지 않으면, 새로운 데이터를 생성하여 저장
+     *
+     * @param memberId 싫어하는 음식 정보를 수정할 회원의 ID
+     * @param dislikeFoodsRequest 회원이 싫어하는 음식 목록
+     * @return 업데이트된 싫어하는 음식 목록을 포함하는 {@link TasteResponseDto}
+     */
     @Override
     @Transactional
     public TasteResponseDto updateDislikeFoods(Long memberId, List<String> dislikeFoodsRequest) {
@@ -117,6 +143,16 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
         return new TasteResponseDto(null, null, dislikeFoodsList.stream().map(DislikeFoods::getDislikeName).toList(),null, null);
     }
 
+    /**
+     * 회원의 식단 선호도를 수정
+     *
+     * <p>기존 데이터를 삭제한 후 새로운 식단 선호도를 저장
+     * 만약 요청된 식단이 데이터베이스에 존재하지 않으면, 새로운 데이터를 생성하여 저장
+     *
+     * @param memberId 식단 선호도를 수정할 회원의 ID
+     * @param dietaryPreferencesRequest 회원이 선호하는 식단 목록
+     * @return 업데이트된 식단 선호도를 포함하는 {@link TasteResponseDto}
+     */
     @Override
     @Transactional
     public TasteResponseDto updateDietaryPreferences(Long memberId, List<String> dietaryPreferencesRequest) {
@@ -140,6 +176,17 @@ public class TasteUpdateServiceImpl implements TasteUpdateService {
         return new TasteResponseDto(null, null,null, dietaryPreferencesList.stream().map(DietaryPreferences::getPreferenceName).toList(),null);
     }
 
+
+    /**
+     * 회원의 매운맛 선호도를 수정
+     *
+     * <p>기존 데이터를 삭제한 후 새로운 매운맛 선호도를 저장
+     * 만약 요청된 매운맛 단계가 데이터베이스에 존재하지 않으면, 새로운 데이터를 생성하여 저장
+     *
+     * @param memberId 매운맛 선호도를 수정할 회원의 ID
+     * @param spicyLevelRequest 회원이 선호하는 매운맛 단계 (정수 값)
+     * @return 업데이트된 매운맛 단계를 포함하는 {@link TasteResponseDto}
+     */
     @Override
     @Transactional
     public TasteResponseDto updateSpicyLevel(Long memberId, Integer spicyLevelRequest) {
