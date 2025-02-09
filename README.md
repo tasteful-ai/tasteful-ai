@@ -84,8 +84,8 @@
 <summary><h3>🔧 최적의 인프라 설계, 이렇게 하면 됩니다!</h3></summary>
 
 - 배포 및 CI/CD
-    - **GitHub & GitHub Actions** : 코드가 GitHub에 업로드되면 GitHub Actions를 활용하여 자동으로 빌드 및 배포가 진행됩니다.
     - **Docker** : 애플리케이션이 Docker 컨테이너로 패키징되어 배포됩니다.
+    - **GitHub & GitHub Actions** : 코드가 GitHub에 업로드되면 GitHub Actions를 활용하여 자동으로 빌드 및 배포가 진행됩니다.
 
 - 프론트엔드
     - **React** 기반의 프론트엔드 애플리케이션이 Amazon CloudFront를 통해 배포 됩니다.
