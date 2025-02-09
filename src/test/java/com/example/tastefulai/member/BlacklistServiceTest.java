@@ -43,6 +43,6 @@ class BlacklistServiceTest {
 
         // Then
         verify(blacklistRedisTemplate.opsForValue(), times(1))
-                .set("blacklist:" + token, "invalid", ttlMillis, TimeUnit.MILLISECONDS);
+                .set("blacklist:" + token, "logout", ttlMillis, TimeUnit.MILLISECONDS);
     }
 }
