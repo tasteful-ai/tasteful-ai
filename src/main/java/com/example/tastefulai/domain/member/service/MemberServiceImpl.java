@@ -16,7 +16,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +44,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
-    // 비밀번호 변경
     @Override
     @Transactional
     public void updatePassword(String email, String currentPassword, String newPassword, String currentAccessToken) {
@@ -71,7 +69,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
-    // 비밀번호 검증
     @Override
     public void verifyPassword(Long memberId, String password) {
 
@@ -89,7 +86,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
-    // 회원 탈퇴
     @Override
     @Transactional
     public void deleteMember(Long memberId) {
@@ -120,7 +116,6 @@ public class MemberServiceImpl implements MemberService {
         blacklistTemplate.delete(VERIFY_PASSWORD_KEY + memberId);
     }
 
-    // 닉네임 수정
     @Override
     @Transactional
     public void updateNickname(Long memberId, String nickname) {
@@ -132,7 +127,6 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
     }
 
-    // 프로필 조회
     @Override
     public ProfileResponseDto getMemberProfile(Long memberId) {
 

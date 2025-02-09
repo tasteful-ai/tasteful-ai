@@ -21,7 +21,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<CommonResponseDto<MemberResponseDto>> signup(@Valid @RequestBody MemberRequestDto memberRequestDto) {
         MemberResponseDto memberResponseDto = authService.signup(memberRequestDto);
@@ -30,7 +29,6 @@ public class AuthController {
     }
 
 
-    // 로그인
     @PostMapping("/login")
     public ResponseEntity<CommonResponseDto<JwtAuthResponse>> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
         JwtAuthResponse jwtAuthResponse = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
@@ -39,7 +37,6 @@ public class AuthController {
     }
 
 
-    // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<CommonResponseDto<String>> logout(@RequestHeader("Authorization") String token) {
         if (!token.startsWith("Bearer ")) {

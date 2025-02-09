@@ -16,7 +16,6 @@ public class MemberDetailsServiceImpl implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
-    // 사용자 정보 로드
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Member member = memberRepository.findByEmail(email)
