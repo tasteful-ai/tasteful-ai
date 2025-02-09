@@ -1493,7 +1493,7 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 
 ---
 
-### [김지윤]
+## [김지윤]
 
 <details>
 <summary><h3>WebSocket 연결 후 사용자 인증 시 JWT 인증이 되지 않는 문제 발생 및 해결 방법</h3></summary>
@@ -1520,10 +1520,43 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 
 </details>
 
-##
 
 <details>
-<summary><h3>WebSocket 연결 후 사용자 인증 시 JWT 인증이 되지 않는 문제 발생 및 해결 방법</h3></summary>
+<summary><h3>WebSocket 인증 및 Spring Security와 충돌 문제</h3></summary>
+
+## **1. 문제 상황**
+
+- WebSocket 연결 시 Authorization 헤더에 Access Token이 포함되지 않아 Spring Security의 인증이 실패하여 연결이 차단 됨
+
+- 알고보니 Access Token이 쿠키에 저장되고 있어서 인증이 되지 않았고, 이를 해결하기 위해 WebSocket 연결 시 Headers의 Cookie 값에 자동으로 쿠키에 저장된 토큰 값을 불러오는 방식으로
+  로직을 변경해봤지만 인증이 여전히 되지 않았음
+
+## **2. 원인 분석**
+
+- Spring Security 구현하는 과정에서 보안을 위해 Access Token 값을 Cookie에 저장하였는데, WebSocket 요청은 기본적으로 Authorization 헤더를 사용하여 토큰을 전달하는
+  방식이므로, header에 토큰 값이 들어가지 않아 인증이 되지 않았음
+
+- Access Token을 Cookie에 저장하고, WebSocket 요청을 허용하기 위해 CSRF 보호를 비활성화하였다. 하지만 WebSocket 요청 시 Authorization 헤더에 토큰이 포함되지 않았기
+  때문에 인증이 이루어지지 않았고, CSRF 보호가 비활성화된 상태에서도 요청이 차단되었습니다.
+
+- CSRF 보호의 문제가 아닌 WebSocket의 인증 방식(Authorization헤더에 AccessToken이 있어야함)과 Authorization 헤더누락(Access Token은 Cookie에 저장되있음)의
+  충돌의 문제
+
+## **3. 해결 방법**
+
+- Access Token을 쿠키에 저장하지 않고, Response Body로 반환하도록 수정 후 클라이언트 측에서 WebSocket 연결 요청을 보낼 때 Authorization 헤더에 Access Token을
+  포함시켜 토큰 전달함. → 인증 됨
+
+## **4. 결과**
+
+- 수정 후 WebSocket 인증이 성공적으로 이루어졌고, 연결 및 메시지 송수신이 정상적으로 동작하는 것을 확인
+
+</details>
+
+## [허수연]
+
+<details>
+<summary><h3></h3></summary>
 
 ## **1. 문제 상황**
 
@@ -1535,9 +1568,70 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 
 </details>
 
----
+<details>
+<summary><h3></h3></summary>
 
-### [허수연]
+## **1. 문제 상황**
+
+## **2. 원인 분석**
+
+## **3. 해결 방법**
+
+## **4. 결과**
+
+</details>
+
+<details>
+<summary><h3></h3></summary>
+
+## **1. 문제 상황**
+
+## **2. 원인 분석**
+
+## **3. 해결 방법**
+
+## **4. 결과**
+
+</details>
+
+<details>
+<summary><h3></h3></summary>
+
+## **1. 문제 상황**
+
+## **2. 원인 분석**
+
+## **3. 해결 방법**
+
+## **4. 결과**
+
+</details>
+
+<details>
+<summary><h3></h3></summary>
+
+## **1. 문제 상황**
+
+## **2. 원인 분석**
+
+## **3. 해결 방법**
+
+## **4. 결과**
+
+</details>
+
+<details>
+<summary><h3></h3></summary>
+
+## **1. 문제 상황**
+
+## **2. 원인 분석**
+
+## **3. 해결 방법**
+
+## **4. 결과**
+
+</details>
 
 ---
 
