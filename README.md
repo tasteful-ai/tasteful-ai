@@ -1495,6 +1495,8 @@ Redis를 활용한 캐싱 전략을 적용하여 성능을 개선하였습니다
 <details>
 <summary><h3>WebSocket 연결 후 사용자 인증 시 JWT 인증이 되지 않는 문제 발생 및 해결 방법</h3></summary>
 
+##### 작성자 : 김지윤
+
 ## **1. 문제 상황**
 
 - WebSocket은 연결 이후 지속적인 메시지 교환 방식인 Stateful 방식을 사용하기 때문에 HTTP 요청의 Authorization header를 사용할 수 없어 JWT 인증이 어려움
