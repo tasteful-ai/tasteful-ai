@@ -3,7 +3,10 @@ package com.example.tastefulai.domain.image.entity;
 import com.example.tastefulai.domain.member.entity.Member;
 import com.example.tastefulai.global.common.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
+import org.jetbrains.annotations.VisibleForTesting;
 
+@Getter
 @Entity
 public class Image extends BaseEntity {
 
@@ -23,7 +26,31 @@ public class Image extends BaseEntity {
     @Column(nullable = false)
     private String imageUrl;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
+
+    @VisibleForTesting
+    public Image(String fileName, String fileType, Long fileSize, String imageUrl) {
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.fileSize = fileSize;
+        this.imageUrl = imageUrl;
+    }
+
+    public Image() {
+    }
+
+    @VisibleForTesting
+    public Image(String fileName, String fileType, Long fileSize, String imageUrl, Member member) {
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.fileSize = fileSize;
+        this.imageUrl = imageUrl;
+        this.member = member;
+    }
+
+    public void updateMember(Member member) {
+        this.member = member;
+    }
 }

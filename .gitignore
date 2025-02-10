@@ -40,3 +40,4 @@ out/
 .env
 
 ### Ignore application.properties ###
+src/main/resources/application.properties

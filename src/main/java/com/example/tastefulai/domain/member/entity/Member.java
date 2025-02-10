@@ -1,16 +1,26 @@
 package com.example.tastefulai.domain.member.entity;
 
+import com.example.tastefulai.domain.aichat.entity.AiChatHistory;
 import com.example.tastefulai.domain.image.entity.Image;
 import com.example.tastefulai.domain.member.enums.GenderRole;
 import com.example.tastefulai.domain.member.enums.MemberRole;
-import com.example.tastefulai.domain.taste.entity.Taste;
+import com.example.tastefulai.domain.taste.entity.dietarypreferences.TasteDietaryPreferences;
+import com.example.tastefulai.domain.taste.entity.dislikefoods.TasteDislikeFoods;
+import com.example.tastefulai.domain.taste.entity.genres.TasteGenres;
+import com.example.tastefulai.domain.taste.entity.likefoods.TasteLikeFoods;
+import com.example.tastefulai.domain.taste.entity.spicylevel.TasteSpicyLevel;
 import com.example.tastefulai.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.VisibleForTesting;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -31,7 +41,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String nickname;
 
-    @Column
+    @Column(nullable = false)
     private Integer age;
 
     @Enumerated(EnumType.STRING)
@@ -42,49 +52,67 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private MemberRole memberRole;
 
-    // 연관 관계
-    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Image image;
+    private LocalDateTime deletedAt;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Taste> tastes = new ArrayList<>();
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<Image> images;
 
-    // 사업자 전용 필드
-    @Column(unique = true)
-    private String businessNumber;
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<TasteGenres> tasteGenres = new ArrayList<>();
 
-    @Column
-    private String storeName;
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<TasteLikeFoods> tasteLikeFoods = new ArrayList<>();
 
-    @Column
-    private String storeAddress;
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<TasteDislikeFoods> tasteDislikeFoods = new ArrayList<>();
 
-    // 생성자
-    public Member(String email, String password, String nickname,
-                  Integer age, GenderRole genderRole, MemberRole memberRole) {
-            this.email = email;
-            this.password = password;
-            this.nickname = nickname;
-            this.age = age;
-            this.genderRole = genderRole;
-            this.memberRole = memberRole;
-    }
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<TasteDietaryPreferences> tasteDietaryPreferences = new ArrayList<>();
 
-    // 사업자 회원 생성자
-    public Member(String email, String password, String nickname,
-                  Integer age, GenderRole genderRole, MemberRole memberRole,
-                  String businessNumber, String storeName, String storeAddress
-                  ) {
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<TasteSpicyLevel> tasteSpicyLevels = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<AiChatHistory> aiChatHistories = new ArrayList<>();
+
+    public Member(MemberRole memberRole, String email, String password, String nickname, Integer age,
+                  GenderRole genderRole, LocalDateTime deletedAt) {
+        this.memberRole = memberRole;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.age = age;
         this.genderRole = genderRole;
-//        this.memberRole = MemberRole.OWNER;
-        this.businessNumber = businessNumber;
-        this.storeName = storeName;
-        this.storeAddress = storeAddress;
-
+        this.deletedAt = deletedAt;
     }
 
+    @VisibleForTesting
+    public Member(Long id, List<Image> images) {
+        this.id = id;
+        this.images = images;
+    }
+
+
+    public List<GrantedAuthority> getAuthorities() {
+        return List.of(memberRole)
+                .stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                .collect(Collectors.toList());
+    }
+
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
