@@ -15,6 +15,12 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * AI 채팅 요청 횟수를 관리하는 서비스 구현체
+ *
+ * <p>회원별 AI 요청 횟수를 Redis에 저장하고, 최대 10회까지 요청할 수 있도록 제한
+ * <p>첫 요청 시에는 자정까지 TTL(Time-To-Live) 설정
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -23,7 +29,6 @@ public class AiChatCountServiceImpl implements AiChatCountService {
     @Qualifier("aiCountRedisTemplate")
     private final RedisTemplate<String, Integer> aiCountRedisTemplate;
 
-    // 요청 횟수 증가 및 자정까지 TTL 설정
     @Override
     public void incrementRequestCount(Long memberId) {
         String countKey = RedisKeyUtil.getRequestCountKey(memberId);
@@ -37,8 +42,6 @@ public class AiChatCountServiceImpl implements AiChatCountService {
         countOps.increment(countKey);
         log.info("AI 채팅 요청 횟수 증가 - 회원 ID: {}, 현재 횟수: {}", memberId, count + 1);
 
-
-        // 첫 번째 요청인 경우 자정까지 TTL 설정
         if (count == 0) {
             long secondsUntilMidnight = getSecondsUntilMidnight();
             countOps.set(countKey, 1, secondsUntilMidnight, TimeUnit.SECONDS);
@@ -46,7 +49,11 @@ public class AiChatCountServiceImpl implements AiChatCountService {
         }
     }
 
-    // 현재 시간 기준으로 자정까지 남은 초 계산
+    /**
+     * 현재 시간 기준으로 자정까지 남은 초 계산
+     *
+     * @return 자정까지 남은 시간(초) 단위
+     */
     private long getSecondsUntilMidnight() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime midnight = now.toLocalDate().plusDays(1).atStartOfDay();
