@@ -4,13 +4,13 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DATABASE_URL=jdbc:mysql://mysql:3306/tastefulai
-      - DATABASE_USERNAME=root
-      - DATABASE_PASSWORD=1234
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - S3_ACCESS_KEY=${S3_ACCESS_KEY}
-      - S3_BUCKET_NAME=tasteful-ai-image-bucket
-      - S3_REGION=ap-northeast-2
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - S3_REGION=${S3_REGION}
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - KAKAO_REST_API_KEY=${KAKAO_REST_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
