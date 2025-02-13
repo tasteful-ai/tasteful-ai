@@ -67,7 +67,7 @@ public class WebSocketChatControllerTest {
         when(memberService.findByEmail(TEST_EMAIL)).thenReturn(member);
 
         ChatMessageDto chatMessageDto = new ChatMessageDto(
-                MessageType.TALK, SENDER_NAME, MESSAGE_CONTENT, CHATROOM_ID, VALID_TOKEN);
+                MessageType.TALK, SENDER_NAME, MESSAGE_CONTENT, CHATROOM_ID, "Bearer " + VALID_TOKEN);
 
         assertDoesNotThrow(() -> webSocketChatController.publishMessage(chatMessageDto));
 
@@ -78,9 +78,10 @@ public class WebSocketChatControllerTest {
     @DisplayName("예외 - 잘못된 토큰")
     void publishMessage_InvalidToken() {
         when(jwtProvider.validateToken(INVALID_TOKEN)).thenReturn(false);
+        when(jwtProvider.getEmailFromToken(INVALID_TOKEN)).thenThrow(new CustomException(ErrorCode.INVALID_TOKEN));
 
         ChatMessageDto chatMessageDto = new ChatMessageDto(
-                MessageType.TALK, SENDER_NAME, MESSAGE_CONTENT, CHATROOM_ID, INVALID_TOKEN);
+                MessageType.TALK, SENDER_NAME, MESSAGE_CONTENT, CHATROOM_ID, "Bearer " + INVALID_TOKEN);
 
         CustomException customException = assertThrows(CustomException.class,
                 () -> webSocketChatController.publishMessage(chatMessageDto));
@@ -100,7 +101,7 @@ public class WebSocketChatControllerTest {
         when(memberService.findByEmail(TEST_EMAIL)).thenReturn(differentMember);
 
         ChatMessageDto chatMessageDto = new ChatMessageDto(
-                MessageType.TALK, "WrongSender", MESSAGE_CONTENT, CHATROOM_ID, VALID_TOKEN);
+                MessageType.TALK, "WrongSender", MESSAGE_CONTENT, CHATROOM_ID, "Bearer " + VALID_TOKEN);
 
         CustomException customException = assertThrows(CustomException.class,
                 () -> webSocketChatController.publishMessage(chatMessageDto));
