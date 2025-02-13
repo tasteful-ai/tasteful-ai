@@ -26,7 +26,17 @@ public class WebSocketChatController {
     public void publishMessage(ChatMessageDto chatMessageDto) {
 
         String token = chatMessageDto.getToken();
-        if (token == null || !jwtProvider.validateToken(token)) {
+        
+        if (token == null || !token.startsWith("Bearer ")) {
+            log.error("WebSocket 메시지에서 JWT 토큰이 올바르지 않음: '{}'", token);
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+
+        token = token.substring(7).trim();
+        log.info("Extracted Token after Trim: '{}'", token);
+
+        if (!jwtProvider.validateToken(token)) {
+            log.error("JWT 검증 실패");
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 

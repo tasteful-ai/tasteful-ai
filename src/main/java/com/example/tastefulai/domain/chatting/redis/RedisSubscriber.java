@@ -16,10 +16,12 @@ public class RedisSubscriber {
     private final ChattingService chattingService;
     private final ObjectMapper objectMapper;
 
-    public void handleMessage(String message) {
+    public void handleMessage(String message, String channel) {
+        log.info("Redis 메시지 수신 완료: {} (채널: {})", message, channel);
         try {
             ChattingMessageResponseDto chattingMessageResponseDto = objectMapper.readValue(message, ChattingMessageResponseDto.class);
             chattingService.processReceivedMessage(chattingMessageResponseDto);
+            log.info("Redis 메시지 처리 완료: {} (채널: {})", chattingMessageResponseDto);
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("Redis 메시지 역직렬화 오류: {}", jsonProcessingException.getMessage());
         }
