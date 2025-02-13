@@ -35,12 +35,13 @@ class RedisSubscriberTest {
     @DisplayName("Redis 메시지 수신 및 처리")
     void handleMessage_Success() throws Exception {
         String message = "{\"senderId\":1,\"senderNickname\":\"User\",\"message\":\"Hello\",\"chattingroomId\":1}";
+        String channel = "chatroom:1";
 
         ChattingMessageResponseDto chattingMessageResponseDto = new ChattingMessageResponseDto(1L, "User", "Hello", 1L);
 
         when(objectMapper.readValue(message, ChattingMessageResponseDto.class)).thenReturn(chattingMessageResponseDto);
 
-        redisSubscriber.handleMessage(message);
+        redisSubscriber.handleMessage(message, channel);
 
         verify(chattingService, times(1)).processReceivedMessage(chattingMessageResponseDto);
     }
